@@ -1,8 +1,12 @@
-from Objects import Message
+from .Objects import Message
+
+## TODO: This place is riddled with mutable defaults.
+## TODO: These could probably all be dataclasses instead.
 
 class GetClientListRequest(Message):
     def __init__(self):
         super().__init__(0)
+        raise NotImplementedError
 
 class HandshakeRequest(Message):
     def __init__(self,
@@ -22,22 +26,27 @@ class HandshakeRequest(Message):
 class WaitForObjectRequest(Message):
     def __init__(self):
         super().__init__(8)
+        raise NotImplementedError
 
 class WaitForObjectValueRequest(Message):
     def __init__(self):
         super().__init__(10)
+        raise NotImplementedError
 
 class SetTimeScaleRequest(Message):
     def __init__(self):
         super().__init__(12)
+        raise NotImplementedError
 
 class SetObjectValueRequest(Message):
     def __init__(self):
         super().__init__(13)
+        raise NotImplementedError
 
 class SetInputFieldTextRequest(Message):
     def __init__(self):
         super().__init__(14)
+        raise NotImplementedError
 
 class CaptureScreenshotRequest(Message):
     # TODO: default filename
@@ -58,34 +67,42 @@ class CaptureScreenshotRequest(Message):
 class RotateRequest(Message):
     def __init__(self):
         super().__init__(17)
+        raise NotImplementedError
 
 class RaycastRequest(Message):
     def __init__(self):
         super().__init__(18)
+        raise NotImplementedError
 
 class NavAgentMoveToPointRequest(Message):
     def __init__(self):
         super().__init__(20)
+        raise NotImplementedError
 
 class MouseMoveToObjectRequest(Message):
     def __init__(self):
         super().__init__(21)
+        raise NotImplementedError
 
 class MouseMoveRequest(Message):
     def __init__(self):
         super().__init__(22)
+        raise NotImplementedError
 
 class MouseDragRequest(Message):
     def __init__(self):
         super().__init__(23)
+        raise NotImplementedError
 
 class LoadSceneRequest(Message):
     def __init__(self):
         super().__init__(24)
+        raise NotImplementedError
 
 class KeyPressRequest(Message):
     def __init__(self):
         super().__init__(25)
+        raise NotImplementedError
 
 class GetObjectValueRequest(Message):
     def __init__(self, HierarchyPath = '', ObjectFieldOrPropertyName = '', TypeFullName = ''):
@@ -98,6 +115,7 @@ class GetObjectValueRequest(Message):
 class GetSceneNameRequest(Message):
     def __init__(self):
         super().__init__(27)
+        raise NotImplementedError
 
 class GetObjectPositionRequest(Message):
     def __init__(self, ObjectHierarchyPath = '', CameraHierarchyPath = ''):
@@ -109,10 +127,12 @@ class GetObjectPositionRequest(Message):
 class GetObjectListRequest(Message):
     def __init__(self):
         super().__init__(29)
+        raise NotImplementedError
 
 class GetMousePositionRequest(Message):
     def __init__(self):
         super().__init__(30)
+        raise NotImplementedError
 
 class ClickObjectRequest(Message):
     def __init__(self, MouseButtonId = 0, HierarchyPath = '', CameraHierarchyPath = '', IsDoubleClick = False, FrameCount = 5):
@@ -155,10 +175,12 @@ class CallMethodRequest(Message):
 class TransferFileRequest(Message):
     def __init__(self):
         super().__init__(34)
+        raise NotImplementedError
 
 class GetObjectInterfacesList(Message):
     def __init__(self):
         super().__init__(35)
+        raise NotImplementedError
 
 class ChangeHookStatusRequest(Message):
     def __init__(self, KeyboardHooksStatus = True, MouseHooksStatus = True, TouchHooksStatus = True, GamepadHooksStatus = True, BitChanged = 0):
@@ -173,26 +195,32 @@ class ChangeHookStatusRequest(Message):
 class PeekRequest(Message):
     def __init__(self):
         super().__init__(41)
+        raise NotImplementedError
 
 class PokeRequest(Message):
     def __init__(self):
         super().__init__(42)
+        raise NotImplementedError
 
 class TouchEventRequest(Message):
     def __init__(self):
         super().__init__(43)
+        raise NotImplementedError
 
 class TapRequest(Message):
     def __init__(self):
         super().__init__(44)
+        raise NotImplementedError
 
 class ObjectDistanceRequest(Message):
     def __init__(self):
         super().__init__(45)
+        raise NotImplementedError
                 
 class FlushCacheRequest(Message):
     def __init__(self):
         super().__init__(46)
+        raise NotImplementedError
 
 class ChangeObjectResolverCacheStateRequest(Message):
     def __init__(self, STATE = True):
@@ -212,14 +240,17 @@ class InputManagerStateRequest(Message):
 class RegisterCollisionMonitorRequest(Message):
     def __init__(self):
         super().__init__(49)
+        raise NotImplementedError
 
 class GetStatisticsRequest(Message):
     def __init__(self):
         super().__init__(50)
+        raise NotImplementedError
 
 class UnregisterCollisionMonitorRequest(Message):
     def __init__(self):
         super().__init__(51)
+        raise NotImplementedError
 
 class GetGameObjectRequest(Message):
     def __init__(self, HierarchyPath=''):
@@ -229,4 +260,6 @@ class GetGameObjectRequest(Message):
         
 class NavAgentMoveToObjectRequest(Message):
     def __init__(self):
-        super().__init__()
+        # NOTE: not the official cmdID
+        super().__init__(100)
+        raise NotImplementedError

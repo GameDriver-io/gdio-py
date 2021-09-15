@@ -2,12 +2,16 @@ import datetime, uuid
 from msgpack import Timestamp as msgpackTime
 from enum import Enum, auto
 
+## TODO: This whole file seems like a bad idea
+
 def stampify(time : datetime.datetime):
     assert type(time) == datetime.datetime
     timestamp = time.timestamp()
     seconds =  int(timestamp // 1)
     nanoseconds = int(((timestamp - seconds) * 10**9) // 1)
     return (seconds, nanoseconds)
+
+
 
 class ResponseCode(Enum):
     OK = auto()
@@ -39,7 +43,7 @@ class ProtocolMessage:
         ):
 
         self.ClientUID = ClientUID
-        self.RequestId = str(uuid.uuid4())
+        self.RequestID = str(uuid.uuid4())
         self.CorrelationId = ''
         self.GDIOMsg = GDIOMsg
         self.IsAsync = IsAsync
@@ -53,9 +57,9 @@ class ProtocolMessage:
         return f'{self.toDict()}'
 
 class RequestInfo:
-    def __init__(self, client, requestId, sentTimestamp):
+    def __init__(self, client, requestID, sentTimestamp):
         self.Client = client
-        self.RequestId = requestId
+        self.RequestID = requestID
         self.SentTimestamp = sentTimestamp
 
     def toDict(self):
@@ -85,3 +89,23 @@ class GameConnectionDetails:
     def __repr__(self):
         return f'{self.toDict()}'
 
+class Vector2:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f'Vector2({self.x}, {self.y})'
+
+class MouseButtons(Enum):
+    LEFT = auto()
+    RIGHT = auto()
+    MIDDLE = auto()
+
+class Collision:
+    pass
+
+# TODO: This method shouldnt be here
+def getGDIOMsgData(message : ProtocolMessage):
+    # TODO: collect CmdIDs somewhere to rebuild MSGs into classes
+    return message['GDIOMsg'][1]

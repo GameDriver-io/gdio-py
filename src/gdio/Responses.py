@@ -1,6 +1,8 @@
-from Objects import Message, ResponseCode
+from .Objects import Message, ResponseCode
 
 from enum import Enum, auto
+
+## TODO: These could probably all be dataclasses instead.
 
 class GenericResponse(Message):
     def __init__(self,

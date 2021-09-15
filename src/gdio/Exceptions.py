@@ -1,6 +1,6 @@
-
 class ClientNotConnectedError(Exception):
-    pass
+    def __init__(self):
+        super().__init__('This client is not connected to a GDIOAgent. Use ApiClient.Connect()')
 
 class FailedClientConnectionError(Exception):
     pass
