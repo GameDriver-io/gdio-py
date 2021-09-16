@@ -1,6 +1,6 @@
 from . import Requests, Objects
 
-import asyncio, socket
+import asyncio
 import msgpack, uuid
 import time
 from binascii import crc32
@@ -12,28 +12,41 @@ class Client:
 
         self.hostname = hostname
         self.port = port
+
+        self._reader = None
+        self._writer = None
+
         self.connectionTimeout = connectionTimeout
 
-        self._client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ClientUID = ''
 
-        self.EventCollection = {}
+        # These dicts are currently useless,
+        # it just helps for them to be here for future reworks.
+        self.EventHandlers : {'RequestID' : 'IsFulfilled'} = {}
+        self.Results : {'CorrelationID' : 'GDIOMsg'} = {}
+        self.EventCollection : {'EventID' : 'IsFulfilled'} = {}
 
         self.GCD = None
 
     async def ReadHandler(self):
+        raise NotImplementedError
         while not self._disposed:
             await asyncio.sleep(0)
 
-    def SendMessage(self, obj):
+    async def SendMessage(self, obj):
+        self.EventHandlers.update(
+            {obj.RequestID : False}
+        )
+        self.log(0, f'Request({obj.GDIOMsg.toList()[0]}): {obj.RequestID} is waiting for a result.')
 
-        self.WriteMessage(obj)
+        await self.WriteMessage(obj)
         return Objects.RequestInfo(self, obj.RequestID, obj.Timestamp)
 
-    def WriteMessage(self, obj):
+    async def WriteMessage(self, obj):
         serialized = msgpack.packb(obj.toDict())
         msg = bytes(self.ConstructPayload(serialized))
-        self._client.send(msg)
+        self._writer.write(msg)
+        await self._writer.drain()
 
     def ConstructPayload(self, msg):
         assert type(msg) == bytes
@@ -46,7 +59,7 @@ class Client:
         
         return payload
 
-    def InitHandshake(self):
+    async def InitHandshake(self):
 
         self.ClientUID = str(uuid.uuid4())
 
@@ -56,38 +69,35 @@ class Client:
                 ClientUID=self.ClientUID,
             )
         )
-        requestInfo = self.SendMessage(msg)
-        self.Wait(requestInfo, self.connectionTimeout)
+
+        requestInfo = await asyncio.wait_for(self.SendMessage(msg), self.connectionTimeout)
         
 
-    def Connect(self):
+    async def Connect(self):
 
-        self._client.connect((self.hostname, self.port))
-        self.InitHandshake()
+        self._reader, self._writer = await asyncio.open_connection(self.hostname, self.port)
+        await self.InitHandshake()
 
-        response = self.Recieve()
+        response = await self.Recieve()
         self.GCD = Objects.GameConnectionDetails(**response['GDIOMsg'][1]['GCD'])
 
         return True
 
-    def Recieve(self):
+    async def Recieve(self):
 
-        response_length = self._client.recv(4)
-        response_data = self._client.recv(int.from_bytes(response_length, byteorder='little', signed=False) + 4)[4:]
+        response_length = await self._reader.read(4)
+        response_data = await self._reader.read(int.from_bytes(response_length, byteorder='little', signed=False) + 4)
 
-        return msgpack.unpackb(response_data)
+        return msgpack.unpackb(response_data[4:])
 
-    def Disconnect(self):
+    async def Disconnect(self):
         self._disposed = True
-        self._client.close()
+        self._writer.close()
+        await self._writer.wait_closed()
     
     def log(self, level, message):
         # TODO: log_level
         print(message)
         
-    async def Wait(self, requestInfo, timeout):
-        self._client.settimeout(timeout)
-        self.log(0, f'Client: {requestInfo.Client} Waiting for RequestID: {requestInfo.RequestID} at {requestInfo.SentTimestamp}')
-    
     def __repr__(self):
         return self.ClientUID

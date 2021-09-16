@@ -1,35 +1,49 @@
+import asyncio
 from gdio.ApiClient import ApiClient
 
 class TestFixture:
+
     def __init__(self):
 
         self.api = ApiClient()
 
-    def Connect(self):
-        self.api.Connect('127.0.0.1', 19734, False, 5)
+    async def Connect(self):
+        await self.api.Connect('127.0.0.1', 19734, False, 5)
+        print(await self.api.GetConnectedGameDetails())
+        
+        ## <Test Methods>
+        await self.api.Wait(200)
+        await self.test_Screenshot(r'C:\Users\ethan\source\repos\GDIO-py\before.png')
+        await self.test_Movement()
+        await self.test_Screenshot(r'C:\Users\ethan\source\repos\GDIO-py\after.png')
+        await self.api.Wait(200)
+        ## </Test Methods>
 
-        print(self.api.GetConnectedGameDetails())
+        await self.Disconnect()
 
-        #self.api.CallMethod("//*[@name='Player']/fn:component('CustomScript')", "CustomMethod", { "string:The Test was run"})
+    async def test_Screenshot(self, path):
+        await self.api.CaptureScreenshot(path, False, True)
 
-        #self.api.CaptureScreenshot(r'C:\Users\ethan\source\repos\GDIO-py\test.png', False, True)
+    async def test_Movement(self):
+        await self.api.EnableHooks()
+        await self.api.AxisPress('Horizontal', 1.0, 500)
+        await self.api.Wait(200)
+        await self.api.ButtonPress('Jump', 100)
+        await self.api.Wait(700)
+        await self.api.ButtonPress('Jump', 100)
+        await self.api.DisableHooks()
 
-        self.api.EnableHooks()
+    async def test_CallMethod(self):
+        await self.api.CallMethod("//*[@name='Player']/fn:component('CustomScript')", "CustomMethod", { "string:The Test was run"})
 
-        self.api.AxisPress('Horizontal', 1.0, 500)
-        self.api.Wait(200)
-        self.api.ButtonPress('Jump', 100)
-        self.api.Wait(700)
-        self.api.ButtonPress('Jump', 100)
-
-        self.api.Wait(500)
-        self.Disconnect()
-
-    def Disconnect(self):
-        self.api.DisableHooks()
-        self.api.Wait(3000)
-        self.api.Disconnect()
+    async def Disconnect(self):
+        await self.api.Wait(3000)
+        await self.api.Disconnect()
 
 if __name__ == '__main__':
     Game = TestFixture()
-    Game.Connect()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(
+        Game.Connect()
+    )
+    

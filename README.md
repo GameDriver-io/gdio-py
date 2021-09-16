@@ -2,7 +2,7 @@
  A Python implementation of the GameDriver Unity API
 
  - [Installation](#Installation)
- - [Latest Version Notes](#Latest-Version-Notes)
+ - [Changelog](CHANGELOG.md)
 
 ## Installation
 
@@ -28,24 +28,3 @@ from gdio.Objects import Objects
 api = ApiClient.ApiClient()
 ...
 ```
-
-## Latest Version Notes
-### 9-14-21
-The way I am handling responses in this version is blatantly wrong because I somehow overlooked the existence of `ReadHandler`. As a result calling a method before the previous one recieves it's response will mix up the receival order and break everything. I am currently testing the fix for this. There are skeletons of all the outward facing methods in `ApiClient`, but most of them will throw a `NotImplementedError`. The same is true for the corresponding request and response objects.
-
-The only currently functioning methods are:
- - AxisPress()
- - ButtonPress()
- - CallMethod() `Barely`
- - CaptureScreenshot()
- - Connect()
- - DisableHooks()
- - DisableObjectCaching()
- - Disconnect()
- - EnableHooks()
- - EnableObjectCaching()
- - FlushObjectLookupCache()
- - GetConnectedGameDetails()
- - GetObjectList()
- - GetSceneName()
- - Wait()

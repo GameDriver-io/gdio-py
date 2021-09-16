@@ -2,7 +2,7 @@ from .Client import Client
 from . import Objects, Requests, Responses, Exceptions
 
 import os
-import asyncio, socket
+import asyncio
 import time
 
 
@@ -17,7 +17,7 @@ class ApiClient:
 
         return
 
-    def AxisPress(self,
+    async def AxisPress(self,
             axisId         : str,      # The name of the target input axis as defined in the Unity Input Manager.
             value          : float,    # The value of change on the target axis from -1.0 to +1.0.
             numberOfFrames : int,      # The number of frames to hold the input for.
@@ -37,18 +37,17 @@ class ApiClient:
                 ChangeValue = value
                 )
         )
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent
+        await self.client.Recieve()
 
         # The message didn't timeout and was sent successfully; return True.
         return True
 
-    def ButtonPress(self,
+    async def ButtonPress(self,
             buttonId       : str,      # The name of the target input button as defined in the Unity Input Manager.
             numberOfFrames : int,      # The number of frames to hold the input for.
             timeout        : int = 30  # The number of seconds to wait for the command to be recieved by the agent.
@@ -67,19 +66,17 @@ class ApiClient:
                 ChangeValue = 0
             ),
         )
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent
+        await self.client.Recieve()
 
         # The message didn't timeout and was sent successfully; return True.
         return True
     
     ## Void overload
-    def CallMethod(self,
+    async def CallMethod(self,
             hierarchyPath   : str,      # The HierarchyPath for an object and the script attached to it.
             methodName      : str,      # The name of the method to call within the script.
             arguments       : list,     # TODO: The list of arguments to pass into the method.
@@ -101,16 +98,10 @@ class ApiClient:
         # TODO: Set and serialize the method's arguments.
         msg.GDIOMsg.SetArguments(arguments)
 
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
-
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
         # Recieve the response message and save its contained GDIOMsg.
-        response = Responses.GetObjectValueResponse(**Objects.getGDIOMsgData(self.client.Recieve()))
+        response = Responses.GetObjectValueResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
 
         # If the response is an error, warning, or information message,
         if response.RC != 0:
@@ -122,12 +113,12 @@ class ApiClient:
 
     ## Return value overload
     '''
-    def CallMethod(self) -> type:
+    async def CallMethod(self) -> type:
         raise NotImplementedError
         return
     '''
 
-    def CaptureScreenshot(self,
+    async def CaptureScreenshot(self,
             filename          : str,          # The path and filename of the screen capture.
             storeInGameFolder : bool = False, # TODO: Save the screenshot on the device the game is running on rather than returning it to the client.
             overwriteExisting : bool = False, # Overwrite if the file already exists.
@@ -146,16 +137,10 @@ class ApiClient:
             ),
         )
 
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
-
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
         # Recieve the response message and save its contained GDIOMsg.
-        response = Responses.CaptureScreenshotResponse(**Objects.getGDIOMsgData(self.client.Recieve()))
+        response = Responses.CaptureScreenshotResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
         
         # If the response is an Error,
         if response.RC == 2:
@@ -182,7 +167,7 @@ class ApiClient:
         return filename
         
     ## Float positions overload
-    def Click(self,
+    async def Click(self,
             buttonId : Objects.MouseButtons,
             x : float,
             y : float,
@@ -193,7 +178,7 @@ class ApiClient:
 
     ## Vector2 positions overload
     '''
-    def Click(self,
+    async def Click(self,
             buttonId : MouseButtons,
             position : Vector2,
             clickFrameCount : int,
@@ -203,7 +188,7 @@ class ApiClient:
     '''
 
     ## Float positions overload
-    def ClickEx(self,
+    async def ClickEx(self,
             buttonId : Objects.MouseButtons,
             x : float,
             y : float,
@@ -219,7 +204,7 @@ class ApiClient:
 
     ## Vector2 positions overload
     '''
-    def ClickEx(self,
+    async def ClickEx(self,
             buttonId : MouseButtons,
             position : Vector2,
             clickFrameCount : int,
@@ -233,13 +218,13 @@ class ApiClient:
         return ClickEx(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
     '''
     
-    def ClickObject(self) -> bool:
+    async def ClickObject(self) -> bool:
         raise NotImplementedError
 
-    def ClickObjectEx(self) -> bool:
+    async def ClickObjectEx(self) -> bool:
         raise NotImplementedError
 
-    def Connect(self,
+    async def Connect(self,
             hostname : str = '127.0.0.1',    # The hostname of the device running the target game.
             port     : int = 19734,          # The port that the target Gamedriver agent is configured to use.
             autoplay : bool = False,         # TODO: Start the game automatically within the Unity Editor.
@@ -251,7 +236,7 @@ class ApiClient:
         try:
             self.client = Client(hostname, port, timeout)
 
-            if not self.client.Connect():
+            if not await self.client.Connect():
                 raise Exceptions.FailedGameConnectionError('Failed to connect to the game')
 
         # If any exception is thrown,
@@ -271,12 +256,12 @@ class ApiClient:
     
     ## Regex overload
     '''
-    def Connect(self) -> None:
+    async def Connect(self) -> None:
         raise NotImplementedError
         return
     '''
 
-    def DisableHooks(self, timeout : int = 30) -> bool:
+    async def DisableHooks(self, timeout : int = 30) -> bool:
 
         # This command cannot be run without an agent connection.
         if not self.client:
@@ -295,18 +280,16 @@ class ApiClient:
             ),
         )
 
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent
+        await self.client.Recieve()
 
         # No exceptions thrown; return True
         return True
 
-    def DisableObjectCaching(self, timeout : int = 30) -> bool:
+    async def DisableObjectCaching(self, timeout : int = 30) -> bool:
 
         # This command cannot be run without an agent connection.
         if not self.client:
@@ -319,18 +302,16 @@ class ApiClient:
             )
         )
 
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent
+        await self.client.Recieve()
 
         # No exceptions thrown; return True
         return True
 
-    def Disconnect(self) -> None:
+    async def Disconnect(self) -> None:
         # If the client isn't connected,
         if not self.client:
             # theres no need to disconnect.
@@ -339,39 +320,39 @@ class ApiClient:
         ## TODO: CLEANUP
         self.gameConnectionDetails = None
 
-        self.client.Disconnect()
+        await self.client.Disconnect()
 
     ## Float positions overload
-    def DoubleClick(self) -> bool:
+    async def DoubleClick(self) -> bool:
         raise NotImplementedError
     
     ## Vector2 positions overload
     '''
-    def DoubleClick(self) -> bool:
+    async def DoubleClick(self) -> bool:
         return self.DoubleClick()
     '''
 
     ## Float positions overload
-    def DoubleClickEx(self) -> bool:
+    async def DoubleClickEx(self) -> bool:
         raise NotImplementedError
     
     ## Vector2 positions overload
     '''
-    def DoubleClickEx(self) -> bool:
+    async def DoubleClickEx(self) -> bool:
         return self.DoubleClickEx()
     '''
 
     ## Float positions overload
-    def DoubleClickObject(self) -> bool:
+    async def DoubleClickObject(self) -> bool:
         raise NotImplementedError
     
     ## Vector2 positions overload
     '''
-    def DoubleClickObject(self) -> bool:
+    async def DoubleClickObject(self) -> bool:
         return self.DoubleClickObject()
     '''
 
-    def EnableHooks(self, timeout : int = 30) -> bool:
+    async def EnableHooks(self, timeout : int = 30) -> bool:
 
         # This command cannot be run without an agent connection.
         if not self.client:
@@ -390,19 +371,17 @@ class ApiClient:
             ),
         )
 
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent
+        await self.client.Recieve()
 
         # No exceptions thrown; return True
         return True
 
 
-    def EnableObjectCaching(self, timeout : int = 30) -> bool:
+    async def EnableObjectCaching(self, timeout : int = 30) -> bool:
 
         # This command cannot be run without an agent connection.
         if not self.client:
@@ -415,18 +394,16 @@ class ApiClient:
             )
         )
 
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent
+        await self.client.Recieve()
 
         # No exceptions thrown; return True
         return True
     
-    def FlushObjectLookupCache(self, timeout : int = 30) -> bool:
+    async def FlushObjectLookupCache(self, timeout : int = 30) -> bool:
 
         # This command cannot be run without an agent connection.
         if not self.client:
@@ -437,28 +414,26 @@ class ApiClient:
             GDIOMsg = Requests.FlushCacheRequest()
         )
 
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent
+        await self.client.Recieve()
 
         # No exceptions thrown; return True
         return True
 
-    def GetConnectedGameDetails(self) -> Objects.GameConnectionDetails:
+    async def GetConnectedGameDetails(self) -> Objects.GameConnectionDetails:
         # Can't retrieve details about a game the client isn't connected to.
         if not self.client:
             raise Exceptions.ClientNotConnectedError
 
         return self.gameConnectionDetails
 
-    def GetLastFPS(self) -> float:
+    async def GetLastFPS(self) -> float:
         raise NotImplementedError
 
-    def GetNextCollisionEvent(self) -> Objects.Collision:
+    async def GetNextCollisionEvent(self) -> Objects.Collision:
         raise NotImplementedError
 
 
@@ -469,7 +444,7 @@ class ApiClient:
 ########################################################################################################################
 ########################################################################################################################
 
-    def GetObjectList(self, timeout : int = 30) -> bool:
+    async def GetObjectList(self, timeout : int = 30) -> bool:
 
         # This command cannot be run without an agent connection.
         if not self.client:
@@ -479,18 +454,17 @@ class ApiClient:
             ClientUID = self.client.ClientUID,
             GDIOMsg = Requests.GetObjectListRequest()
         )
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent
+        await self.client.Recieve()
 
         # TODO: return object list if RC==OK
         return True
 
-    def GetSceneName(self, timeout : int = 30) -> bool:
+    async def GetSceneName(self, timeout : int = 30) -> bool:
         
         # This command cannot be run without an agent connection.
         if not self.client:
@@ -500,18 +474,17 @@ class ApiClient:
             ClientUID = self.client.ClientUID,
             GDIOMsg = Requests.GetSceneNameRequest()
         )
-        # Send the message, and save its Client, RequestID, and Timestamp.
-        requestInfo = self.client.SendMessage(msg)
 
-        # Wait until either:
-        #   the message is acknowleged
-        #   or the request times out and throws and exception.
-        self.client.Wait(requestInfo, timeout)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+
+        # Mitigates response mixups. Still happens sometimes.
+        # Also means commands are input dependent.
+        await self.client.Recieve()
 
         # TODO: return scene name if RC==OK
         return True
 
     
 
-    def Wait(self, miliseconds : int) -> None:
+    async def Wait(self, miliseconds : int) -> None:
         time.sleep(miliseconds * 0.001)
