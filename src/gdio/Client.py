@@ -40,10 +40,6 @@ class Client:
                 self._disposed = True
                 break
             try:
-                print('ReadHandler: Iterating')
-                #await asyncio.sleep(0)
-                print('ReadHandler: Reading')
-
                 msg_length = await reader.read(4)
                 #print(bytes(msg_length))
 
@@ -58,7 +54,7 @@ class Client:
                 
                 msg = Objects.ProtocolMessage(**unpacked)
                 self.ProcessMessage(msg)
-            except ValueError as e:
+            except ValueError:
                 pass
 
     async def EventsPending(self, eventId):
@@ -99,15 +95,19 @@ class Client:
 
     async def GetResult(self, requestId):
         value = None
-        #while not await self.EventsPending(requestId):
-        await asyncio.sleep(0)
+        while not requestId in self.Results:
+            await asyncio.sleep(0)
         try:
-            value = self.Results[requestId]
-        except KeyError as e:
+            value = self.Results[requestId][1]
+        except KeyError:
             pass
         else:
             del self.Results[requestId]
-        return value
+            del self.EventHandlers[requestId]
+        finally:
+            print(self.Results)
+            print(self.EventHandlers)
+            return value
 
     async def SendMessage(self, obj, writer=None):
 

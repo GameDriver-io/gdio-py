@@ -34,7 +34,7 @@ class GenericResponse(Message):
 
 class GetObjectValueResponse(GenericResponse):
     def __init__(self,
-            Value,
+            _cmdID,
             SerializeObjectType,
             Serializer,
             directObject,
@@ -48,7 +48,7 @@ class GetObjectValueResponse(GenericResponse):
         ):
         super().__init__(36, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
 
-        self.Value = Value
+        self._CmdID = _cmdID
         self.SerializeObjectType = SerializeObjectType
         self.Serializer = Serializer
         self.directObject = directObject
@@ -65,7 +65,7 @@ class CaptureScreenshotResponse(GenericResponse):
             RC,
             ReturnedValues,
         ):
-        super.__init__(16, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+        super().__init__(16, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
 
         self.ImageData = ImageData
         self.ImagePath = ImagePath
