@@ -25,6 +25,6 @@ You can now import the module and its members via:
 from gdio.ApiClient import ApiClient
 from gdio.Objects import Objects
 
-api = ApiClient.ApiClient()
+api = ApiClient()
 ...
 ```

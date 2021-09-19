@@ -65,7 +65,19 @@ class CaptureScreenshotResponse(GenericResponse):
             RC,
             ReturnedValues,
         ):
-        super().__init__(16, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+        super.__init__(16, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
 
         self.ImageData = ImageData
         self.ImagePath = ImagePath
+
+
+
+class HandshakeResponse(GenericResponse):
+    def __init__(self,
+            ReceivedTimestamp,
+            RC,
+            GCD
+        ):
+        self.ReceivedTimestamp = ReceivedTimestamp
+        self.RC = RC
+        self.GCD = GCD

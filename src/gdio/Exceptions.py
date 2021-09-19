@@ -13,3 +13,6 @@ class CallMethodError(Exception):
 
 class CaptureScreenshotError(Exception):
     pass
+
+class CorruptedHandshakeException(Exception):
+    pass

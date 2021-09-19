@@ -1,9 +1,11 @@
-from . import Requests, Objects
+from . import Requests, Objects, Responses, Exceptions
 
-import asyncio
+import asyncio, socket
 import msgpack, uuid
 import time
 from binascii import crc32
+
+BYTE_ORDER = 'little'
 
 class Client:
     def __init__(self, hostname, port, connectionTimeout):
@@ -17,83 +19,184 @@ class Client:
         self._writer = None
 
         self.connectionTimeout = connectionTimeout
+        self._currentHandshakeState = Objects.HandshakeState.NOT_STARTED
 
         self.ClientUID = ''
 
-        # These dicts are currently useless,
-        # it just helps for them to be here for future reworks.
-        self.EventHandlers : {'RequestID' : 'IsFulfilled'} = {}
-        self.Results : {'CorrelationID' : 'GDIOMsg'} = {}
-        self.EventCollection : {'EventID' : 'IsFulfilled'} = {}
+        self.EventHandlers : ['RequestId'] = []
+        self.EventCollection : ['EventId'] = []
+        self.Results : {'CorrelationId' : 'GDIOMsg'} = {}
+        
 
         self.GCD = None
 
-    async def ReadHandler(self):
-        raise NotImplementedError
+    async def ReadHandler(self, reader=None):
+        
+        reader = self._reader if reader == None else reader
+
+        print('ReadHandler: Started Task')
         while not self._disposed:
-            await asyncio.sleep(0)
+            if reader.at_eof():
+                self._disposed = True
+                break
+            try:
+                print('ReadHandler: Iterating')
+                #await asyncio.sleep(0)
+                print('ReadHandler: Reading')
 
-    async def SendMessage(self, obj):
-        self.EventHandlers.update(
-            {obj.RequestID : False}
+                msg_length = await reader.read(4)
+                #print(bytes(msg_length))
+
+                msg_crc = await reader.read(4)
+                #print(bytes(msg_crc))
+
+                msg_data = await reader.read(int.from_bytes(msg_length[:4], byteorder=BYTE_ORDER, signed=False))
+                #print(bytes(msg_data))
+
+                unpacked = msgpack.unpackb(msg_data)
+                #print(unpacked)
+                
+                msg = Objects.ProtocolMessage(**unpacked)
+                self.ProcessMessage(msg)
+            except ValueError as e:
+                pass
+
+    async def EventsPending(self, eventId):
+        if eventId in self.EventCollection:
+            if self.EventCollection[eventId].is_set():
+                return True
+        return False
+
+    async def RemoveEventCollectionId(self, eventId):
+        if eventId in self.EventCollection:
+            del self.EventCollection[eventId]
+    
+    def ProcessMessage(self, msg):
+        # TODO: Reconstruct GDIOMsg
+        # TODO: GDIOMsg.GetName()
+        commandType = msg.GDIOMsg[0]
+        gdioMsg = msg.GDIOMsg[1]
+        print(f'[RECV] Command: {msg.CorrelationId}')
+        if self._currentHandshakeState != Objects.HandshakeState.COMPLETE:
+            if commandType != 4:
+                print(f'Dropping message before handshake is complete: {commandType}')
+                return
+            elif self._currentHandshakeState == Objects.HandshakeState.CLIENT_INFORMATION_SENT:
+                if Responses.HandshakeResponse(**gdioMsg).RC == Objects.HandshakeReasonCode.OK:
+                    self.GCD = Responses.HandshakeResponse(**gdioMsg).GCD
+                    self._currentHandshakeState = Objects.HandshakeState.COMPLETE
+                    print('Handshake Complete')
+                else:
+                    print(f'Handshake Failed: {Responses.HandshakeResponse(**gdioMsg).RC}')
+                return
+            raise Exceptions.CorruptedHandshakeException
+            
+        print(f'Registering Response: {msg.CorrelationId}')
+        # NOTE: `dict.update()` will overwrite the value of overlapping keys
+        self.Results.update(
+            {msg.CorrelationId : msg.GDIOMsg}
         )
-        self.log(0, f'Request({obj.GDIOMsg.toList()[0]}): {obj.RequestID} is waiting for a result.')
 
-        await self.WriteMessage(obj)
-        return Objects.RequestInfo(self, obj.RequestID, obj.Timestamp)
+    async def GetResult(self, requestId):
+        value = None
+        #while not await self.EventsPending(requestId):
+        await asyncio.sleep(0)
+        try:
+            value = self.Results[requestId]
+        except KeyError as e:
+            pass
+        else:
+            del self.Results[requestId]
+        return value
 
-    async def WriteMessage(self, obj):
+    async def SendMessage(self, obj, writer=None):
+
+        writer = self._writer if writer == None else writer
+
+        while obj.RequestId in self.EventHandlers:
+            obj.RequestId = str(uuid.uuid4())
+
+        self.EventHandlers.append(obj.RequestId)
+        print(f'Sending: {obj.toDict()}')
+        print(f'RequestId: {obj.RequestId} is waiting for a result.\n')
+
+        
+
+        await self.WriteMessage(obj, writer)
+        return Objects.RequestInfo(self, obj.RequestId, obj.Timestamp)
+
+    async def WriteMessage(self, obj, writer=None):
+
+        writer = self._writer if writer == None else writer
+
         serialized = msgpack.packb(obj.toDict())
-        msg = bytes(self.ConstructPayload(serialized))
-        self._writer.write(msg)
-        await self._writer.drain()
+        msg_payload = await self.ConstructPayload(serialized)
+        payload_bytes = bytes(msg_payload)
+        writer.write(payload_bytes)
+        await writer.drain()
 
-    def ConstructPayload(self, msg):
+    async def ConstructPayload(self, msg):
         assert type(msg) == bytes
 
-        length_bytes = bytearray(len(msg).to_bytes(4, 'little'))
-        crcBytes = bytearray(crc32(bytes(msg)).to_bytes(4, 'little'))
+        length_bytes = bytearray(len(msg).to_bytes(4, BYTE_ORDER))
+        crcBytes = bytearray(crc32(bytes(msg)).to_bytes(4, BYTE_ORDER))
         msgBytes = bytearray(msg)
 
         payload = bytearray(length_bytes + crcBytes + msgBytes)
         
         return payload
 
-    async def InitHandshake(self):
+    async def InitHandshake(self, writer=None):
+
+        writer = self._writer if writer == None else writer
 
         self.ClientUID = str(uuid.uuid4())
 
         msg = Objects.ProtocolMessage(
             ClientUID = self.ClientUID,
             GDIOMsg = Requests.HandshakeRequest(
+                ProtocolVersion='2.04.13.2021',
                 ClientUID=self.ClientUID,
+                channel=None,
+                Recording=False
             )
         )
+        self._currentHandshakeState = Objects.HandshakeState.CLIENT_INFORMATION_SENT
 
-        requestInfo = await asyncio.wait_for(self.SendMessage(msg), self.connectionTimeout)
+        requestInfo = await asyncio.wait_for(self.SendMessage(msg, writer), self.connectionTimeout)
+        return requestInfo
         
+    async def Connect(self, internalComms=False):
 
-    async def Connect(self):
+        if internalComms:
+            await self.configureChannel()
+        else:
+            self._reader, self._writer = await asyncio.wait_for(asyncio.open_connection(self.hostname, self.port), self.connectionTimeout)
+            asyncio.create_task(self.ReadHandler())
 
-        self._reader, self._writer = await asyncio.open_connection(self.hostname, self.port)
         await self.InitHandshake()
-
-        response = await self.Recieve()
-        self.GCD = Objects.GameConnectionDetails(**response['GDIOMsg'][1]['GCD'])
-
+        
         return True
 
-    async def Recieve(self):
+    async def configureChannel(self):
+        pass
 
-        response_length = await self._reader.read(4)
-        response_data = await self._reader.read(int.from_bytes(response_length, byteorder='little', signed=False) + 4)
+    async def Receive(self, reader=None):
 
-        return msgpack.unpackb(response_data[4:])
+        reader = self._reader if reader == None else reader
+        response_length = await reader.read(4)
+        response_crc = await reader.read(4)
+        response_data = await reader.read(int.from_bytes(response_length, byteorder=BYTE_ORDER, signed=False))
 
-    async def Disconnect(self):
+        return msgpack.unpackb(response_data)
+
+    async def Disconnect(self, writer=None):
+
+        writer = self._writer if writer == None else writer
+
         self._disposed = True
-        self._writer.close()
-        await self._writer.wait_closed()
+        writer.close()
+        await writer.wait_closed()
     
     def log(self, level, message):
         # TODO: log_level

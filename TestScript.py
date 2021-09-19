@@ -9,7 +9,8 @@ class TestFixture:
 
     async def Connect(self):
         await self.api.Connect('127.0.0.1', 19734, False, 5)
-        print(await self.api.GetConnectedGameDetails())
+        #print(await self.api.GetConnectedGameDetails())
+        await asyncio.sleep(2)
         
         ## <Test Methods>
         await self.api.Wait(200)
@@ -37,7 +38,6 @@ class TestFixture:
         await self.api.CallMethod("//*[@name='Player']/fn:component('CustomScript')", "CustomMethod", { "string:The Test was run"})
 
     async def Disconnect(self):
-        await self.api.Wait(3000)
         await self.api.Disconnect()
 
 if __name__ == '__main__':

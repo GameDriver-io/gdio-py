@@ -10,18 +10,19 @@ class GetClientListRequest(Message):
 
 class HandshakeRequest(Message):
     def __init__(self,
-            ClientUID,
-
             # TODO: dotenv
-            ProtocolVersion='2.04.13.2021'
+            ProtocolVersion=None,
+            ClientUID = None,
+            channel = None,
+            Recording = False,
         ):
         super().__init__(1)
 
         
-        self.ProtocolVersion : str = ProtocolVersion
+        self.ProtocolVersion : str = '' if ProtocolVersion == None else ProtocolVersion
         self.ClientUID : str = ClientUID
-        self.channel = None
-        self.Recording = False
+        self.channel = channel
+        self.Recording = Recording
 
 class WaitForObjectRequest(Message):
     def __init__(self):

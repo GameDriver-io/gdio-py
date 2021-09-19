@@ -42,7 +42,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # The message didn't timeout and was sent successfully; return True.
         return True
@@ -70,7 +71,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # The message didn't timeout and was sent successfully; return True.
         return True
@@ -101,7 +103,9 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
         # Recieve the response message and save its contained GDIOMsg.
-        response = Responses.GetObjectValueResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
+        #response = Responses.GetObjectValueResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
+        result = await self.client.GetResult(requestInfo.RequestId)
+        response = Responses.GetObjectValueResponse(**result)
 
         # If the response is an error, warning, or information message,
         if response.RC != 0:
@@ -140,7 +144,9 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
         # Recieve the response message and save its contained GDIOMsg.
-        response = Responses.CaptureScreenshotResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
+        #response = Responses.CaptureScreenshotResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
+        result = await self.client.GetResult(requestInfo.RequestId)
+        response = Responses.CaptureScreenshotResponse(**result)
         
         # If the response is an Error,
         if response.RC == 2:
@@ -284,7 +290,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # No exceptions thrown; return True
         return True
@@ -306,7 +313,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # No exceptions thrown; return True
         return True
@@ -375,7 +383,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # No exceptions thrown; return True
         return True
@@ -398,7 +407,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # No exceptions thrown; return True
         return True
@@ -418,7 +428,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # No exceptions thrown; return True
         return True
@@ -459,7 +470,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # TODO: return object list if RC==OK
         return True
@@ -479,7 +491,8 @@ class ApiClient:
 
         # Mitigates response mixups. Still happens sometimes.
         # Also means commands are input dependent.
-        await self.client.Recieve()
+        #await self.client.Recieve()
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # TODO: return scene name if RC==OK
         return True
