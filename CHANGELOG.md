@@ -4,7 +4,24 @@
 
  - Pending
 
-## 9-15-21
+## 9-18-2021
+This version fixed the problem with responses being received in the wrong order. It also has agent-side issues that I don't yet understand.
+
+### Added:
+ - Added `Client.GetResult()` which will return a command's response by looking up its RequestId.
+ - Added `Client.ProcessMessage()` which will(eventually) convert a response into its appropriate GDIOMsg for it to be registered as an unhandled result in the `Client._results` collection.
+
+### Changed:
+ - Passed all response handling to `Client.ReadHandler()`
+ - Due to asyncronous response reading, responses are now handled in accordance to their CorrelationId.
+    - This also means message responses are no longer bound by the order they are received.
+
+### Deprecated:
+ - `Client.Receive()` is no longer referenced.
+    - It might still be useful when using the module through a REPL, in which case it will be migrated outside [`Client.py`](src/gdio/Client.py).
+
+## 9-15-2021
+This version focused on breaking everything as little as possible whilst changing everything into a coroutine.
 
 ### Added:
  - [`CHANGELOG.md`](CHANGELOG.md)
@@ -17,18 +34,15 @@
  - Made the tests in [`TestScript.py`](TestScript.py) more realistic/practical in order to punish my bad implementation of response messages.
  - Moved the Latest Version Notes section of [`README.md`](README.md) to this file.
     - And replaced the anchor with a link to this file.
- - Clarified and amended previous version notes.
 
 ### Removed:
  - Removed `Client.Wait(requestInfo, timeout)`
     - Aside from timeout which has been moved elsewhere, It was essentially just a logger for only `RequestInfo` objects.
 
-## 9-14-21
-In this version, every `ApiClient` method handles its own response blind to `CorrelationID`. It relies purely on receival order. As a result, calling a method before the previous one receives its response will mix up the receival order and break everything. I already wrote a POC for the proper way to do this using a ReadHandler loop as an async task, but I will first need to convert basically everything into coroutines.
+## 9-14-2021
+In this version, every [`ApiClient`](src/gdio/ApiClient.py) method handles its own response blind to CorrelationID. It relies purely on receival order. As a result, calling a method before the previous one receives its response will mix up the receival order and break everything. I already wrote a POC for the proper way to do this using a ReadHandler loop as an async task, but I will first need to convert basically everything into coroutines.
 
-
-
-There are skeletons of all the outward facing methods in `ApiClient`, but most of them will throw a `NotImplementedError`. The same is true for the corresponding request and response objects.
+There are skeletons of all the outward facing methods in [`ApiClient`](src/gdio/ApiClient.py), but most of them will throw a `NotImplementedError`. The same is true for the corresponding request and response objects.
 
 The only currently functioning methods are:
 ```py
