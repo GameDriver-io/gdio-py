@@ -2,7 +2,11 @@
 
 ## Upcoming
 
- - Pending
+## 9-19-2021
+
+### Changed:
+ - added an extra check and retry loop in `Client.GetResult()`
+    - this has seemingly fixed the main issues from last version.
 
 ## 9-18-2021
 This version fixed the problem with responses being received in the wrong order. It also has agent-side issues that I don't yet understand.
