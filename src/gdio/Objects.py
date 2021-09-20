@@ -1,6 +1,7 @@
 import datetime, uuid
 from msgpack import Timestamp as msgpackTime
 from enum import IntEnum, auto
+from . import Requests
 
 ## TODO: This whole file seems like a bad idea
 
@@ -29,20 +30,10 @@ class HandshakeReasonCode(IntEnum):
     DUPLICATE_CLIENTUID = 3
 
 class Message:
-    def __init__(self, CmdID):
-        self._CmdID = CmdID
-
-    def toList(self):
-
-        # TODO: This is probably a bad idea,
-        # I should add CmdId somewhere else
-        members = {**vars(self)}
-        members.pop('_CmdID')
-
-        return [self._CmdID, members]
-
-    def __repr__(self):
-        return f'{self.toList()}'
+    def __init__(self):
+        pass
+    def pack(self):
+        return [Requests.CmdIds[self.__class__.__name__], vars(self)]
 
 class ProtocolMessage:
     def __init__(self,
@@ -62,11 +53,14 @@ class ProtocolMessage:
         self.Timestamp : msgpackTime = msgpackTime(*stampify(datetime.datetime.now())) if Timestamp == None else Timestamp
 
     def toDict(self):
+        return vars(self)
+    
+    def pack(self):
         return {
             'ClientUID' : self.ClientUID,
             'RequestId' : self.RequestId,
             'CorrelationId' : self.CorrelationId,
-            'GDIOMsg' : self.GDIOMsg.toList(),
+            'GDIOMsg' : self.GDIOMsg.pack(),
             'IsAsync' : self.IsAsync,
             'Timestamp' : self.Timestamp
         }

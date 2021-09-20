@@ -6,21 +6,18 @@ from enum import Enum, auto
 
 class GenericResponse(Message):
     def __init__(self,
-        # TODO: NO MUTABLE DEFAULTS!!!
-            CmdID = 99,
-            StackTrace = '',
-            ErrorMessage = '',
-            InformationMessage = '',
-            WarningMessage = '',
-            RC = ResponseCode.OK,
-            ReturnedValues = None
+            StackTrace         = None,
+            ErrorMessage       = None,
+            InformationMessage = None,
+            WarningMessage     = None,
+            RC                 = ResponseCode.OK,
+            ReturnedValues     = None
         ):
-        super().__init__(CmdID)
 
-        self.StackTrace = StackTrace
-        self.ErrorMessage = ErrorMessage
-        self.InformationMessage = InformationMessage
-        self.WarningMessage = WarningMessage
+        self.StackTrace =         '' if StackTrace == None else StackTrace
+        self.ErrorMessage =       '' if ErrorMessage == None else ErrorMessage
+        self.InformationMessage = '' if InformationMessage == None else InformationMessage
+        self.WarningMessage =     '' if WarningMessage == None else WarningMessage
         self.RC = RC
 
     def IsError(self):
@@ -46,7 +43,7 @@ class GetObjectValueResponse(GenericResponse):
             RC,
             ReturnedValues,
         ):
-        super().__init__(36, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
 
         self._CmdID = _cmdID
         self.SerializeObjectType = SerializeObjectType
@@ -65,7 +62,7 @@ class CaptureScreenshotResponse(GenericResponse):
             RC,
             ReturnedValues,
         ):
-        super().__init__(16, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
 
         self.ImageData = ImageData
         self.ImagePath = ImagePath
@@ -76,7 +73,7 @@ class HandshakeResponse(GenericResponse):
     def __init__(self,
             ReceivedTimestamp,
             RC,
-            GCD
+            GCD,
         ):
         self.ReceivedTimestamp = ReceivedTimestamp
         self.RC = RC

@@ -1,4 +1,4 @@
-from . import Requests, Objects, Responses, Exceptions
+from . import Requests, Objects, Responses, Exceptions, Serializers
 
 import asyncio, socket
 import msgpack, uuid
@@ -70,15 +70,19 @@ class Client:
     def ProcessMessage(self, msg):
         # TODO: Reconstruct GDIOMsg
         # TODO: GDIOMsg.GetName()
-        commandType = msg.GDIOMsg[0]
-        gdioMsg = msg.GDIOMsg[1]
+        print('processmessage')
+        for key, value in Requests.CmdIds:
+            print(f'{key} : {value}')
+            if value == msg.GDIOMsg[0]:
+                gdioMsg = eval(f'Requests.{key})')(msg.GDIOMsg[1])
+                
         print(f'[RECV] Command: {msg.CorrelationId}')
         if self._currentHandshakeState != Objects.HandshakeState.COMPLETE:
-            if commandType != 4:
-                print(f'Dropping message before handshake is complete: {commandType}')
+            if isinstance(gdioMsg, Requests.HandshakeRequest):
+                print(f'Dropping message before handshake is complete')
                 return
             elif self._currentHandshakeState == Objects.HandshakeState.CLIENT_INFORMATION_SENT:
-                if Responses.HandshakeResponse(**gdioMsg).RC == Objects.HandshakeReasonCode.OK:
+                if gdioMsg.RC == Objects.HandshakeReasonCode.OK:
                     self.GCD = Responses.HandshakeResponse(**gdioMsg).GCD
                     self._currentHandshakeState = Objects.HandshakeState.COMPLETE
                     print('Handshake Complete')
@@ -120,8 +124,6 @@ class Client:
         print(f'Sending: {obj.toDict()}')
         print(f'RequestId: {obj.RequestId} is waiting for a result.\n')
 
-        
-
         await self.WriteMessage(obj, writer)
         return Objects.RequestInfo(self, obj.RequestId, obj.Timestamp)
 
@@ -129,7 +131,7 @@ class Client:
 
         writer = self._writer if writer == None else writer
 
-        serialized = msgpack.packb(obj.toDict())
+        serialized = msgpack.packb(obj, default=Serializers.customSerializer)
         msg_payload = await self.ConstructPayload(serialized)
         payload_bytes = bytes(msg_payload)
         writer.write(payload_bytes)
