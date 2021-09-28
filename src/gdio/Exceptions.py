@@ -14,5 +14,8 @@ class CallMethodError(Exception):
 class CaptureScreenshotError(Exception):
     pass
 
-class CorruptedHandshakeException(Exception):
+class CorruptedHandshakeError(Exception):
+    pass
+
+class UnmatchedEventError(Exception):
     pass

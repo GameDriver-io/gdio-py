@@ -1,6 +1,7 @@
-import asyncio
+import os, asyncio
 from gdio.ApiClient import ApiClient
 
+# TODO: Pytest Fixture
 class TestFixture:
 
     def __init__(self):
@@ -14,9 +15,12 @@ class TestFixture:
         
         ## <Test Methods>
         await self.api.Wait(200)
-        await self.test_Screenshot(r'C:\Users\ethan\source\repos\GDIO-py\before.png')
+        await self.test_Screenshot(f'{os.getcwd()}\\before.png')
+        await self.api.EnableHooks()
         await self.test_Movement()
-        await self.test_Screenshot(r'C:\Users\ethan\source\repos\GDIO-py\after.png')
+        await self.api.WaitForEmptyInput(5)
+        await self.api.DisableHooks()
+        await self.test_Screenshot(f'{os.getcwd()}\\after.png')
         await self.api.Wait(200)
         ## </Test Methods>
 
@@ -26,15 +30,14 @@ class TestFixture:
         await self.api.CaptureScreenshot(path, False, True)
 
     async def test_Movement(self):
-        await self.api.EnableHooks()
         await self.api.AxisPress('Horizontal', 1.0, 500)
         await self.api.Wait(200)
         await self.api.ButtonPress('Jump', 100)
         await self.api.Wait(700)
         await self.api.ButtonPress('Jump', 100)
-        await self.api.DisableHooks()
 
     async def test_CallMethod(self):
+        # Unused
         await self.api.CallMethod("//*[@name='Player']/fn:component('CustomScript')", "CustomMethod", { "string:The Test was run"})
 
     async def Disconnect(self):
@@ -43,7 +46,5 @@ class TestFixture:
 if __name__ == '__main__':
     Game = TestFixture()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        Game.Connect()
-    )
+    loop.run_until_complete(Game.Connect())
     

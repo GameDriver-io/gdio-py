@@ -69,7 +69,7 @@ class CaptureScreenshotResponse(GenericResponse):
 
 
 
-class HandshakeResponse(GenericResponse):
+class HandshakeResponse:
     def __init__(self,
             ReceivedTimestamp,
             RC,

@@ -32,6 +32,10 @@ class HandshakeReasonCode(IntEnum):
 class Message:
     def __init__(self):
         pass
+
+    def GetName(self):
+        return f'{self.__class__.__name__}'
+
     def pack(self):
         return [Requests.CmdIds[self.__class__.__name__], vars(self)]
 
@@ -51,9 +55,6 @@ class ProtocolMessage:
         self.GDIOMsg = GDIOMsg
         self.IsAsync = IsAsync
         self.Timestamp : msgpackTime = msgpackTime(*stampify(datetime.datetime.now())) if Timestamp == None else Timestamp
-
-    def toDict(self):
-        return vars(self)
     
     def pack(self):
         return {
@@ -66,7 +67,7 @@ class ProtocolMessage:
         }
 
     def __repr__(self):
-        return f'{self.toDict()}'
+        return f'{self.pack()}'
 
 class RequestInfo:
     def __init__(self, client, requestId, sentTimestamp):
@@ -116,8 +117,3 @@ class MouseButtons(IntEnum):
 
 class Collision:
     pass
-
-# TODO: This method shouldnt be here
-def getGDIOMsgData(message : ProtocolMessage):
-    # TODO: collect CmdIDs somewhere to rebuild MSGs into classes
-    return message['GDIOMsg'][1]
