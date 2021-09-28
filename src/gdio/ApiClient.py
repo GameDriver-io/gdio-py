@@ -104,8 +104,7 @@ class ApiClient:
 
         # Recieve the response message and save its contained GDIOMsg.
         #response = Responses.GetObjectValueResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
-        result = await self.client.GetResult(requestInfo.RequestId)
-        response = Responses.GetObjectValueResponse(**result)
+        response = await self.client.GetResult(requestInfo.RequestId)
 
         # If the response is an error, warning, or information message,
         if response.RC != 0:
@@ -145,8 +144,7 @@ class ApiClient:
 
         # Recieve the response message and save its contained GDIOMsg.
         #response = Responses.CaptureScreenshotResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
-        result = await self.client.GetResult(requestInfo.RequestId)
-        response = Responses.CaptureScreenshotResponse(**result)
+        response = await self.client.GetResult(requestInfo.RequestId)
         
         # If the response is an Error,
         if response.RC == 2:
@@ -497,7 +495,9 @@ class ApiClient:
         # TODO: return scene name if RC==OK
         return True
 
-    
+    async def WaitForEmptyInput(self, timeout : int = 30) -> bool:
+        await asyncio.wait_for(self.client.WaitForEmptyInput(), timeout)
+
 
     async def Wait(self, miliseconds : int) -> None:
         time.sleep(miliseconds * 0.001)

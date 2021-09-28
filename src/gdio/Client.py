@@ -1,11 +1,14 @@
-from . import Requests, Objects, Responses, Exceptions
+from . import Requests, Objects, Responses, Exceptions, Serializers, Events
 
 import asyncio, socket
 import msgpack, uuid
-import time
+import datetime, time
 from binascii import crc32
 
 BYTE_ORDER = 'little'
+
+def isEvent(msg):
+    return True if msg.GDIOMsg.GetName()[len('Event'):] == 'Event' else False
 
 class Client:
     def __init__(self, hostname, port, connectionTimeout):
@@ -26,8 +29,8 @@ class Client:
         self.EventHandlers : ['RequestId'] = []
         self.EventCollection : ['EventId'] = []
         self.Results : {'CorrelationId' : 'GDIOMsg'} = {}
+        self.LastEvent : {'eventType' : 'Timestamp'} = {}
         
-
         self.GCD = None
 
     async def ReadHandler(self, reader=None):
@@ -53,7 +56,7 @@ class Client:
                 #print(unpacked)
                 
                 msg = Objects.ProtocolMessage(**unpacked)
-                self.ProcessMessage(msg)
+                await self.ProcessMessage(msg)
             except ValueError:
                 pass
 
@@ -67,47 +70,67 @@ class Client:
         if eventId in self.EventCollection:
             del self.EventCollection[eventId]
     
-    def ProcessMessage(self, msg):
-        # TODO: Reconstruct GDIOMsg
+    async def ProcessMessage(self, msg):
         # TODO: GDIOMsg.GetName()
-        commandType = msg.GDIOMsg[0]
-        gdioMsg = msg.GDIOMsg[1]
-        print(f'[RECV] Command: {msg.CorrelationId}')
+        for key, value in Requests.CmdIds.items():
+            await asyncio.sleep(0)
+            if msg.GDIOMsg[0] == 80:
+                msg.GDIOMsg = Events.EmptyInput
+                self.SetEventTimestamp(Events.EmptyInput)
+                break
+            if value == msg.GDIOMsg[0]:
+                msg.GDIOMsg = eval(f'Responses.{key}(**msg.GDIOMsg[1])')
+                break
+                
+        print(f'[RECV] Command: {msg.GDIOMsg}')
         if self._currentHandshakeState != Objects.HandshakeState.COMPLETE:
-            if commandType != 4:
-                print(f'Dropping message before handshake is complete: {commandType}')
+            if not isinstance(msg.GDIOMsg, Responses.HandshakeResponse):
+                print(f'Dropping message before handshake is complete')
                 return
             elif self._currentHandshakeState == Objects.HandshakeState.CLIENT_INFORMATION_SENT:
-                if Responses.HandshakeResponse(**gdioMsg).RC == Objects.HandshakeReasonCode.OK:
-                    self.GCD = Responses.HandshakeResponse(**gdioMsg).GCD
+                if msg.GDIOMsg.RC == Objects.HandshakeReasonCode.OK:
+                    self.GCD = msg.GDIOMsg.GCD
                     self._currentHandshakeState = Objects.HandshakeState.COMPLETE
                     print('Handshake Complete')
                 else:
-                    print(f'Handshake Failed: {Responses.HandshakeResponse(**gdioMsg).RC}')
+                    print(f'Handshake Failed: {msg.GDIOMsg.RC}')
                 return
-            raise Exceptions.CorruptedHandshakeException
+            raise Exceptions.CorruptedHandshakeError
             
+        self.Results.update({msg.CorrelationId : msg.GDIOMsg})
         print(f'Registering Response: {msg.CorrelationId}')
         # NOTE: `dict.update()` will overwrite the value of overlapping keys
-        self.Results.update(
-            {msg.CorrelationId : msg.GDIOMsg}
-        )
+        
 
     async def GetResult(self, requestId):
         value = None
         while not requestId in self.Results:
             await asyncio.sleep(0)
         try:
-            value = self.Results[requestId][1]
+            value = self.Results[requestId]
         except KeyError:
             pass
         else:
             del self.Results[requestId]
             del self.EventHandlers[requestId]
         finally:
-            print(self.Results)
-            print(self.EventHandlers)
             return value
+
+    def GetLastEventTimestamp(self, eventType):
+        if eventType in self.LastEvent:
+            return self.LastEvent[eventType]
+        return 0
+
+    def SetEventTimestamp(self, eventType):
+        self.LastEvent.update(
+            {eventType : datetime.datetime.now().timestamp()}
+        )
+
+    async def WaitForEmptyInput(self):
+        print('Waiting for empty input')
+        while (self.GetLastEventTimestamp(Events.EmptyInput) >= datetime.datetime.now().timestamp()) != True:
+            await asyncio.sleep(0)
+        return True
 
     async def SendMessage(self, obj, writer=None):
 
@@ -117,10 +140,8 @@ class Client:
             obj.RequestId = str(uuid.uuid4())
 
         self.EventHandlers.append(obj.RequestId)
-        print(f'Sending: {obj.toDict()}')
+        print(f'Sending: {obj.pack()}')
         print(f'RequestId: {obj.RequestId} is waiting for a result.\n')
-
-        
 
         await self.WriteMessage(obj, writer)
         return Objects.RequestInfo(self, obj.RequestId, obj.Timestamp)
@@ -129,7 +150,7 @@ class Client:
 
         writer = self._writer if writer == None else writer
 
-        serialized = msgpack.packb(obj.toDict())
+        serialized = msgpack.packb(obj, default=Serializers.customSerializer)
         msg_payload = await self.ConstructPayload(serialized)
         payload_bytes = bytes(msg_payload)
         writer.write(payload_bytes)

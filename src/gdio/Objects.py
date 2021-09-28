@@ -1,6 +1,7 @@
 import datetime, uuid
 from msgpack import Timestamp as msgpackTime
 from enum import IntEnum, auto
+from . import Requests
 
 ## TODO: This whole file seems like a bad idea
 
@@ -29,20 +30,14 @@ class HandshakeReasonCode(IntEnum):
     DUPLICATE_CLIENTUID = 3
 
 class Message:
-    def __init__(self, CmdID):
-        self._CmdID = CmdID
+    def __init__(self):
+        pass
 
-    def toList(self):
+    def GetName(self):
+        return f'{self.__class__.__name__}'
 
-        # TODO: This is probably a bad idea,
-        # I should add CmdId somewhere else
-        members = {**vars(self)}
-        members.pop('_CmdID')
-
-        return [self._CmdID, members]
-
-    def __repr__(self):
-        return f'{self.toList()}'
+    def pack(self):
+        return [Requests.CmdIds[self.__class__.__name__], vars(self)]
 
 class ProtocolMessage:
     def __init__(self,
@@ -60,19 +55,19 @@ class ProtocolMessage:
         self.GDIOMsg = GDIOMsg
         self.IsAsync = IsAsync
         self.Timestamp : msgpackTime = msgpackTime(*stampify(datetime.datetime.now())) if Timestamp == None else Timestamp
-
-    def toDict(self):
+    
+    def pack(self):
         return {
             'ClientUID' : self.ClientUID,
             'RequestId' : self.RequestId,
             'CorrelationId' : self.CorrelationId,
-            'GDIOMsg' : self.GDIOMsg.toList(),
+            'GDIOMsg' : self.GDIOMsg.pack(),
             'IsAsync' : self.IsAsync,
             'Timestamp' : self.Timestamp
         }
 
     def __repr__(self):
-        return f'{self.toDict()}'
+        return f'{self.pack()}'
 
 class RequestInfo:
     def __init__(self, client, requestId, sentTimestamp):
@@ -122,8 +117,3 @@ class MouseButtons(IntEnum):
 
 class Collision:
     pass
-
-# TODO: This method shouldnt be here
-def getGDIOMsgData(message : ProtocolMessage):
-    # TODO: collect CmdIDs somewhere to rebuild MSGs into classes
-    return message['GDIOMsg'][1]

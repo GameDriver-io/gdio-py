@@ -1,10 +1,36 @@
 # Changelog
 
 ## Upcoming
+ - pending
+
+## 9-27-2021
+This version reworked how messages are packed and unpacked. It also introduces a bug surrounding `ApiClient.WaitForEmptyInput()` where the method will just time out if the EmptyInput arrives before the method call. Otherwise, I'm happy with the overall structure for now. Next version will probably be focused on unit testing using PyTest; that way I can prove functionality across different platforms.
+
+### Added:
+ - `ApiClient.WaitForEmptyInput()` that waits until an EmptyInput Event is received.
+ - Custom serializers in the [`Serializers.py`](src/gdio/Serializers.py) file.
+    - This handles the standard object representations of message objects like `toDict()` and `toList()` used to by invoking the object's`.pack()` method.
+    - This is also important to have when I eventually get to implementing arguments in `ApiClient.CallMethod()`
+ - [`Events.py`](src/gdio/Events.py) to keep event message definitions.
+ - `Message.GetName()` that returns a string representation of the class name.
+    - Used in `Client.ProcessMessage()` in order to rebuild responses and do message-type-specific actions.
+ - [`requirements_dev.txt`](requirements_dev.txt) holding packages useful to development but not to an end user.
+    - Amended [`setup.cfg`](setup.cfg) appropriately.
+    - Added [`py.typed`](src/gdio/py.typed) to comply with the [`flake8`](https://github.com/pycqa/flake8) style checker.
+ 
+
+### Changed:
+ - Moved message IDs outside the message class and into a dict *currently being stored in [`Requests.py`](src/gdio/Requests.py)*.
+    - This allows for turning response messages back into message objects by looking up their stored ID.
+ - Replaced the behavior of `toDict()` and `toList()` with `pack()` in both the `ProtocolMessage` and `Message` classes. 
+
+### Removed:
+ - `Objects.getGDIOMsgData()` that hasn't been used in a few versions because it was mostly used in patchwork functionality.
 
 ## 9-19-2021
 
 ### Changed:
+
  - Added a loop in `Client.GetResult()` to check for pending results and retry if there arent any.
     - This has seemingly fixed the main issues from last version... agent side errors strangely.
 
