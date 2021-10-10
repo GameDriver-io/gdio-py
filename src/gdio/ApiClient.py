@@ -1,10 +1,20 @@
 from .Client import Client
-from . import Objects, Requests, Responses, Exceptions
+from . import ProtocolObjects, Messages, Exceptions, Enums
+
+from functools import wraps
 
 import os
 import asyncio
-import time
+import time, datetime
 
+
+def requireClientConnection(function):
+    @wraps(function)
+    async def inner(*args, **kwargs):
+        if args[0].client == None:
+            raise Exceptions.ClientNotConnectedError
+        await function(*args, **kwargs)
+    return inner
 
 class ApiClient:
     def __init__(self):
@@ -17,6 +27,7 @@ class ApiClient:
 
         return
 
+    @requireClientConnection
     async def AxisPress(self,
             axisId         : str,      # The name of the target input axis as defined in the Unity Input Manager.
             value          : float,    # The value of change on the target axis from -1.0 to +1.0.
@@ -24,13 +35,9 @@ class ApiClient:
             timeout        : int = 30  # The number of seconds to wait for the command to be recieved by the agent.
         ) -> bool:
 
-        # This command cannot be run without an agent connection.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
-
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.InputManagerStateRequest(
+            GDIOMsg = Messages.Cmd_InputManagerStateRequest(
                 IdName = axisId,
                 NumberOfFrames = numberOfFrames,
                 InputType = 1,
@@ -45,22 +52,22 @@ class ApiClient:
         #await self.client.Recieve()
         response = await self.client.GetResult(requestInfo.RequestId)
 
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exceptions.HooksStatusError(response.ErrorMessage)
+
         # The message didn't timeout and was sent successfully; return True.
         return True
 
+    @requireClientConnection
     async def ButtonPress(self,
             buttonId       : str,      # The name of the target input button as defined in the Unity Input Manager.
             numberOfFrames : int,      # The number of frames to hold the input for.
             timeout        : int = 30  # The number of seconds to wait for the command to be recieved by the agent.
         ) -> bool:
 
-        # This command cannot be run without an agent connection.
-        if self.client == None:
-            raise Exceptions.ClientNotConnectedError
-
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.InputManagerStateRequest(
+            GDIOMsg = Messages.Cmd_InputManagerStateRequest(
                 IdName = buttonId,
                 NumberOfFrames = numberOfFrames,
                 InputType = 0,
@@ -74,10 +81,14 @@ class ApiClient:
         #await self.client.Recieve()
         response = await self.client.GetResult(requestInfo.RequestId)
 
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exceptions.HooksStatusError(response.ErrorMessage)
+
         # The message didn't timeout and was sent successfully; return True.
         return True
     
     ## Void overload
+    @requireClientConnection
     async def CallMethod(self,
             hierarchyPath   : str,      # The HierarchyPath for an object and the script attached to it.
             methodName      : str,      # The name of the method to call within the script.
@@ -85,13 +96,9 @@ class ApiClient:
             timeout         : int = 30, # The number of seconds to wait for the command to be recieved by the agent.
         ) -> None:
 
-        # This command cannot be run without an agent connection.
-        if self.client == None:
-            raise Exceptions.ClientNotConnectedError
-
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.CallMethodRequest(
+            GDIOMsg = Messages.Cmd_CallMethodRequest(
                 HierarchyPath = hierarchyPath,
                 MethodName = methodName,
             )
@@ -103,8 +110,11 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
         # Recieve the response message and save its contained GDIOMsg.
-        #response = Responses.GetObjectValueResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
+        #response = Responses.GetObjectValueResponse(**ProtocolObjects.getGDIOMsgData(await self.client.Recieve()))
         response = await self.client.GetResult(requestInfo.RequestId)
+
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exceptions.HooksStatusError(response.ErrorMessage)
 
         # If the response is an error, warning, or information message,
         if response.RC != 0:
@@ -121,6 +131,7 @@ class ApiClient:
         return
     '''
 
+    @requireClientConnection
     async def CaptureScreenshot(self,
             filename          : str,          # The path and filename of the screen capture.
             storeInGameFolder : bool = False, # TODO: Save the screenshot on the device the game is running on rather than returning it to the client.
@@ -128,13 +139,9 @@ class ApiClient:
             timeout           : int = 60,     # The number of seconds to wait for the command to be recieved by the agent.
         ) -> str:
 
-        # This command cannot be run without an agent connection.
-        if self.client == None:
-            raise Exceptions.ClientNotConnectedError
-
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.CaptureScreenshotRequest(
+            GDIOMsg = Messages.Cmd_CaptureScreenshotRequest(
                 StoreInGameFolder = storeInGameFolder,
                 Filename = filename,
             ),
@@ -143,8 +150,8 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
 
         # Recieve the response message and save its contained GDIOMsg.
-        #response = Responses.CaptureScreenshotResponse(**Objects.getGDIOMsgData(await self.client.Recieve()))
-        response = await self.client.GetResult(requestInfo.RequestId)
+        #response = Responses.CaptureScreenshotResponse(**ProtocolObjects.getGDIOMsgData(await self.client.Recieve()))
+        response = await asyncio.wait_for(self.client.GetResult(requestInfo.RequestId), timeout)
         
         # If the response is an Error,
         if response.RC == 2:
@@ -171,8 +178,9 @@ class ApiClient:
         return filename
         
     ## Float positions overload
+    @requireClientConnection
     async def Click(self,
-            buttonId : Objects.MouseButtons,
+            buttonId : Enums.MouseButtons,
             x : float,
             y : float,
             clickFrameCount : int,
@@ -192,8 +200,9 @@ class ApiClient:
     '''
 
     ## Float positions overload
+    @requireClientConnection
     async def ClickEx(self,
-            buttonId : Objects.MouseButtons,
+            buttonId : Enums.MouseButtons,
             x : float,
             y : float,
             clickFrameCount : int,
@@ -222,9 +231,11 @@ class ApiClient:
         return ClickEx(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
     '''
     
+    @requireClientConnection
     async def ClickObject(self) -> bool:
         raise NotImplementedError
 
+    @requireClientConnection
     async def ClickObjectEx(self) -> bool:
         raise NotImplementedError
 
@@ -233,14 +244,16 @@ class ApiClient:
             port     : int = 19734,          # The port that the target Gamedriver agent is configured to use.
             autoplay : bool = False,         # TODO: Start the game automatically within the Unity Editor.
             timeout  : int = 30,             # The number of seconds to wait for the command to be recieved by the agent.
-            autoPortResolution : bool = True # TODO: Automatically resolve the port a Gamedriver Agent is running on.
+            autoPortResolution : bool = True,# TODO: Automatically resolve the port a Gamedriver Agent is running on.
+            reader=None, # TEMP
+            writer=None, # TEMP
         ) -> None:
 
         # Try to connect to the target game.
         try:
             self.client = Client(hostname, port, timeout)
 
-            if not await self.client.Connect():
+            if not await self.client.Connect(internalComms=False, reader=reader, writer=writer):
                 raise Exceptions.FailedGameConnectionError('Failed to connect to the game')
 
         # If any exception is thrown,
@@ -265,22 +278,19 @@ class ApiClient:
         return
     '''
 
-    async def DisableHooks(self, timeout : int = 30) -> bool:
-
-        # This command cannot be run without an agent connection.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
+    @requireClientConnection
+    async def DisableHooks(self, hookingObject, timeout : int = 30) -> bool:
 
         # TODO: Hooking objects
-        # NOTE: ATM, disables all hooking
-        msg = Objects.ProtocolMessage(
+        # NOTE: ATM, enables all hooking
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.ChangeHookStatusRequest(
-                KeyboardHooksStatus = False,
-                MouseHooksStatus = False,
-                TouchHooksStatus = False,
-                GamepadHooksStatus = False,
-                BitChanged = 0xF
+            GDIOMsg = Messages.Cmd_ChangeHookStatusRequest(
+                KeyboardHooksStatus = True if (hookingObject & Enums.HookingObject.KEYBOARD) <= 0 else False,
+                MouseHooksStatus = True if (hookingObject & Enums.HookingObject.MOUSE) <= 0 else False,
+                TouchHooksStatus = True if (hookingObject & Enums.HookingObject.TOUCHINPUT) <= 0 else False,
+                GamepadHooksStatus = True if (hookingObject & Enums.HookingObject.GAMEPAD) <= 0 else False,
+                BitChanged = int(hookingObject)
             ),
         )
 
@@ -291,18 +301,18 @@ class ApiClient:
         #await self.client.Recieve()
         response = await self.client.GetResult(requestInfo.RequestId)
 
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exceptions.HooksStatusError(response.ErrorMessage)
+
         # No exceptions thrown; return True
-        return True
+        return response.RC == Enums.ResponseCode.OK
 
+    @requireClientConnection
     async def DisableObjectCaching(self, timeout : int = 30) -> bool:
-
-        # This command cannot be run without an agent connection.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
             
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.ChangeObjectResolverCacheStateRequest(
+            GDIOMsg = Messages.Cmd_ChangeObjectResolverCacheStateRequest(
                 STATE = False
             )
         )
@@ -329,6 +339,7 @@ class ApiClient:
         await self.client.Disconnect()
 
     ## Float positions overload
+    @requireClientConnection
     async def DoubleClick(self) -> bool:
         raise NotImplementedError
     
@@ -339,6 +350,7 @@ class ApiClient:
     '''
 
     ## Float positions overload
+    @requireClientConnection
     async def DoubleClickEx(self) -> bool:
         raise NotImplementedError
     
@@ -349,6 +361,7 @@ class ApiClient:
     '''
 
     ## Float positions overload
+    @requireClientConnection
     async def DoubleClickObject(self) -> bool:
         raise NotImplementedError
     
@@ -358,22 +371,19 @@ class ApiClient:
         return self.DoubleClickObject()
     '''
 
-    async def EnableHooks(self, timeout : int = 30) -> bool:
-
-        # This command cannot be run without an agent connection.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
+    @requireClientConnection
+    async def EnableHooks(self, hookingObject, timeout : int = 30) -> bool:
 
         # TODO: Hooking objects
         # NOTE: ATM, enables all hooking
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.ChangeHookStatusRequest(
-                KeyboardHooksStatus = True,
-                MouseHooksStatus = True,
-                TouchHooksStatus = True,
-                GamepadHooksStatus = True,
-                BitChanged = 0xF
+            GDIOMsg = Messages.Cmd_ChangeHookStatusRequest(
+                KeyboardHooksStatus = (hookingObject & Enums.HookingObject.KEYBOARD) > 0,
+                MouseHooksStatus = (hookingObject & Enums.HookingObject.MOUSE) > 0,
+                TouchHooksStatus = (hookingObject & Enums.HookingObject.TOUCHINPUT) > 0,
+                GamepadHooksStatus = (hookingObject & Enums.HookingObject.GAMEPAD) > 0,
+                BitChanged = int(hookingObject)
             ),
         )
 
@@ -384,19 +394,18 @@ class ApiClient:
         #await self.client.Recieve()
         response = await self.client.GetResult(requestInfo.RequestId)
 
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exceptions.HooksStatusError(response.ErrorMessage)
+
         # No exceptions thrown; return True
-        return True
+        return response.RC == Enums.ResponseCode.OK
 
-
+    @requireClientConnection
     async def EnableObjectCaching(self, timeout : int = 30) -> bool:
 
-        # This command cannot be run without an agent connection.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
-
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.ChangeObjectResolverCacheStateRequest(
+            GDIOMsg = Messages.Cmd_ChangeObjectResolverCacheStateRequest(
                 STATE = True
             )
         )
@@ -411,15 +420,12 @@ class ApiClient:
         # No exceptions thrown; return True
         return True
     
+    @requireClientConnection
     async def FlushObjectLookupCache(self, timeout : int = 30) -> bool:
-
-        # This command cannot be run without an agent connection.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
             
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.FlushCacheRequest()
+            GDIOMsg = Messages.Cmd_FlushCacheRequest()
         )
 
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -432,17 +438,16 @@ class ApiClient:
         # No exceptions thrown; return True
         return True
 
-    async def GetConnectedGameDetails(self) -> Objects.GameConnectionDetails:
-        # Can't retrieve details about a game the client isn't connected to.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
-
+    @requireClientConnection
+    async def GetConnectedGameDetails(self) -> ProtocolObjects.GameConnectionDetails:
         return self.gameConnectionDetails
 
+    @requireClientConnection
     async def GetLastFPS(self) -> float:
         raise NotImplementedError
 
-    async def GetNextCollisionEvent(self) -> Objects.Collision:
+    @requireClientConnection
+    async def GetNextCollisionEvent(self) -> ProtocolObjects.Collision:
         raise NotImplementedError
 
 
@@ -453,15 +458,12 @@ class ApiClient:
 ########################################################################################################################
 ########################################################################################################################
 
+    @requireClientConnection
     async def GetObjectList(self, timeout : int = 30) -> bool:
-
-        # This command cannot be run without an agent connection.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
             
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.GetObjectListRequest()
+            GDIOMsg = Messages.Cmd_GetObjectListRequest()
         )
 
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -474,15 +476,12 @@ class ApiClient:
         # TODO: return object list if RC==OK
         return True
 
+    @requireClientConnection
     async def GetSceneName(self, timeout : int = 30) -> bool:
-        
-        # This command cannot be run without an agent connection.
-        if not self.client:
-            raise Exceptions.ClientNotConnectedError
             
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Requests.GetSceneNameRequest()
+            GDIOMsg = Messages.Cmd_GetSceneNameRequest()
         )
 
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -495,8 +494,23 @@ class ApiClient:
         # TODO: return scene name if RC==OK
         return True
 
+    @requireClientConnection
+    async def LoadScene(self, sceneName : str, timeout : int = 30) -> bool:
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_LoadSceneRequest(
+                SceneName = sceneName
+            )
+        )
+
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        response = await self.client.GetResult(requestInfo.RequestId)
+        
+        return True
+
+    @requireClientConnection
     async def WaitForEmptyInput(self, timeout : int = 30) -> bool:
-        await asyncio.wait_for(self.client.WaitForEmptyInput(), timeout)
+        await asyncio.wait_for(self.client.WaitForEmptyInput(datetime.datetime.now().timestamp()), timeout)
 
 
     async def Wait(self, miliseconds : int) -> None:

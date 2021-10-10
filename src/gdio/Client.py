@@ -1,4 +1,4 @@
-from . import Requests, Objects, Responses, Exceptions, Serializers, Events
+from . import ProtocolObjects, Messages, Exceptions, Serializers, Enums
 
 import asyncio, socket
 import msgpack, uuid
@@ -6,6 +6,7 @@ import datetime, time
 from binascii import crc32
 
 BYTE_ORDER = 'little'
+PROTOCOL_VERSION = '2.04.13.2021'
 
 def isEvent(msg):
     return True if msg.GDIOMsg.GetName()[len('Event'):] == 'Event' else False
@@ -22,15 +23,15 @@ class Client:
         self._writer = None
 
         self.connectionTimeout = connectionTimeout
-        self._currentHandshakeState = Objects.HandshakeState.NOT_STARTED
+        self._currentHandshakeState = Enums.HandshakeState.NOT_STARTED
 
         self.ClientUID = ''
 
-        self.EventHandlers : ['RequestId'] = []
-        self.EventCollection : ['EventId'] = []
-        self.Results : {'CorrelationId' : 'GDIOMsg'} = {}
-        self.LastEvent : {'eventType' : 'Timestamp'} = {}
-        
+        self.EventHandlers : list = []
+        self.EventCollection : list = []
+        self.Results : dict = {}
+        self.LastEvent : dict = {}
+
         self.GCD = None
 
     async def ReadHandler(self, reader=None):
@@ -43,8 +44,9 @@ class Client:
                 self._disposed = True
                 break
             try:
+                print('#########Reading#########')
                 msg_length = await reader.read(4)
-                #print(bytes(msg_length))
+                #print(f'\n{bytes(msg_length)}')
 
                 msg_crc = await reader.read(4)
                 #print(bytes(msg_crc))
@@ -53,82 +55,82 @@ class Client:
                 #print(bytes(msg_data))
 
                 unpacked = msgpack.unpackb(msg_data)
-                #print(unpacked)
+                #print(f'\n{unpacked}\n')
                 
-                msg = Objects.ProtocolMessage(**unpacked)
+                msg = ProtocolObjects.ProtocolMessage(**unpacked)
                 await self.ProcessMessage(msg)
+
             except ValueError:
                 pass
+                print(f'{self.EventHandlers}')
 
     async def EventsPending(self, eventId):
-        if eventId in self.EventCollection:
-            if self.EventCollection[eventId].is_set():
-                return True
-        return False
+        return True if eventId in self.EventCollection else False
 
     async def RemoveEventCollectionId(self, eventId):
         if eventId in self.EventCollection:
             del self.EventCollection[eventId]
     
-    async def ProcessMessage(self, msg):
-        # TODO: GDIOMsg.GetName()
-        for key, value in Requests.CmdIds.items():
-            await asyncio.sleep(0)
-            if msg.GDIOMsg[0] == 80:
-                msg.GDIOMsg = Events.EmptyInput
-                self.SetEventTimestamp(Events.EmptyInput)
-                break
-            if value == msg.GDIOMsg[0]:
-                msg.GDIOMsg = eval(f'Responses.{key}(**msg.GDIOMsg[1])')
-                break
-                
-        print(f'[RECV] Command: {msg.GDIOMsg}')
-        if self._currentHandshakeState != Objects.HandshakeState.COMPLETE:
-            if not isinstance(msg.GDIOMsg, Responses.HandshakeResponse):
+    async def ProcessMessage(self, msg) -> None:
+        print(f'Processing: {msg}')
+
+        if isinstance(msg.GDIOMsg, Messages.Cmd_GenericResponse):
+            if msg.GDIOMsg.IsError():
+                raise Exception(msg.GDIOMsg.ErrorMessage)
+            if msg.GDIOMsg.IsWarning():
+                raise Warning(msg.GDIOMsg.WarningMessage)
+            if msg.GDIOMsg.IsInformation():
+                raise Warning(msg.GDIOMsg.InformationMessage)
+
+        print(f'[RECV] Command: {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}')
+        if self._currentHandshakeState != Enums.HandshakeState.COMPLETE:
+            if not isinstance(msg.GDIOMsg, Messages.Cmd_HandshakeResponse):
                 print(f'Dropping message before handshake is complete')
                 return
-            elif self._currentHandshakeState == Objects.HandshakeState.CLIENT_INFORMATION_SENT:
-                if msg.GDIOMsg.RC == Objects.HandshakeReasonCode.OK:
+            elif self._currentHandshakeState == Enums.HandshakeState.CLIENT_INFORMATION_SENT:
+                if msg.GDIOMsg.RC == Enums.HandshakeReasonCode.OK:
                     self.GCD = msg.GDIOMsg.GCD
-                    self._currentHandshakeState = Objects.HandshakeState.COMPLETE
+                    self._currentHandshakeState = Enums.HandshakeState.COMPLETE
                     print('Handshake Complete')
                 else:
                     print(f'Handshake Failed: {msg.GDIOMsg.RC}')
                 return
             raise Exceptions.CorruptedHandshakeError
-            
+        
+        if isinstance(msg.GDIOMsg, Messages.Evt_EmptyInput):
+            self.SetEventTimestamp(Messages.Evt_EmptyInput)
+            return
+
+        # NOTE: `dict.update()` will overwrite the value of overlapping keys
         self.Results.update({msg.CorrelationId : msg.GDIOMsg})
         print(f'Registering Response: {msg.CorrelationId}')
-        # NOTE: `dict.update()` will overwrite the value of overlapping keys
         
 
     async def GetResult(self, requestId):
         value = None
         while not requestId in self.Results:
             await asyncio.sleep(0)
+        print(f'retrieving result for: {requestId}')
         try:
             value = self.Results[requestId]
         except KeyError:
             pass
         else:
-            del self.Results[requestId]
-            del self.EventHandlers[requestId]
+            print(f'deleting: {requestId}')
+            self.Results.pop(requestId)
+            self.EventHandlers.pop(requestId)
         finally:
             return value
 
     def GetLastEventTimestamp(self, eventType):
-        if eventType in self.LastEvent:
-            return self.LastEvent[eventType]
-        return 0
+        return self.LastEvent[eventType] if eventType in self.LastEvent else 0
 
     def SetEventTimestamp(self, eventType):
-        self.LastEvent.update(
-            {eventType : datetime.datetime.now().timestamp()}
-        )
+        self.LastEvent.update({eventType : datetime.datetime.now().timestamp()})
 
-    async def WaitForEmptyInput(self):
+    async def WaitForEmptyInput(self, timestamp):
         print('Waiting for empty input')
-        while (self.GetLastEventTimestamp(Events.EmptyInput) >= datetime.datetime.now().timestamp()) != True:
+        while (self.GetLastEventTimestamp(Messages.Evt_EmptyInput) >= timestamp) != True:
             await asyncio.sleep(0)
         return True
 
@@ -144,7 +146,7 @@ class Client:
         print(f'RequestId: {obj.RequestId} is waiting for a result.\n')
 
         await self.WriteMessage(obj, writer)
-        return Objects.RequestInfo(self, obj.RequestId, obj.Timestamp)
+        return ProtocolObjects.RequestInfo(self, obj.RequestId, obj.Timestamp)
 
     async def WriteMessage(self, obj, writer=None):
 
@@ -173,29 +175,31 @@ class Client:
 
         self.ClientUID = str(uuid.uuid4())
 
-        msg = Objects.ProtocolMessage(
+        msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.ClientUID,
-            GDIOMsg = Requests.HandshakeRequest(
-                ProtocolVersion='2.04.13.2021',
+            GDIOMsg = Messages.Cmd_HandshakeRequest(
+                ProtocolVersion=PROTOCOL_VERSION,
                 ClientUID=self.ClientUID,
                 channel=None,
                 Recording=False
             )
         )
-        self._currentHandshakeState = Objects.HandshakeState.CLIENT_INFORMATION_SENT
+        self._currentHandshakeState = Enums.HandshakeState.CLIENT_INFORMATION_SENT
 
         requestInfo = await asyncio.wait_for(self.SendMessage(msg, writer), self.connectionTimeout)
         return requestInfo
         
-    async def Connect(self, internalComms=False):
+    async def Connect(self, internalComms=False, reader=None, writer=None):
 
         if internalComms:
             await self.configureChannel()
         else:
-            self._reader, self._writer = await asyncio.wait_for(asyncio.open_connection(self.hostname, self.port), self.connectionTimeout)
+            if reader == None and writer == None:
+                reader, writer = await asyncio.wait_for(asyncio.open_connection(self.hostname, self.port), self.connectionTimeout)
+            self._reader, self._writer = reader, writer
             asyncio.create_task(self.ReadHandler())
 
-        await self.InitHandshake()
+        await self.InitHandshake(writer)
         
         return True
 

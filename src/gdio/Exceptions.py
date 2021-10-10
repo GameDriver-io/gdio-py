@@ -19,3 +19,8 @@ class CorruptedHandshakeError(Exception):
 
 class UnmatchedEventError(Exception):
     pass
+
+class HooksStatusError(Exception):
+    def __init__(self, message=None):
+        self.message = '' if message == None else message
+        super.__init__(f'Failied to change hook status: {self.message}')
