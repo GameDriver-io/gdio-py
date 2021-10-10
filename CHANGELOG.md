@@ -30,8 +30,9 @@ This version reworked how messages are packed and unpacked. It also introduces a
 ## 9-19-2021
 
 ### Changed:
- - Added an extra check and retry loop in `Client.GetResult()`
-    - this has seemingly fixed the main issues from last version.
+
+ - Added a loop in `Client.GetResult()` to check for pending results and retry if there arent any.
+    - This has seemingly fixed the main issues from last version... agent side errors strangely.
 
 ## 9-18-2021
 This version fixed the problem with responses being received in the wrong order. It also has agent-side issues that I don't yet understand.
