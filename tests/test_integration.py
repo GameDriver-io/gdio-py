@@ -1,6 +1,7 @@
 import pytest, os, asyncio
 from gdio.ApiClient import ApiClient
 import gdio.Exceptions as Exceptions
+from gdio.Enums import KeyCode, HookingObject
 
 @pytest.fixture
 async def api_notConnected():
@@ -54,8 +55,26 @@ class Test_Methods:
             await eval(f'api.{method}{methodArgs}')
 
 @pytest.mark.asyncio
+@pytest.mark.skip
 async def test_AxisPress(api_connectedlocal):
     api = api_connectedlocal
     await api.LoadScene('SampleScene')
+    await api.AxisPress('Horizontal', 1.0, 500)
 
+@pytest.mark.asyncio
+@pytest.mark.skip
+async def test_ButtonPress(api_connectedlocal):
+    api = api_connectedlocal
+    await api.LoadScene('SampleScene')
+    await api.ButtonPress('Jump', 100)
+
+@pytest.mark.asyncio
+async def test_KeyPress(api_connectedlocal):
+    api = api_connectedlocal
+    #await api.LoadScene('SampleScene')
+    await api.EnableHooks(HookingObject.ALL)
+    await api.Wait(1000)
+    await api.KeyPress([KeyCode.Space], 100)
+    await api.DisableHooks(HookingObject.ALL)
+    
 

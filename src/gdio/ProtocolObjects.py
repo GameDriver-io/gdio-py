@@ -85,7 +85,29 @@ class Vector2:
     def __repr__(self):
         return f'Vector2({self.x}, {self.y})'
 
+class Vector3:
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
 
+    def __repr__(self):
+        return f'Vector3({self.x}, {self.y}, {self.z})'
+
+class Vector4:
+    def __init__(self, x, y, z, w):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.w = w
+
+    def __repr__(self):
+        return f'Vector4({self.x}, {self.y}, {self.z}, {self.w})'
 
 class Collision:
     pass
+
+class AutoPlayDetails:
+    def __init__(self, GCD = None, Addr = None) -> None:
+        self.GCD = GameConnectionDetails() if GCD == None else GCD
+        self.Addr = '' if Addr == None else Addr

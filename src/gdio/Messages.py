@@ -1,3 +1,4 @@
+from gdio.ProtocolObjects import Vector2
 from . import Enums
 
 CmdIds = {
@@ -124,36 +125,104 @@ class Cmd_CaptureScreenshotRequest(Message):
         self.Mode = 1
 
 class Cmd_RotateRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self,
+            HierarchyPath = None,
+            WaitForObject = True,
+            Timeout = 30,
+            Eulers = None,
+            Axis = None,
+            EulersUTR = None,
+            AxisUTR = None,
+            Angle = None,
+            XAngle = None,
+            YAngle = None,
+            ZAngle = None,
+            Quant = None,
+            RelativeTo = Enums.Space.Self,
+            QuantUTR = None,
+            RelativeToUTR = Enums.Space.Self,
+        ):
+        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+        self.WaitForObject = WaitForObject
+        self.Timeout = Timeout
+        self.Eulers = Eulers
+        self.Axis = Axis
+        self.EulersUTR = EulersUTR
+        self.AxisUTR = AxisUTR
+        self.Angle = Angle
+        self.XAngle = XAngle
+        self.YAngle = YAngle
+        self.ZAngle = ZAngle
+        self.Quant = Quant
+        self.RelativeTo = RelativeTo
+        self.QuantUTR = QuantUTR
+        self.RelativeToUTR = RelativeToUTR
 
 class Cmd_RaycastRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self,
+            RaycastPoint = None,
+            RaycastPointUTR = None,
+            CameraHierarchyPath = None,
+        ):
+        self.RaycastPoint = RaycastPoint
+        self.RaycastPointUTR = RaycastPointUTR
+        self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
 
 class Cmd_NavAgentMoveToPointRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self,
+            Point = None,
+            PointUTR = None,
+            NavAgent_HierarchyPath = None,
+        ):
+        self.Point = Point
+        self.PointUTR = PointUTR
+        self.NavAgent_HierarchyPath = '' if NavAgent_HierarchyPath == None else NavAgent_HierarchyPath
 
 class Cmd_MouseMoveToObjectRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self,
+            ObjectHierarchyPath = None,
+            Timeout = 30,
+            FrameCount = 5,
+            WaitForObject = True,
+        ):
+        self.ObjectHierarchyPath = ObjectHierarchyPath
+        self.Timeout = Timeout
+        self.FrameCount = FrameCount
+        self.WaitForObject = WaitForObject
 
 class Cmd_MouseMoveRequest(Message):
     def __init__(self):
         raise NotImplementedError
 
 class Cmd_MouseDragRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self,
+            Destination = None,
+            Origin = None,
+            DestinationUTR = None,
+            OriginUTR = None,
+            FrameCount = 0,
+            ButtonId = 0
+        ):
+        self.Destination = Destination
+        self.Origin = Origin
+        self.DestinationUTR = DestinationUTR
+        self.OriginUTR = OriginUTR
+        self.FrameCount = FrameCount
+        self.ButtonId = ButtonId
 
 class Cmd_LoadSceneRequest(Message):
     def __init__(self, SceneName = None):
         self.SceneName = '' if SceneName == None else SceneName
 
 class Cmd_KeyPressRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self,
+            KeyCodes : list = None,
+            Modifiers : list = None,
+            NumberOfFrames : int = None,
+        ):
+        self.KeyCodes = [] if KeyCodes == None else KeyCodes
+        self.Modifiers = [] if Modifiers == None else Modifiers
+        self.NumberOfFrames = 0 if NumberOfFrames == None else NumberOfFrames
 
 class Cmd_GetObjectValueRequest(Message):
     def __init__(self, HierarchyPath = None, ObjectFieldOrPropertyName = None, TypeFullName = None):
@@ -173,7 +242,8 @@ class Cmd_GetObjectPositionRequest(Message):
         self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
 
 class Cmd_GetObjectListRequest(Message):
-    def __init__(self):
+    def __init__(self, 
+        ):
         raise NotImplementedError
 
 class Cmd_GetMousePositionRequest(Message):
@@ -181,7 +251,13 @@ class Cmd_GetMousePositionRequest(Message):
         raise NotImplementedError
 
 class Cmd_ClickObjectRequest(Message):
-    def __init__(self, MouseButtonId = 0, HierarchyPath = None, CameraHierarchyPath = None, IsDoubleClick = False, FrameCount = 5):
+    def __init__(self,
+            MouseButtonId = 0,
+            HierarchyPath = None,
+            CameraHierarchyPath = None,
+            IsDoubleClick = False,
+            FrameCount = 5
+        ):
         self.MouseButtonId = MouseButtonId
         self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
         self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
@@ -245,8 +321,13 @@ class Cmd_TapRequest(Message):
         raise NotImplementedError
 
 class Cmd_ObjectDistanceRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self,
+            ObjectA_HierarchyPath = None,
+            ObjectB_HierarchyPath = None,
+        ):
+        self.ObjectA_HierarchyPath = '' if ObjectA_HierarchyPath == None else ObjectA_HierarchyPath
+        self.ObjectB_HierarchyPath = '' if ObjectB_HierarchyPath == None else ObjectB_HierarchyPath
+        
                 
 class Cmd_FlushCacheRequest(Message):
     def __init__(self):
@@ -265,12 +346,14 @@ class Cmd_InputManagerStateRequest(Message):
         self.ChangeValue = ChangeValue
 
 class Cmd_RegisterCollisionMonitorRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self,
+            HierarchyPath = None,
+        ):
+        HierarchyPath = '' if HierarchyPath == None else HierarchyPath
 
 class Cmd_GetStatisticsRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self, HierarchyPath = None):
+        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
 
 class Cmd_UnregisterCollisionMonitorRequest(Message):
     def __init__(self):
@@ -365,3 +448,53 @@ class Evt_EmptyInput(Message):
 class Cmd_SceneLoaded(Message):
     def __init__(self, SceneName):
         self.SceneName = SceneName
+
+class Cmd_ObjectListResponse(Cmd_GenericResponse):
+    def __init__(self,
+            Objects = None,
+
+            StackTrace = None,
+            ErrorMessage = None,
+            InformationMessage = None,
+            WarningMessage = None,
+            RC = None,
+            ReturnedValues = None,
+        ):
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+        self.Objects = [] if Objects == None else Objects
+
+class Cmd_VectorResponse(Cmd_GenericResponse):
+    def __init__(self,
+            Value3 = None,
+            Value2 = None,
+            Value3UTR = None,
+            Value2UTR = None,
+
+            StackTrace = None,
+            ErrorMessage = None,
+            InformationMessage = None,
+            WarningMessage = None,
+            RC = None,
+            ReturnedValues = None,
+        ):
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+        self.Value3 = None if Value3 == None else Value3
+        self.Value2 = None if Value2 == None else Value2
+        self.Value3UTR = Value3UTR
+        self.Value2UTR = Value2UTR
+
+class Cmd_RaycastResponse(Cmd_GenericResponse):
+    def __init__(self,
+            RaycastResults = None,
+            RaycastResultsUTR = None,
+
+            StackTrace = None,
+            ErrorMessage = None,
+            InformationMessage = None,
+            WarningMessage = None,
+            RC = None,
+            ReturnedValues = None,
+        ):
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+        self.RaycastResults = RaycastResults
+        self.RaycastResultsUTR = RaycastResultsUTR
