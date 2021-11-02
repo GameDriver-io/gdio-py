@@ -44,18 +44,13 @@ class ApiClient:
                 )
         )
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        # Mitigates response mixups. Still happens sometimes.
-        # Also means commands are input dependent
-        #await self.client.Recieve()
-        response = await self.client.GetResult(requestInfo.RequestId)
+        if cmd_GenericResponse.RC == Enums.ResponseCode.ERROR:
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.HooksStatusError(response.ErrorMessage)
-
-        # The message didn't timeout and was sent successfully; return True.
-        return True
+        return (cmd_GenericResponse.Response == Enums.ResponseCode.OK)
 
     @requireClientConnection
     async def ButtonPress(self,
@@ -73,26 +68,21 @@ class ApiClient:
                 ChangeValue = 0
             ),
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        # Mitigates response mixups. Still happens sometimes.
-        # Also means commands are input dependent
-        #await self.client.Recieve()
-        response = await self.client.GetResult(requestInfo.RequestId)
+        if cmd_GenericResponse.RC == Enums.ResponseCode.ERROR:
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.HooksStatusError(response.ErrorMessage)
-
-        # The message didn't timeout and was sent successfully; return True.
-        return True
+        return (cmd_GenericResponse.Response == Enums.ResponseCode.OK)
     
     ## Void overload
     @requireClientConnection
-    async def CallMethod(self,
-            hierarchyPath   : str,      # The HierarchyPath for an object and the script attached to it.
-            methodName      : str,      # The name of the method to call within the script.
-            arguments       : list,     # TODO: The list of arguments to pass into the method.
-            timeout         : int = 30, # The number of seconds to wait for the command to be recieved by the agent.
+    async def CallMethod_void(self,
+            hierarchyPath : str,      # The HierarchyPath for an object and the script attached to it.
+            methodName    : str,      # The name of the method to call within the script.
+            arguments     : list,     # TODO: The list of arguments to pass into the method.
+            timeout       : int = 30, # The number of seconds to wait for the command to be recieved by the agent.
         ) -> None:
 
         msg = ProtocolObjects.ProtocolMessage(
@@ -106,36 +96,52 @@ class ApiClient:
         # TODO: Set and serialize the method's arguments.
         msg.GDIOMsg.SetArguments(arguments)
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-
-        # Recieve the response message and save its contained GDIOMsg.
-        #response = Responses.GetObjectValueResponse(**ProtocolObjects.getGDIOMsgData(await self.client.Recieve()))
-        response = await self.client.GetResult(requestInfo.RequestId)
-
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.HooksStatusError(response.ErrorMessage)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         # If the response is an error, warning, or information message,
-        if response.RC != 0:
+        if cmd_GenericResponse.RC != 0:
             # throw an exception containing the response data.
-            raise Exceptions.CallMethodError(response.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         # The message didn't timeout, and the response was OK; return
         return
 
     ## Return value overload
-    '''
-    async def CallMethod_t(self) -> type:
-        raise NotImplementedError
-        return
-    '''
+    @requireClientConnection
+    async def CallMethod_t(self,
+            t             : type,
+            hierarchyPath : str,      # The HierarchyPath for an object and the script attached to it.
+            methodName    : str,      # The name of the method to call within the script.
+            arguments     : list,     # TODO: The list of arguments to pass into the method.
+            timeout       : int = 30, # The number of seconds to wait for the command to be recieved by the agent.
+        ) -> None:
+
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_CallMethodRequest(
+                HierarchyPath = hierarchyPath,
+                MethodName = methodName,
+            )
+        )
+
+        # TODO: Set and serialize the method's arguments.
+        msg.GDIOMsg.SetArguments(arguments)
+
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
+
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exception(cmd_GenericResponse.ErrorMessage)
+
+        return cmd_GenericResponse.ReturnValues
 
     @requireClientConnection
     async def CaptureScreenshot(self,
             filename          : str,          # The path and filename of the screen capture.
             storeInGameFolder : bool = False, # TODO: Save the screenshot on the device the game is running on rather than returning it to the client.
             overwriteExisting : bool = False, # Overwrite if the file already exists.
-            timeout           : int = 60,     # The number of seconds to wait for the command to be recieved by the agent.
+            timeout           : int = 30,     # The number of seconds to wait for the command to be recieved by the agent.
         ) -> str:
 
         msg = ProtocolObjects.ProtocolMessage(
@@ -143,48 +149,38 @@ class ApiClient:
             GDIOMsg = Messages.Cmd_CaptureScreenshotRequest(
                 StoreInGameFolder = storeInGameFolder,
                 Filename = filename,
-            ),
+            )
         )
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-
-        # Recieve the response message and save its contained GDIOMsg.
-        #response = Responses.CaptureScreenshotResponse(**ProtocolObjects.getGDIOMsgData(await self.client.Recieve()))
-        response = await asyncio.wait_for(self.client.GetResult(requestInfo.RequestId), timeout)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_CaptureScreenshotResponse : Messages.Cmd_CaptureScreenshotResponse = await asyncio.wait_for(self.client.GetResult(requestInfo.RequestId), timeout)
         
-        # If the response is an Error,
-        if response.RC == 2:
-            # throw an exception containing the response data.
-            raise Exceptions.CaptureScreenshotError(response.ErrorMessage)
+        if cmd_CaptureScreenshotResponse.RC == Enums.ResponseCode.ERROR:
+            raise Exception(cmd_CaptureScreenshotResponse.ErrorMessage)
 
         # TODO: Im not sure this works properly
-        # If the client does not save the image localy,
         if storeInGameFolder:
-            # Return the image's location relative to the game.
-            return response.ImagePath
+            return cmd_CaptureScreenshotResponse.ImagePath
 
-        # If the file already exists,
-        # and `overwriteExisting` is not True,
         if os.path.isfile(filename) and not overwriteExisting:
-            # throw and exception that the image can't be saved.
             raise OSError(f'Cannot save screenshot to {filename}, file already exists')
         
         # TODO: Relative paths
         with open(filename, 'wb') as f:
-            f.write(response.ImageData)
+            f.write(cmd_CaptureScreenshotResponse.ImageData)
 
-        # No exceptions thrown; return image's location.
         return filename
         
     ## Float positions overload
     @requireClientConnection
-    async def Click(self,
-            buttonId : Enums.MouseButtons,
-            x : float,
-            y : float,
+    async def Click_XY(self,
+            buttonId        : Enums.MouseButtons,
+            x               : float,
+            y               : float,
             clickFrameCount : int,
-            timeout : int = 30
+            timeout         : int = 30
         ) -> bool:
+
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_ClickRequest(
@@ -194,43 +190,39 @@ class ApiClient:
                 FrameCount=clickFrameCount,
             ),
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        # Mitigates response mixups. Still happens sometimes.
-        # Also means commands are input dependent
-        response = await self.client.GetResult(requestInfo.RequestId)
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(response.ErrorMessage)
-
-        # The message didn't timeout and was sent successfully; return True.
-        return True
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
 
     ## Vector2 positions overload
-    '''
-    async def Click(self,
-            buttonId : MouseButtons,
-            position : Vector2,
+    # TODO: Can probably combine this with the XY overload
+    @requireClientConnection
+    async def Click_V2(self,
+            buttonId        : Enums.MouseButtons,
+            position        : ProtocolObjects.Vector2,
             clickFrameCount : int,
-            timeout : int = 30
+            timeout         : int = 30
         ) -> bool:
-        return self.Click(buttonId, position.x, position.y, clickFrameCount, timeout)
-    '''
+        return self.Click_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
 
     ## Float positions overload
     @requireClientConnection
-    async def ClickEx(self,
-            buttonId : Enums.MouseButtons,
-            x : float,
-            y : float,
-            clickFrameCount : int,
-            keys : list = None,
-            keysNumberOfFrames : int = 5,
-            modifiers : list = None,
+    async def ClickEx_XY(self,
+            buttonId                : Enums.MouseButtons,
+            x                       : float,
+            y                       : float,
+            clickFrameCount         : int,
+            keys                    : list = None,
+            keysNumberOfFrames      : int = 5,
+            modifiers               : list = None,
             modifiersNumberOfFrames : int = 3,
             delayAfterModifiersMsec : int = 500,
-            timeout : int = 30
+            timeout                 : int = 30
         ) -> bool:
         if keys != None or modifiers != None:
             await self.KeyPress(
@@ -250,36 +242,35 @@ class ApiClient:
                     FrameCount = clickFrameCount,
                 ),
             )
-            requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-            response = await self.client.GetResult(requestInfo.RequestId)
-            if response.RC != Enums.ResponseCode.OK:
-                raise Exceptions.ClickObjectError(response.ErrorMessage)
+            requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-            return response.RC == Enums.ResponseCode.OK
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     ## Vector2 positions overload
-    '''
-    async def ClickEx(self,
-            buttonId : MouseButtons,
-            position : Vector2,
-            clickFrameCount : int,
-            keys : list = None,
-            keysNumberOfFrames : int = 5,
-            modifiers : list = None,
+    async def ClickEx_V2(self,
+            buttonId                : Enums.MouseButtons,
+            position                : ProtocolObjects.Vector2,
+            clickFrameCount         : int,
+            keys                    : list = None,
+            keysNumberOfFrames      : int = 5,
+            modifiers               : list = None,
             modifiersNumberOfFrames : int = 3,
             delayAfterModifiersMsec : int = 500,
-            timeout : int = 30
+            timeout                 : int = 30
         ) -> bool:
-        return ClickEx(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
-    '''
+        return self.ClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
     
     @requireClientConnection
     async def ClickObject(self,
-            buttonId : Enums.MouseButtons,
-            hierarchyPath : str,
-            frameCount : int,
+            buttonId            : Enums.MouseButtons,
+            hierarchyPath       : str,
+            frameCount          : int,
             cameraHierarchyPath : str = None,
-            timeout : int = 30
+            timeout             : int = 30
         ) -> bool:
         
         msg = ProtocolObjects.ProtocolMessage(
@@ -291,25 +282,27 @@ class ApiClient:
                 CameraHierarchyPath = cameraHierarchyPath,
             )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(response.ErrorMessage)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        return response.RC == Enums.ResponseCode.OK
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+
+
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     @requireClientConnection
     async def ClickObjectEx(self,
-            buttonId : Enums.MouseButtons,
-            hierarchyPath : str,
-            frameCount : int,
-            cameraHierarchyPath : str = None,
-            keys : list = None,
-            keysNumberOfFrames : int = 5,
-            modifiers : list = None,
+            buttonId                : Enums.MouseButtons,
+            hierarchyPath           : str,
+            frameCount              : int,
+            cameraHierarchyPath     : str = None,
+            keys                    : list = None,
+            keysNumberOfFrames      : int = 5,
+            modifiers               : list = None,
             modifiersNumberOfFrames : int = 3,
             delayAfterModifiersMsec : int = 500,
-            timeout : int = 30
+            timeout                 : int = 30
         ) -> bool:
 
         if keys != None or modifiers != None:
@@ -324,22 +317,25 @@ class ApiClient:
                 CameraHierarchyPath = cameraHierarchyPath,
             )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(response.ErrorMessage)
-            
-        return response.RC == Enums.ResponseCode.OK
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+
+
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
+            
     # TODO: autoplay
     async def Connect(self,
-            hostname : str = '127.0.0.1',    # The hostname of the device running the target game.
-            port     : int = 19734,          # The port that the target Gamedriver agent is configured to use.
-            autoplay : bool = False,         # TODO: Start the game automatically within the Unity Editor.
-            timeout  : int = 30,             # The number of seconds to wait for the command to be recieved by the agent.
+            hostname           : str = '127.0.0.1',    # The hostname of the device running the target game.
+            port               : int = 19734,          # The port that the target Gamedriver agent is configured to use.
+            autoplay           : bool = False,         # TODO: Start the game automatically within the Unity Editor.
+            timeout            : int = 30,             # The number of seconds to wait for the command to be recieved by the agent.
             autoPortResolution : bool = True,# TODO: Automatically resolve the port a Gamedriver Agent is running on.
-            reader=None, # TEMP
-            writer=None, # TEMP
+
+            reader : asyncio.StreamReader = None, # TEMP
+            writer : asyncio.StreamWriter = None, # TEMP
         ) -> None:
 
         # Try to connect to the target game.
@@ -390,8 +386,6 @@ class ApiClient:
     @requireClientConnection
     async def DisableHooks(self, hookingObject, timeout : int = 30) -> bool:
 
-        # TODO: Hooking objects
-        # NOTE: ATM, enables all hooking
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_ChangeHookStatusRequest(
@@ -403,18 +397,14 @@ class ApiClient:
             ),
         )
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        # Mitigates response mixups. Still happens sometimes.
-        # Also means commands are input dependent
-        #await self.client.Recieve()
-        response = await self.client.GetResult(requestInfo.RequestId)
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.HooksStatusError(response.ErrorMessage)
 
-        # No exceptions thrown; return True
-        return response.RC == Enums.ResponseCode.OK
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     @requireClientConnection
     async def DisableObjectCaching(self, timeout : int = 30) -> bool:
@@ -426,13 +416,14 @@ class ApiClient:
             )
         )
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if response.RC != Enums.ResponseCode.OK:
-            return False
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        return True
+
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     async def Disconnect(self) -> None:
         # If the client isn't connected,
@@ -441,6 +432,7 @@ class ApiClient:
             return
 
         ## TODO: CLEANUP
+        self._cleanup()
         self.gameConnectionDetails = None
 
         await self.client.Disconnect()
@@ -448,7 +440,7 @@ class ApiClient:
     ## Float positions overload
     @requireClientConnection
     async def DoubleClick(self,
-            buttonId : Enums.MouseButtonId,
+            buttonId : Enums.MouseButtons,
             x : float,
             y : float,
             clickFrameCount : int,
@@ -466,13 +458,13 @@ class ApiClient:
             )
         )
 
-        requestInfo = await self.client.SendMessage(msg, timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(response.ErrorMessage)
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        return response.RC == Enums.ResponseCode.OK
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     ## Vector2 positions overload
     '''
@@ -509,13 +501,13 @@ class ApiClient:
             )
         )
 
-        requestInfo = await self.client.SendMessage(msg, timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(response.ErrorMessage)
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        return response.RC == Enums.ResponseCode.OK
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     ## Vector2 positions overload
     '''
@@ -541,13 +533,14 @@ class ApiClient:
                 IsDoubleClick = True
             )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(response.ErrorMessage)
-            
-        return response.RC == Enums.ResponseCode.OK
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
+
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     ## Vector2 positions overload
     '''
@@ -580,12 +573,13 @@ class ApiClient:
                 IsDoubleClick = True
             )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(response.ErrorMessage)
-            
-        return response.RC == Enums.ResponseCode.OK
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
+
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     @requireClientConnection
     async def EnableHooks(self, hookingObject, timeout : int = 30) -> bool:
@@ -603,18 +597,13 @@ class ApiClient:
             ),
         )
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        # Mitigates response mixups. Still happens sometimes.
-        # Also means commands are input dependent
-        #await self.client.Recieve()
-        response = await self.client.GetResult(requestInfo.RequestId)
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.HooksStatusError(response.ErrorMessage)
-
-        # No exceptions thrown; return True
-        return response.RC == Enums.ResponseCode.OK
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     @requireClientConnection
     async def EnableObjectCaching(self, timeout : int = 30) -> bool:
@@ -626,15 +615,13 @@ class ApiClient:
             )
         )
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        # Mitigates response mixups. Still happens sometimes.
-        # Also means commands are input dependent
-        #await self.client.Recieve()
-        response = await self.client.GetResult(requestInfo.RequestId)
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        # No exceptions thrown; return True
-        return True
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     @requireClientConnection
     async def FlushObjectLookupCache(self, timeout : int = 30) -> bool:
@@ -644,15 +631,13 @@ class ApiClient:
             GDIOMsg = Messages.Cmd_FlushCacheRequest()
         )
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        # Mitigates response mixups. Still happens sometimes.
-        # Also means commands are input dependent
-        #await self.client.Recieve()
-        response = await self.client.GetResult(requestInfo.RequestId)
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        # No exceptions thrown; return True
-        return True
+        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     @requireClientConnection
     async def GetConnectedGameDetails(self) -> ProtocolObjects.GameConnectionDetails:
@@ -664,13 +649,15 @@ class ApiClient:
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_GetStatisticsRequest()
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
-        if response.RC != Enums.ResponseCode.OK:
+
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
+
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             return -1
 
-        return response.ReturnedValues['FPS']
-
+        return cmd_GenericResponse.ReturnedValues['FPS']
+        
 
     @requireClientConnection
     async def GetNextCollisionEvent(self) -> ProtocolObjects.Collision:
@@ -692,12 +679,13 @@ class ApiClient:
                 ObjectBHierarchyPath = objectB_HierarchyPath
             )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
-        if response.RC != Enums.ResponseCode.OK:
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
+
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             return -1
 
-        return response
+        return cmd_GenericResponse
 
     @requireClientConnection
     async def GetObjectFieldValue(self,
@@ -716,13 +704,13 @@ class ApiClient:
                 Type = t.__class__
             )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if response.RC != Enums.ResponseCode.OK:
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             return -1
 
-        return response
+        return cmd_GenericResponse
 
     @requireClientConnection
     async def GetObjectFieldValueByName(self,
@@ -756,13 +744,13 @@ class ApiClient:
             GDIOMsg = Messages.Cmd_GetObjectListRequest()
         )
 
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
+        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ObjectListError(response.ErrorMessage)
+        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
-        return response.Objects
+        return cmd_GenericResponse.Objects
 
     @requireClientConnection
     async def GetObjectPosition(self,
@@ -785,6 +773,12 @@ class ApiClient:
             raise Exceptions.ObjectPositionError(response.ErrorMessage)
 
         return response.Value3
+
+###############################################################################################
+#                                                                                             #
+#                                  LEFT OFF HERE                                              #
+#                                                                                             #
+###############################################################################################
 
     @requireClientConnection
     async def GetSceneName(self, timeout : int = 30) -> bool:
@@ -1117,3 +1111,6 @@ class ApiClient:
 
     async def Wait(self, miliseconds : int) -> None:
         time.sleep(miliseconds * 0.001)
+
+    def _cleanup(self):
+        pass
