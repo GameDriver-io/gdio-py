@@ -69,6 +69,7 @@ async def test_ButtonPress(api_connectedlocal):
     await api.ButtonPress('Jump', 100)
 
 @pytest.mark.asyncio
+@pytest.mark.skip
 async def test_KeyPress(api_connectedlocal):
     api = api_connectedlocal
     #await api.LoadScene('SampleScene')
@@ -76,5 +77,10 @@ async def test_KeyPress(api_connectedlocal):
     await api.Wait(1000)
     await api.KeyPress([KeyCode.Space], 100)
     await api.DisableHooks(HookingObject.ALL)
-    
 
+#('CallMethod_Void', ("//*[@name='Player']/fn:component('CustomScript')", "Call_Test")),
+
+@pytest.mark.asyncio
+async def test_CallMethod(api_connectedlocal):
+    api = api_connectedlocal
+    await api.CallMethod_Void("//*[@name='Player']/fn:component('CustomScript')", "Args_Test", ["string:The Test was run"])

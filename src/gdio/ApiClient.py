@@ -78,11 +78,11 @@ class ApiClient:
     
     ## Void overload
     @requireClientConnection
-    async def CallMethod_void(self,
-            hierarchyPath : str,      # The HierarchyPath for an object and the script attached to it.
-            methodName    : str,      # The name of the method to call within the script.
-            arguments     : list,     # TODO: The list of arguments to pass into the method.
-            timeout       : int = 30, # The number of seconds to wait for the command to be recieved by the agent.
+    async def CallMethod_Void(self,
+            hierarchyPath : str,         # The HierarchyPath for an object and the script attached to it.
+            methodName    : str,         # The name of the method to call within the script.
+            arguments     : list = None, # TODO: The list of arguments to pass into the method.
+            timeout       : int = 30,    # The number of seconds to wait for the command to be recieved by the agent.
         ) -> None:
 
         msg = ProtocolObjects.ProtocolMessage(
@@ -94,7 +94,8 @@ class ApiClient:
         )
 
         # TODO: Set and serialize the method's arguments.
-        msg.GDIOMsg.SetArguments(arguments)
+        if arguments:
+            msg.GDIOMsg.SetArguments(arguments)
 
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
@@ -109,7 +110,7 @@ class ApiClient:
 
     ## Return value overload
     @requireClientConnection
-    async def CallMethod_t(self,
+    async def CallMethod(self,
             t             : type,
             hierarchyPath : str,      # The HierarchyPath for an object and the script attached to it.
             methodName    : str,      # The name of the method to call within the script.
@@ -475,7 +476,7 @@ class ApiClient:
     ## Float positions overload
     @requireClientConnection
     async def DoubleClickEx(self,
-            buttonId : Enums.MouseButtonId,
+            buttonId : Enums.MouseButtons,
             x : float,
             y : float,
             clickFrameCount : int,
@@ -758,7 +759,7 @@ class ApiClient:
             coordSpace : Enums.CoordinateConversion = Enums.CoordinateConversion.NONE,
             cameraHierarchyPath : str = None,
             timeout : int = 30
-        ) -> ProtocolObjects.Position:
+        ) -> ProtocolObjects.Vector3:
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_GetObjectPositionRequest(
@@ -856,7 +857,7 @@ class ApiClient:
 
     @requireClientConnection
     async def MouseDrag(self,
-            button : Enums.MouseButton,
+            button : Enums.MouseButtons,
             dx : float,
             dy : float,
             frameCount : float,

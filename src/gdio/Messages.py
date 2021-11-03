@@ -1,4 +1,7 @@
-from gdio.ProtocolObjects import Vector2
+import msgpack
+from gdio import Serializers
+from . import ProtocolObjects
+from gdio.Serializers import customSerializer
 from . import Enums
 
 CmdIds = {
@@ -282,12 +285,45 @@ class Cmd_CallMethodRequest(Message):
         self._serializer = _serializer
 
     def SetArguments(self, arguments = None, serializer = None):
+        customSerializer : Serializers.CustomSerializer = self._serializer if serializer == None else serializer
+        serializedObjectData = None
         if arguments == None:
             return
-        # TODO: Logging with context awareness
-        print('CallMethod: Arguments not yet handled. Passing None')
-        return
+        if len(arguments) == 1:
+            if not Serializers.IsBuiltin(arguments[0]):
+                if (customSerializer == None):
+                    raise Exception(f'CustomSerializer is not defined for type: {type(arguments[0])}')
+                    
+                serializedObjectData = customSerializer.Serialize(arguments[0])
 
+            self.Arguments.append(Serializers.SerializedObject(
+                SerializedObjectType = type(arguments[0]),
+                SerializedObjectData = serializedObjectData
+            ))
+            return
+
+        ret = []
+        for obj in arguments:
+            if isinstance(obj, object):
+                if  not Serializers.IsBuiltin(obj) and (customSerializer == None):
+                    raise Exception(f'CustomSerializer is not defined for type: {type(obj)}')
+                serializedObjectData = msgpack.packb(obj) if customSerializer == None else customSerializer.Serialize(obj)
+                if serializedObjectData == None:
+                    raise Exception(f'Failed to serialized object of type: {type(obj)}')
+                ret.append(
+                    Serializers.SerializedObject(
+                        SerializedObjectType = type(obj),
+                        SerializedObjectData = serializedObjectData,
+                        CustomSerialization = True
+                    )
+                )
+            else:
+                ret.append(
+                    Serializers.SerializedObject(
+                        NonSerializedObject=obj
+                    )
+                )
+        
 class Cmd_TransferFileRequest(Message):
     def __init__(self):
         raise NotImplementedError
