@@ -50,7 +50,7 @@ class ApiClient:
         if cmd_GenericResponse.RC == Enums.ResponseCode.ERROR:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return (cmd_GenericResponse.Response == Enums.ResponseCode.OK)
+        return (cmd_GenericResponse.RC == Enums.ResponseCode.OK)
 
     @requireClientConnection
     async def ButtonPress(self,
@@ -74,7 +74,7 @@ class ApiClient:
         if cmd_GenericResponse.RC == Enums.ResponseCode.ERROR:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return (cmd_GenericResponse.Response == Enums.ResponseCode.OK)
+        return (cmd_GenericResponse.RC == Enums.ResponseCode.OK)
     
     ## Void overload
     @requireClientConnection
@@ -203,7 +203,7 @@ class ApiClient:
     ## Vector2 positions overload
     # TODO: Can probably combine this with the XY overload
     @requireClientConnection
-    async def Click_V2(self,
+    async def Click_Vec2(self,
             buttonId        : Enums.MouseButtons,
             position        : ProtocolObjects.Vector2,
             clickFrameCount : int,
@@ -252,7 +252,7 @@ class ApiClient:
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     ## Vector2 positions overload
-    async def ClickEx_V2(self,
+    async def ClickEx_Vec2(self,
             buttonId                : Enums.MouseButtons,
             position                : ProtocolObjects.Vector2,
             clickFrameCount         : int,
@@ -440,7 +440,7 @@ class ApiClient:
 
     ## Float positions overload
     @requireClientConnection
-    async def DoubleClick(self,
+    async def DoubleClick_XY(self,
             buttonId : Enums.MouseButtons,
             x : float,
             y : float,
@@ -468,14 +468,17 @@ class ApiClient:
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     ## Vector2 positions overload
-    '''
-    async def DoubleClick(self) -> bool:
-        return self.DoubleClick()
-    '''
+    async def DoubleClick_Vec2(self,
+            buttonId : Enums.MouseButtons,
+            position : ProtocolObjects.Vector2,
+            clickFrameCount : int,
+            timeout : int = 30
+        ) -> bool:
+        return self.DoubleClick(buttonId, position.x, position.y, clickFrameCount, timeout)
 
     ## Float positions overload
     @requireClientConnection
-    async def DoubleClickEx(self,
+    async def DoubleClickEx_XY(self,
             buttonId : Enums.MouseButtons,
             x : float,
             y : float,
@@ -511,10 +514,18 @@ class ApiClient:
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     ## Vector2 positions overload
-    '''
-    async def DoubleClickEx(self) -> bool:
-        return self.DoubleClickEx()
-    '''
+    async def DoubleClickEx_Vec2(self,
+            buttonId : Enums.MouseButtons,
+            position : ProtocolObjects.Vector2,
+            clickFrameCount : int,
+            keys : list = None,
+            keysNumberOfFrames : int = 5,
+            modifiers : list = None,
+            modifiersNumberOfFrames : int = 3,
+            delayAfterModifiersMsec : int = 500,
+            timeout : int = 30
+        ) -> bool:
+        return self.DoubleClickEx(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
 
     ## Float positions overload
     @requireClientConnection
@@ -542,12 +553,6 @@ class ApiClient:
             raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-    
-    ## Vector2 positions overload
-    '''
-    async def DoubleClickObject(self) -> bool:
-        return self.DoubleClickObject()
-    '''
 
     @requireClientConnection
     async def DoubleClickObjectEx(self,
@@ -774,12 +779,6 @@ class ApiClient:
             raise Exceptions.ObjectPositionError(response.ErrorMessage)
 
         return response.Value3
-
-###############################################################################################
-#                                                                                             #
-#                                  LEFT OFF HERE                                              #
-#                                                                                             #
-###############################################################################################
 
     @requireClientConnection
     async def GetSceneName(self, timeout : int = 30) -> bool:
@@ -1098,20 +1097,148 @@ class ApiClient:
         # TODO: Big one
         raise NotImplementedError
 
-################################################################################
-#                                                                              #
-#                                                                              #
-#                                                                              #
-################################################################################
-        
+    @requireClientConnection
+    async def Tap_XY(self,
+            x : float,
+            y : float,
+            tapCount : int = 1,
+            frameCount : int = 5,
+            timeout : int = 30
+        ) -> bool:
+        request = Messages.Cmd_TapRequest(
+            X = x,
+            Y = y,
+            FrameCount = frameCount,
+            TapCount = tapCount
+        )
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
+        response = await self.client.GetResult(requestInfo.RequestId)
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exception(response.ErrorMessage)
+
+        return True
+
+    @requireClientConnection
+    async def Tap_Vec2(self,
+            position : ProtocolObjects.Vector2,
+            tapCount : int = 1,
+            frameCount : int = 5,
+            timeout : int = 30
+        ) -> bool:
+        return await self.Tap_XY(position.X, position.Y, tapCount, frameCount, timeout)
+
+    @requireClientConnection
+    async def TapObject(self,
+            hierarchyPath : str,
+            tapCount : int = 1,
+            frameCount : int = 5,
+            cameraHierarchyPath : str = None,
+            timeout : int = 30
+        ) -> bool:
+        request = Messages.Cmd_TapRequest(
+            HierarchyPath = hierarchyPath,
+            FrameCount = frameCount,
+            TapCount = tapCount,
+            CameraHierarchyPath = cameraHierarchyPath
+        )
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
+        response = await self.client.GetResult(requestInfo.RequestId)
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exception(response.ErrorMessage)
+
+        return True
+
+    @requireClientConnection
+    async def TerminateGame(self):
+        raise NotImplementedError
+
+    @requireClientConnection
+    async def ToggleEditorPause(self):
+        raise NotImplementedError
+
+    @requireClientConnection
+    async def ToggleEditorPlay(self):
+        raise NotImplementedError
+
+    @requireClientConnection
+    async def TouchInput(self,
+            x1 : float,
+            y1 : float,
+            x2 : float,
+            y2 : float,
+            fingerId : int,
+            tapCount : int = 1,
+            frameCount : int = 5,
+            waitForEmptyInput : bool = True,
+            radius : float = 20,
+            pressure : float = 1,
+            altitudeAngle : float = 0,
+            azmulthAngle : float = 0,
+            maximumPossiblePressure : float = 1,
+            timeout : int = 30
+        ) -> bool:
+        request = Messages.Cmd_TouchEventRequest(
+            StartPosition=ProtocolObjects.Vector2(X=x1, Y=y1),
+            DestinationPosition=ProtocolObjects.Vector2(X=x2, Y=y2),
+            FrameCount = frameCount,
+            TapCount = tapCount,
+            Radius = radius,
+            Pressure = pressure,
+            AltitudeAngle = altitudeAngle,
+            AzmulthAngle = azmulthAngle,
+            FingerId = fingerId,            
+            MaximumPossiblePressure = maximumPossiblePressure
+        )
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
+        response = await self.client.GetResult(requestInfo.RequestId)
+        if waitForEmptyInput:
+            self.WaitForEmptyInput(timeout)
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exception(response.ErrorMessage)
+
+        return True
+
+    
+    @requireClientConnection
+    async def UnregisterCollisionMonitor(self,
+            hierarchyPath : str,
+            timeout : int = 30
+        ) -> bool:
+        request = Messages.Cmd_UnregisterCollisionMonitorRequest(
+            HierarchyPath = hierarchyPath,
+        )
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
+        response = await self.client.GetResult(requestInfo.RequestId)
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exception(response.ErrorMessage)
+
+        return True
+
+    async def Wait(self, miliseconds : int) -> None:
+        time.sleep(miliseconds * 0.001)
 
     @requireClientConnection
     async def WaitForEmptyInput(self, timeout : int = 30) -> bool:
         await asyncio.wait_for(self.client.WaitForEmptyInput(datetime.datetime.now().timestamp()), timeout)
 
+    @requireClientConnection
+    async def WaitForCollisionEvent(self,
+            eventId : str,
+            timeout : int = 30
+        ) -> ProtocolObjects.Collision:
+        raise NotImplementedError
 
-    async def Wait(self, miliseconds : int) -> None:
-        time.sleep(miliseconds * 0.001)
+    def waitForObject(self,
+            hierarchyPath : str,
+            timeout : int = 30
+        ) -> bool:
+        raise NotImplementedError
+
+    def waitForObjectValue(self,
+            hierarchyPath : str,
+            timeout : int = 30
+        ) -> bool:
+        raise NotImplementedError
 
     def _cleanup(self):
         pass

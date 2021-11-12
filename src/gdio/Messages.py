@@ -77,203 +77,24 @@ class Message:
     def __repr__(self):
         return f'{self.pack()}'
 
-class Cmd_GetClientListRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+class Cmd_GenericResponse(Message):
+    def __init__(self, StackTrace = None, ErrorMessage = None, InformationMessage = None, WarningMessage = None, RC = Enums.ResponseCode.OK, ReturnedValues = None):
 
-class Cmd_HandshakeRequest(Message):
-    def __init__(self,
-            ProtocolVersion=None,
-            ClientUID = None,
-            channel = None,
-            Recording = False,
-        ):
-        self.ProtocolVersion : str = '' if ProtocolVersion == None else ProtocolVersion
-        self.ClientUID : str = '' if ClientUID == None else ClientUID
-        self.channel = channel
-        self.Recording = Recording
+        self.StackTrace =         '' if StackTrace == None else StackTrace
+        self.ErrorMessage =       '' if ErrorMessage == None else ErrorMessage
+        self.InformationMessage = '' if InformationMessage == None else InformationMessage
+        self.WarningMessage =     '' if WarningMessage == None else WarningMessage
+        self.RC = RC
 
-class Cmd_WaitForObjectRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def IsError(self):
+        return (len(self.ErrorMessage) > 1)
 
-class Cmd_WaitForObjectValueRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def IsInformation(self):
+        return (len(self.InformationMessage) > 1)
 
-class Cmd_SetTimeScaleRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
+    def IsWarning(self):
+        return (len(self.WarningMessage) > 1)
 
-class Cmd_SetObjectValueRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
-
-class Cmd_SetInputFieldTextRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
-
-class Cmd_CaptureScreenshotRequest(Message):
-    # TODO: default filename
-    # TODO: stereo capture mode = LeftEye (Enum)
-    def __init__(self,
-            StoreInGameFolder = False,
-            Filename = None,
-            SuperSize = 1,
-            Mode = 1
-        ):
-        self.StoreInGameFolder = False
-        self.Filename = Filename if Filename != None else ''
-        self.SuperSize = 1
-        self.Mode = 1
-
-class Cmd_RotateRequest(Message):
-    def __init__(self,
-            HierarchyPath = None,
-            WaitForObject = True,
-            Timeout = 30,
-            Eulers = None,
-            Axis = None,
-            EulersUTR = None,
-            AxisUTR = None,
-            Angle = None,
-            XAngle = None,
-            YAngle = None,
-            ZAngle = None,
-            Quant = None,
-            RelativeTo = Enums.Space.Self,
-            QuantUTR = None,
-            RelativeToUTR = Enums.Space.Self,
-        ):
-        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
-        self.WaitForObject = WaitForObject
-        self.Timeout = Timeout
-        self.Eulers = Eulers
-        self.Axis = Axis
-        self.EulersUTR = EulersUTR
-        self.AxisUTR = AxisUTR
-        self.Angle = Angle
-        self.XAngle = XAngle
-        self.YAngle = YAngle
-        self.ZAngle = ZAngle
-        self.Quant = Quant
-        self.RelativeTo = RelativeTo
-        self.QuantUTR = QuantUTR
-        self.RelativeToUTR = RelativeToUTR
-
-class Cmd_RaycastRequest(Message):
-    def __init__(self,
-            RaycastPoint = None,
-            RaycastPointUTR = None,
-            CameraHierarchyPath = None,
-        ):
-        self.RaycastPoint = RaycastPoint
-        self.RaycastPointUTR = RaycastPointUTR
-        self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
-
-class Cmd_NavAgentMoveToPointRequest(Message):
-    def __init__(self,
-            Point = None,
-            PointUTR = None,
-            NavAgent_HierarchyPath = None,
-        ):
-        self.Point = Point
-        self.PointUTR = PointUTR
-        self.NavAgent_HierarchyPath = '' if NavAgent_HierarchyPath == None else NavAgent_HierarchyPath
-
-class Cmd_MouseMoveToObjectRequest(Message):
-    def __init__(self,
-            ObjectHierarchyPath = None,
-            Timeout = 30,
-            FrameCount = 5,
-            WaitForObject = True,
-        ):
-        self.ObjectHierarchyPath = ObjectHierarchyPath
-        self.Timeout = Timeout
-        self.FrameCount = FrameCount
-        self.WaitForObject = WaitForObject
-
-class Cmd_MouseMoveRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
-
-class Cmd_MouseDragRequest(Message):
-    def __init__(self,
-            Destination = None,
-            Origin = None,
-            DestinationUTR = None,
-            OriginUTR = None,
-            FrameCount = 0,
-            ButtonId = 0
-        ):
-        self.Destination = Destination
-        self.Origin = Origin
-        self.DestinationUTR = DestinationUTR
-        self.OriginUTR = OriginUTR
-        self.FrameCount = FrameCount
-        self.ButtonId = ButtonId
-
-class Cmd_LoadSceneRequest(Message):
-    def __init__(self, SceneName = None):
-        self.SceneName = '' if SceneName == None else SceneName
-
-class Cmd_KeyPressRequest(Message):
-    def __init__(self,
-            KeyCodes : list = None,
-            Modifiers : list = None,
-            NumberOfFrames : int = None,
-        ):
-        self.KeyCodes = [] if KeyCodes == None else KeyCodes
-        self.Modifiers = [] if Modifiers == None else Modifiers
-        self.NumberOfFrames = 0 if NumberOfFrames == None else NumberOfFrames
-
-class Cmd_GetObjectValueRequest(Message):
-    def __init__(self, HierarchyPath = None, ObjectFieldOrPropertyName = None, TypeFullName = None):
-
-        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
-        self.ObjectFieldOrPropertyName = '' if ObjectFieldOrPropertyName == None else ObjectFieldOrPropertyName
-        self.TypeFullName = '' if TypeFullName == None else TypeFullName
-
-class Cmd_GetSceneNameRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
-
-class Cmd_GetObjectPositionRequest(Message):
-    def __init__(self, ObjectHierarchyPath = None, CameraHierarchyPath = None):
-
-        self.ObjectHierarchyPath = '' if ObjectHierarchyPath == None else ObjectHierarchyPath
-        self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
-
-class Cmd_GetObjectListRequest(Message):
-    def __init__(self, 
-        ):
-        raise NotImplementedError
-
-class Cmd_GetMousePositionRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
-
-class Cmd_ClickObjectRequest(Message):
-    def __init__(self,
-            MouseButtonId = 0,
-            HierarchyPath = None,
-            CameraHierarchyPath = None,
-            IsDoubleClick = False,
-            FrameCount = 5
-        ):
-        self.MouseButtonId = MouseButtonId
-        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
-        self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
-        self.IsDoubleClick = IsDoubleClick
-        self.FrameCount = FrameCount
-
-class Cmd_ClickRequest(Message):
-    def __init__(self, IsDoubleClick = False, FrameCount = 5, MouseButtonId = 0, X = 0, Y = 0):
-        self.IsDoubleClick = IsDoubleClick
-        self.FrameCount = FrameCount
-        self.MouseButtonId = MouseButtonId
-        self.X = X
-        self.Y = Y
 
 class Cmd_CallMethodRequest(Message):
     # TODO: custom serializer
@@ -323,14 +144,24 @@ class Cmd_CallMethodRequest(Message):
                         NonSerializedObject=obj
                     )
                 )
-        
-class Cmd_TransferFileRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
 
-class Cmd_GetObjectInterfacesList(Message):
-    def __init__(self):
-        raise NotImplementedError
+
+class Cmd_CaptureScreenshotRequest(Message):
+    # TODO: default filename
+    # TODO: stereo capture mode = LeftEye (Enum)
+    def __init__(self, StoreInGameFolder = False, Filename = None, SuperSize = 1, Mode = 1):
+        self.StoreInGameFolder = StoreInGameFolder
+        self.Filename = '' if Filename == None else Filename
+        self.SuperSize = SuperSize
+        self.Mode = Mode
+
+class Cmd_CaptureScreenshotResponse(Cmd_GenericResponse):
+    def __init__(self, ImageData, ImagePath, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+
+        self.ImageData = ImageData
+        self.ImagePath = ImagePath
+
 
 class Cmd_ChangeHookStatusRequest(Message):
     def __init__(self, KeyboardHooksStatus = True, MouseHooksStatus = True, TouchHooksStatus = True, GamepadHooksStatus = True, BitChanged = 0):
@@ -339,110 +170,70 @@ class Cmd_ChangeHookStatusRequest(Message):
         self.TouchHooksStatus = TouchHooksStatus
         self.GamepadHooksStatus = GamepadHooksStatus
         self.BitChanged = BitChanged
-        
-class Cmd_PeekRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
 
-class Cmd_PokeRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
-
-class Cmd_TouchEventRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
-
-class Cmd_TapRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
-
-class Cmd_ObjectDistanceRequest(Message):
-    def __init__(self,
-            ObjectA_HierarchyPath = None,
-            ObjectB_HierarchyPath = None,
-        ):
-        self.ObjectA_HierarchyPath = '' if ObjectA_HierarchyPath == None else ObjectA_HierarchyPath
-        self.ObjectB_HierarchyPath = '' if ObjectB_HierarchyPath == None else ObjectB_HierarchyPath
-        
-                
-class Cmd_FlushCacheRequest(Message):
-    def __init__(self):
-        raise NotImplementedError
 
 class Cmd_ChangeObjectResolverCacheStateRequest(Message):
     def __init__(self, STATE = True):
-
         self.STATE = STATE
 
-class Cmd_InputManagerStateRequest(Message):
-    def __init__(self, IdName, NumberOfFrames, InputType, ChangeValue=0.0):
-        self.IdName = IdName
-        self.NumberOfFrames = NumberOfFrames
-        self.InputType = InputType
-        self.ChangeValue = ChangeValue
 
-class Cmd_RegisterCollisionMonitorRequest(Message):
-    def __init__(self,
-            HierarchyPath = None,
-        ):
-        HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+class Cmd_ClickObjectRequest(Message):
+    def __init__(self, MouseButtonId = 0, HierarchyPath = None, CameraHierarchyPath = None, IsDoubleClick = False, FrameCount = 5):
+        self.MouseButtonId = MouseButtonId
+        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+        self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
+        self.IsDoubleClick = IsDoubleClick
+        self.FrameCount = FrameCount
 
-class Cmd_GetStatisticsRequest(Message):
+
+class Cmd_ClickRequest(Message):
+    def __init__(self, IsDoubleClick = False, FrameCount = 5, MouseButtonId = 0, X = 0, Y = 0):
+        self.IsDoubleClick = IsDoubleClick
+        self.FrameCount = FrameCount
+        self.MouseButtonId = MouseButtonId
+        self.X = X
+        self.Y = Y
+
+
+class Cmd_FlushCacheRequest(Message):
+    def __init__(self):
+        pass
+
+
+class Cmd_GetGameObjectRequest(Message):
     def __init__(self, HierarchyPath = None):
         self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
 
-class Cmd_UnregisterCollisionMonitorRequest(Message):
+
+class Cmd_GetMousePositionRequest(Message):
     def __init__(self):
-        raise NotImplementedError
+        pass
 
-class Cmd_GetGameObjectRequest(Message):
-    def __init__(self, HierarchyPath=''):
 
-        self.HierarchyPath = HierarchyPath
-        
-class Cmd_NavAgentMoveToObjectRequest(Message):
+class Cmd_GetObjectInterfacesList(Message):
     def __init__(self):
-        raise NotImplementedError
+        pass
 
-class Cmd_GenericResponse(Message):
-    def __init__(self,
-            StackTrace         = None,
-            ErrorMessage       = None,
-            InformationMessage = None,
-            WarningMessage     = None,
-            RC                 = Enums.ResponseCode.OK,
-            ReturnedValues     = None
-        ):
 
-        self.StackTrace =         '' if StackTrace == None else StackTrace
-        self.ErrorMessage =       '' if ErrorMessage == None else ErrorMessage
-        self.InformationMessage = '' if InformationMessage == None else InformationMessage
-        self.WarningMessage =     '' if WarningMessage == None else WarningMessage
-        self.RC = RC
+class Cmd_GetObjectListRequest(Message):
+    def __init__(self):
+        pass
 
-    def IsError(self):
-        return (len(self.ErrorMessage) > 1)
 
-    def IsInformation(self):
-        return (len(self.InformationMessage) > 1)
+class Cmd_GetObjectPositionRequest(Message):
+    def __init__(self, ObjectHierarchyPath = None, CameraHierarchyPath = None):
+        self.ObjectHierarchyPath = '' if ObjectHierarchyPath == None else ObjectHierarchyPath
+        self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
 
-    def IsWarning(self):
-        return (len(self.WarningMessage) > 1)
+
+class Cmd_GetObjectValueRequest(Message):
+    def __init__(self, HierarchyPath = None, ObjectFieldOrPropertyName = None, TypeFullName = None):
+        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+        self.ObjectFieldOrPropertyName = '' if ObjectFieldOrPropertyName == None else ObjectFieldOrPropertyName
+        self.TypeFullName = '' if TypeFullName == None else TypeFullName
 
 class Cmd_GetObjectValueResponse(Cmd_GenericResponse):
-    def __init__(self,
-            _cmdID,
-            SerializeObjectType,
-            Serializer,
-            directObject,
-
-            StackTrace,
-            ErrorMessage,
-            InformationMessage,
-            WarningMessage,
-            RC,
-            ReturnedValues,
-        ):
+    def __init__(self, _cmdID, SerializeObjectType, Serializer, directObject, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):
         super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
 
         self._CmdID = _cmdID
@@ -450,29 +241,255 @@ class Cmd_GetObjectValueResponse(Cmd_GenericResponse):
         self.Serializer = Serializer
         self.directObject = directObject
 
-class Cmd_CaptureScreenshotResponse(Cmd_GenericResponse):
-    def __init__(self,
-            ImageData,
-            ImagePath,
 
-            StackTrace,
-            ErrorMessage,
-            InformationMessage,
-            WarningMessage,
-            RC,
-            ReturnedValues,
+class Cmd_GetSceneNameRequest(Message):
+    def __init__(self):
+        pass
+
+
+class Cmd_GetStatisticsRequest(Message):
+    def __init__(self, HierarchyPath = None):
+        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+
+
+class Cmd_InputManagerStateRequest(Message):
+    def __init__(self, IdName=None, NumberOfFrames=0, InputType=0, ChangeValue=0.0):
+        self.IdName = IdName if IdName else ''
+        self.NumberOfFrames = NumberOfFrames
+        self.InputType = InputType
+        self.ChangeValue = ChangeValue
+
+
+class Cmd_KeyPressRequest(Message):
+    def __init__(self,
+            KeyCodes : list = None,
+            Modifiers : list = None,
+            NumberOfFrames : int = 0,
+        ):
+        self.KeyCodes = KeyCodes if KeyCodes else []
+        self.Modifiers = Modifiers if Modifiers else []
+        self.NumberOfFrames = NumberOfFrames
+
+
+class Cmd_LoadSceneRequest(Message):
+    def __init__(self, SceneName = None):
+        self.SceneName = SceneName if SceneName else ''
+
+
+class Cmd_MouseDragRequest(Message):
+    def __init__(self, Destination = None, Origin = None, DestinationUTR = None, OriginUTR = None, FrameCount = 0, ButtonId = 0):
+        self.Destination = Destination
+        self.Origin = Origin
+        self.DestinationUTR = DestinationUTR
+        self.OriginUTR = OriginUTR
+        self.FrameCount = FrameCount
+        self.ButtonId = ButtonId
+
+
+class Cmd_MouseMoveRequest(Message):
+    def __init__(self, Destination = None, Origin = None, DestinationUTR = None, OriginUTR = None, FrameCount = 0):
+        self.Destination = Destination
+        self.Origin = Origin
+        self.DestinationUTR = DestinationUTR
+        self.OriginUTR = OriginUTR
+        self.FrameCount = FrameCount
+
+
+class Cmd_MouseMoveToObjectRequest(Message):
+    def __init__(self, ObjectHierarchyPath = None, Timeout = 30, FrameCount = 5, WaitForObject = True):
+        self.ObjectHierarchyPath = ObjectHierarchyPath if ObjectHierarchyPath else ''
+        self.Timeout = Timeout
+        self.FrameCount = FrameCount
+        self.WaitForObject = WaitForObject
+
+
+class Cmd_NavAgentMoveToPointRequest(Message):
+    def __init__(self, Point = None, PointUTR = None, NavAgent_HierarchyPath = None):
+        self.Point = Point
+        self.PointUTR = PointUTR
+        self.NavAgent_HierarchyPath = NavAgent_HierarchyPath if NavAgent_HierarchyPath else ''
+
+
+class Cmd_NavAgentMoveToObjectRequest(Message):
+    def __init__(self):
+        raise NotImplementedError
+
+
+class Cmd_ObjectDistanceRequest(Message):
+    def __init__(self, ObjectA_HierarchyPath = None, ObjectB_HierarchyPath = None):
+        self.ObjectA_HierarchyPath = ObjectA_HierarchyPath if ObjectA_HierarchyPath else ''
+        self.ObjectB_HierarchyPath = ObjectB_HierarchyPath if ObjectB_HierarchyPath else ''
+
+
+class Cmd_PeekRequest(Message):
+    def __init__(self, Address = 0, Size = 0):
+        self.Address = Address
+        self.Size = Size
+
+class Cmd_PokeRequest(Message):
+    def __init__(self, Address = 0, Bytes = None):
+        self.Address = Address
+        self.Bytes = Bytes if Bytes else []
+
+
+class Cmd_RaycastRequest(Message):
+    def __init__(self, RaycastPoint = None, RaycastPointUTR = None, CameraHierarchyPath = None):
+        self.RaycastPoint = RaycastPoint
+        self.RaycastPointUTR = RaycastPointUTR
+        self.CameraHierarchyPath = CameraHierarchyPath if CameraHierarchyPath else ''
+
+class Cmd_RaycastResponse(Cmd_GenericResponse):
+    def __init__(self,
+            RaycastResults = None,
+            RaycastResultsUTR = None,
+
+            StackTrace = None,
+            ErrorMessage = None,
+            InformationMessage = None,
+            WarningMessage = None,
+            RC = None,
+            ReturnedValues = None,
         ):
         super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+        self.RaycastResults = RaycastResults
+        self.RaycastResultsUTR = RaycastResultsUTR
 
-        self.ImageData = ImageData
-        self.ImagePath = ImagePath
+
+class Cmd_RegisterCollisionMonitorRequest(Message):
+    def __init__(self, HierarchyPath = None):
+        HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+
+
+class Cmd_RotateRequest(Message):
+    def __init__(self,
+            HierarchyPath = None,
+            WaitForObject = True,
+            Timeout = 30,
+            Eulers = None,
+            Axis = None,
+            EulersUTR = None,
+            AxisUTR = None,
+            Angle = None,
+            XAngle = None,
+            YAngle = None,
+            ZAngle = None,
+            Quant = None,
+            RelativeTo = Enums.Space.Self,
+            QuantUTR = None,
+            RelativeToUTR = Enums.Space.Self,
+        ):
+        self.HierarchyPath = HierarchyPath if HierarchyPath else ''
+        self.WaitForObject = WaitForObject
+        self.Timeout = Timeout
+        self.Eulers = Eulers
+        self.Axis = Axis
+        self.EulersUTR = EulersUTR
+        self.AxisUTR = AxisUTR
+        self.Angle = Angle
+        self.XAngle = XAngle
+        self.YAngle = YAngle
+        self.ZAngle = ZAngle
+        self.Quant = Quant
+        self.RelativeTo = RelativeTo
+        self.QuantUTR = QuantUTR
+        self.RelativeToUTR = RelativeToUTR
+
+
+class Cmd_SetInputFieldTextRequest(Message):
+    def __init__(self, Timeout = 30, HierarchyPath = None, WaitForObject = False, Value = None):
+        self.Timeout = Timeout
+        self.HierarchyPath = HierarchyPath if HierarchyPath else ''
+        self.WaitForObject = WaitForObject
+        self.Value = Value if Value else ''
+
+
+class Cmd_SetObjectValueRequest(Message):
+    def __init__(self, Timeout = 30, HierarchyPath = None, ObjectFieldOrPropertyName = None, WaitForObject = False, Value = None, CustomSerialization = False, SerializedObjectType = None, Serializer = None):
+        self.Timeout = Timeout
+        self.HierarchyPath = HierarchyPath if HierarchyPath else ''
+        self.ObjectFieldOrPropertyName = ObjectFieldOrPropertyName if ObjectFieldOrPropertyName else ''
+        self.WaitForObject = WaitForObject
+        self.Value = Value
+        self.CustomSerialization = CustomSerialization
+        self.SerializedObjectType = SerializedObjectType
+        self.Serializer = Serializer
+
+
+class Cmd_SetTimeScaleRequest(Message):
+    def __init__(self, Value = 1.0):
+        self.Value = Value
+
+
+class Cmd_TapRequest(Message):
+    def __init__(self, TapCount = 1, FrameCount = 5, X = 0, Y = 0, HierarchyPath = None, CameraHierarchyPath = None):
+        self.TapCount = TapCount
+        self.FrameCount = FrameCount
+        self.X = X
+        self.Y = Y
+        self.HierarchyPath = HierarchyPath if HierarchyPath else ''
+        self.CameraHierarchyPath = CameraHierarchyPath if CameraHierarchyPath else ''
+
+
+class Cmd_TouchEventRequest(Message):
+    def __init__(self, FingerId = 0, AltitudeAngle = 0, AzimulthAngle = 0, Pressure = 1, MaximumPossiblePressure = 1, StartPosition = None, DestinationPosition = None, StartPositionUTR = None, DestinationPositionUTR = None, TapCount = 1, Radius = 20, FrameCount = 5):
+        self.FingerId = FingerId
+        self.AltitudeAngle = AltitudeAngle
+        self.AzimulthAngle = AzimulthAngle
+        self.Pressure = Pressure
+        self.MaximumPossiblePressure = MaximumPossiblePressure
+        self.StartPosition = StartPosition
+        self.DestinationPosition = DestinationPosition
+        self.StartPositionUTR = StartPositionUTR
+        self.DestinationPositionUTR = DestinationPositionUTR
+        self.TapCount = TapCount
+        self.Radius = Radius
+        self.FrameCount = FrameCount
+
+
+class Cmd_TransferFileRequest(Message):
+    def __init__(self):
+        pass
+
+
+class Cmd_UnregisterCollisionMonitorRequest(Message):
+    def __init__(self, HierarchyPath = None):
+        HeirarchyPath = HierarchyPath if HierarchyPath else ''
+
+
+class Cmd_WaitForObjectRequest(Message):
+    def __init__(self, Timeout = 30, HierarchyPath = None):
+        self.Timeout = Timeout
+        self.HierarchyPath = HierarchyPath if HierarchyPath else ''
+
+
+class Cmd_WaitForObjectValueRequest(Message):
+    def __init__(self, Timeout = 30, HierarchyPath = None, ObjectFieldOrPropertyName = None, Value = None, CustomSerialization = False, SerializedObjectType = None, Serializer = None):
+        self.Timeout = Timeout
+        self.HierarchyPath = HierarchyPath if HierarchyPath else ''
+        self.ObjectFieldOrPropertyName = ObjectFieldOrPropertyName if ObjectFieldOrPropertyName else ''
+        self.Value = Value
+        self.CustomSerialization = CustomSerialization
+        self.SerializedObjectType = SerializedObjectType
+        self.Serializer = Serializer
+
+
+
+
+
+
+class Cmd_GetClientListRequest(Message):
+    def __init__(self):
+        raise NotImplementedError
+
+class Cmd_HandshakeRequest(Message):
+    def __init__(self, ProtocolVersion=None, ClientUID = None, channel = None, Recording = False):
+        self.ProtocolVersion : str = '' if ProtocolVersion == None else ProtocolVersion
+        self.ClientUID : str = '' if ClientUID == None else ClientUID
+        self.channel = channel
+        self.Recording = Recording
 
 class Cmd_HandshakeResponse(Message):
-    def __init__(self,
-            ReceivedTimestamp,
-            RC,
-            GCD,
-        ):
+    def __init__(self, ReceivedTimestamp, RC, GCD):
         self.ReceivedTimestamp = ReceivedTimestamp
         self.RC = RC
         self.GCD = GCD
@@ -518,19 +535,3 @@ class Cmd_VectorResponse(Cmd_GenericResponse):
         self.Value2 = None if Value2 == None else Value2
         self.Value3UTR = Value3UTR
         self.Value2UTR = Value2UTR
-
-class Cmd_RaycastResponse(Cmd_GenericResponse):
-    def __init__(self,
-            RaycastResults = None,
-            RaycastResultsUTR = None,
-
-            StackTrace = None,
-            ErrorMessage = None,
-            InformationMessage = None,
-            WarningMessage = None,
-            RC = None,
-            ReturnedValues = None,
-        ):
-        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
-        self.RaycastResults = RaycastResults
-        self.RaycastResultsUTR = RaycastResultsUTR

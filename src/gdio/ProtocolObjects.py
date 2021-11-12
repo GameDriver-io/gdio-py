@@ -27,7 +27,8 @@ class ProtocolMessage:
         if type(self.GDIOMsg) == list:
             for key, value in Messages.CmdIds.items():
                 if value == self.GDIOMsg[0]:
-                    self.GDIOMsg = eval(f'Messages.{key}(**self.GDIOMsg[1])')
+                    messageType = getattr(Messages, key)
+                    self.GDIOMsg = messageType(**self.GDIOMsg[1])
                     break
     
     def pack(self):
