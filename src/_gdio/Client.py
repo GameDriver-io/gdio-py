@@ -1,6 +1,6 @@
 from . import ProtocolObjects, Messages, Exceptions, Serializers, Enums
 
-import asyncio, socket
+import asyncio, socket, sys
 import msgpack, uuid
 import datetime, time
 from binascii import crc32
@@ -197,14 +197,14 @@ class Client:
             if reader == None and writer == None:
                 reader, writer = await asyncio.wait_for(asyncio.open_connection(self.hostname, self.port), self.connectionTimeout)
             self._reader, self._writer = reader, writer
-            asyncio.create_task(self.ReadHandler())
+            asyncio.shield(asyncio.create_task(self.ReadHandler()))
 
         await self.InitHandshake(writer)
         
         return True
 
     async def configureChannel(self):
-        pass
+        raise NotImplementedError
 
     async def Receive(self, reader=None):
 
@@ -217,9 +217,10 @@ class Client:
 
     async def Disconnect(self, writer=None):
 
-        writer = self._writer if writer == None else writer
+        writer = self._writer if writer == None else writer        
 
         self._disposed = True
+        
         writer.close()
         await writer.wait_closed()
     
