@@ -1,7 +1,6 @@
 import msgpack
-from gdio import Serializers
+from . import Serializers
 from . import ProtocolObjects
-from gdio.Serializers import customSerializer
 from . import Enums
 
 CmdIds = {

@@ -20,9 +20,9 @@ This way, the module refers directly to the installed folder rather than the ver
 
 After either one of the above steps, the module and its members can be imported and used.
 ```py
-# NOTE: Namespace structure will be changed in the future.
-from gdio.ApiClient import ApiClient
-from gdio.Objects import Objects
+from gdio.api import ApiClient
+from gdio.common.objects import *
+from gdio.common.exceptions import *
 
 api = ApiClient()
 ...
