@@ -209,7 +209,7 @@ class ApiClient:
             clickFrameCount : int,
             timeout         : int = 30
         ) -> bool:
-        return self.Click_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
+        return await self.Click_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
 
     ## Float positions overload
     @requireClientConnection
@@ -263,7 +263,7 @@ class ApiClient:
             delayAfterModifiersMsec : int = 500,
             timeout                 : int = 30
         ) -> bool:
-        return self.ClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
+        return await self.ClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
     
     @requireClientConnection
     async def ClickObject(self,
@@ -329,11 +329,11 @@ class ApiClient:
             
     # TODO: autoplay
     async def Connect(self,
-            hostname           : str = '127.0.0.1',    # The hostname of the device running the target game.
-            port               : int = 19734,          # The port that the target Gamedriver agent is configured to use.
-            autoplay           : bool = False,         # TODO: Start the game automatically within the Unity Editor.
-            timeout            : int = 30,             # The number of seconds to wait for the command to be recieved by the agent.
-            autoPortResolution : bool = True,# TODO: Automatically resolve the port a Gamedriver Agent is running on.
+            hostname           : str = '127.0.0.1', # The hostname of the device running the target game.
+            port               : int = 19734,       # The port that the target Gamedriver agent is configured to use.
+            autoplay           : bool = False,      # TODO: Start the game automatically within the Unity Editor.
+            timeout            : int = 30,          # The number of seconds to wait for the command to be recieved by the agent.
+            autoPortResolution : bool = True,       # TODO: Automatically resolve the port a Gamedriver Agent is running on.
 
             reader : asyncio.StreamReader = None, # TEMP
             writer : asyncio.StreamWriter = None, # TEMP
@@ -474,7 +474,7 @@ class ApiClient:
             clickFrameCount : int,
             timeout : int = 30
         ) -> bool:
-        return self.DoubleClick(buttonId, position.x, position.y, clickFrameCount, timeout)
+        return await self.DoubleClick_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
 
     ## Float positions overload
     @requireClientConnection
@@ -525,7 +525,7 @@ class ApiClient:
             delayAfterModifiersMsec : int = 500,
             timeout : int = 30
         ) -> bool:
-        return self.DoubleClickEx(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
+        return await self.DoubleClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
 
     ## Float positions overload
     @requireClientConnection
@@ -814,7 +814,7 @@ class ApiClient:
             modifiersMessage = ProtocolObjects.ProtocolMessage(
                 ClientUID = self.client.ClientUID,
                 GDIOMsg = Messages.Cmd_KeyPressRequest(
-                    KeysCodes = [int(key) for key in modifiers],
+                    KeyCodes = [int(key) for key in modifiers],
                     NumberOfFrames = numberOfFrames + modifiersNumberOfFrames,
                 )
             )
