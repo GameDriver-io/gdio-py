@@ -1,7 +1,7 @@
 import os, asyncio
 from gdio.api import ApiClient
 from gdio.common.objects import *
-# TODO: Pytest Fixture
+
 class TestFixture:
 
     def __init__(self):
@@ -16,9 +16,9 @@ class TestFixture:
         await self.api.Wait(2000)
         await self.api.EnableHooks(HookingObject.ALL)
         await self.api.Wait(1000)
-        await self.test_Screenshot(f'{os.getcwd()}\\android-before.png')
+        #await self.test_Screenshot(f'{os.getcwd()}\\android-before.png')
         await self.test_Movement()
-        await self.test_Screenshot(f'{os.getcwd()}\\android-after.png')
+        #await self.test_Screenshot(f'{os.getcwd()}\\android-after.png')
         await self.api.WaitForEmptyInput(5)
         await self.api.DisableHooks(HookingObject.ALL)
         await self.api.Wait(2000)
