@@ -1,7 +1,6 @@
 import pytest, os, asyncio
 from gdio.api import ApiClient
 from gdio.common.objects import *
-from gdio.common.exceptions import *
 
 TIMEOUT = 5
 
@@ -27,7 +26,7 @@ async def api_connectedlocal():
 @pytest.mark.parametrize('method, methodArgs', [
     ('AxisPress',('Horizontal', 1.0, 500, TIMEOUT)),
     ('ButtonPress',('Jump', 100, TIMEOUT)),
-    ('CaptureScreenshot',(f'{os.getcwd()}/screenshot.png', False, True, TIMEOUT)),
+    ('CaptureScreenshot',(f'{os.getcwd()}/outputs/screenshot.png', False, True, TIMEOUT)),
     ('ClickEx_Vec2',(MouseButtons.LEFT, Vector2(340, 220), 100, [KeyCode.Space], 1000, [KeyCode.LeftControl], 5, 500, TIMEOUT)),
     ('ClickEx_XY',(MouseButtons.LEFT, 340, 220, 100, [KeyCode.Space], 1000, [KeyCode.LeftControl], 5, 500, TIMEOUT)),
     ('ClickObject',(MouseButtons.LEFT, "//*[@name='Player']", 1000, '', TIMEOUT)),
@@ -37,7 +36,7 @@ async def api_connectedlocal():
     ('DoubleClickEx_Vec2',(MouseButtons.LEFT, Vector2(340, 220), 100, [KeyCode.Space], 1000, [KeyCode.LeftControl], 5, 500, TIMEOUT)),
     ('DoubleClickEx_XY',(MouseButtons.LEFT, 340, 220, 100, [KeyCode.Space], 1000, [KeyCode.LeftControl], 5, 500, TIMEOUT)),
     ('DoubleClickObject',(MouseButtons.LEFT, "//*[@name='Player']", 1000, TIMEOUT)),
-    ('DoubleClickObjectEx',(MouseButtons.LEFT, "//*[@name='Player']", 1000, '', [KeyCode.Space], 1000, [KeyCode.LeftControl], 5, 500, TIMEOUT)),
+    ('DoubleClickObjectEx',(MouseButtons.LEFT, "//*[@name='Player']", 1000, [KeyCode.Space], 1000, [KeyCode.LeftControl], 5, 500, TIMEOUT)),
     ('DoubleClick_Vec2',(MouseButtons.LEFT, Vector2(340, 220), 1000, TIMEOUT)),
     ('DoubleClick_XY',(MouseButtons.LEFT, 340, 220, 1000, TIMEOUT)),
     #('MouseDrag',()),
@@ -55,7 +54,7 @@ async def api_connectedlocal():
 ])
 @pytest.mark.asyncio
 class Test_Methods:
-    @pytest.mark.skip
+    #@pytest.mark.skip
     async def test_InputMethods(self, api_connectedlocal, method, methodArgs):
         api = api_connectedlocal
         method = getattr(api, method)
@@ -67,6 +66,7 @@ class Test_Methods:
         await api.DisableHooks(HookingObject.ALL)
 
 @pytest.mark.asyncio
+@pytest.mark.skip
 async def test_InputEx(api_connectedlocal):
     api = api_connectedlocal
     await api.EnableHooks(HookingObject.ALL)

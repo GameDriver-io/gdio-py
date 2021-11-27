@@ -1,5 +1,5 @@
 from .Client import Client
-from . import ProtocolObjects, Messages, Exceptions, Enums
+from . import ProtocolObjects, Messages, Enums
 
 from functools import wraps
 
@@ -14,7 +14,7 @@ def requireClientConnection(function):
     @wraps(function)
     async def inner(*args, **kwargs):
         if args[0].client == None:
-            raise Exceptions.ClientNotConnectedError
+            raise Exception("This method requires a client connection")
         await function(*args, **kwargs)
     return inner
 
@@ -308,7 +308,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
@@ -404,7 +404,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
@@ -488,7 +488,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
@@ -547,7 +547,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
@@ -588,7 +588,7 @@ class ApiClient:
                 # TODO: ManageAutoPlay()
                 autoPlayDetails = self.ManageAutoPlay(hostname)
                 if len(autoPlayDetails) == 0:
-                    raise Exceptions.AutoPlayError("No compatible game found on the specified hostname.")
+                    raise Exception("No compatible game found on the specified hostname.")
                 gameConnectionDetails = autoPlayDetails[0].GCD
                 self.CurrentPlayDetails = autoPlayDetails[0]
 
@@ -602,12 +602,12 @@ class ApiClient:
             self.client = Client(hostname, port, timeout)
 
             if not await self.client.Connect(internalComms=False, reader=reader, writer=writer):
-                raise Exceptions.FailedGameConnectionError('Failed to connect to the game')
+                raise Exception('Failed to connect to the game')
 
         # If any exception is thrown,
         except Exception as inner:
             # throw a wrapper exception and trace back to the inner exception.
-            raise Exceptions.FailedClientConnectionError(f'Failed to connect to {hostname}:{port}') from inner
+            raise Exception(f'Failed to connect to {hostname}:{port}') from inner
 
         # If no exception is thrown
         else:
@@ -660,7 +660,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
@@ -694,7 +694,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
@@ -768,7 +768,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
@@ -840,7 +840,7 @@ class ApiClient:
         </example>
         '''
         if (keys != None) or (modifiers != None):
-            self.KeyPress(keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
+            await self.KeyPress(keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
 
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
@@ -857,7 +857,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
@@ -940,7 +940,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
@@ -996,7 +996,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
@@ -1036,7 +1036,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
@@ -1069,7 +1069,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
@@ -1100,7 +1100,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
@@ -1333,7 +1333,7 @@ class ApiClient:
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exceptions.ClickObjectError(cmd_GenericResponse.ErrorMessage)
+            raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.Objects
 
@@ -1375,7 +1375,7 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
         if response.Value3 == None or response.RC != Enums.ResponseCode.INFORMATION:
-            raise Exceptions.ObjectPositionError(response.ErrorMessage)
+            raise Exception(response.ErrorMessage)
 
         return response.Value3
 
@@ -1407,7 +1407,7 @@ class ApiClient:
         response = await self.client.GetResult(requestInfo.RequestId)
 
         if response.RC != Enums.ResponseCode.INFORMATION:
-            raise Exceptions.SceneNameError(response.ErrorMessage)
+            raise Exception(response.ErrorMessage)
 
         return response.InformationMessage
 
@@ -1466,7 +1466,7 @@ class ApiClient:
                 )
             )
             modifiersRequestInfo = await asyncio.wait_for(self.client.SendMessage(modifiersMessage), timeout)
-            self.Wait(delayAfterModifiersMsec)
+            await self.Wait(delayAfterModifiersMsec)
 
         keysMessage = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
@@ -1582,7 +1582,7 @@ class ApiClient:
         if waitForEmptyInput:
             self.WaitForEmptyInput(timeout)
         if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.InputRequestError(response.ErrorMessage)
+            raise Exception(response.ErrorMessage)
 
         return True
 
@@ -1628,7 +1628,7 @@ class ApiClient:
         if waitForEmptyInput:
             self.WaitForEmptyInput(timeout)
         if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.InputRequestError(response.ErrorMessage)
+            raise Exception(response.ErrorMessage)
 
         return True
 
@@ -1677,7 +1677,7 @@ class ApiClient:
         if waitForEmptyInput:
             self.WaitForEmptyInput(timeout)
         if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.InputRequestError(response.ErrorMessage)
+            raise Exception(response.ErrorMessage)
 
         return True
 
@@ -1720,7 +1720,7 @@ class ApiClient:
         response = await self.client.GetResult(requestInfo.RequestId)
 
         if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.InputRequestError(response.ErrorMessage)
+            raise Exception(response.ErrorMessage)
 
         return True
 
@@ -1760,7 +1760,7 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
         if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.InputRequestError(response.ErrorMessage)
+            raise Exception(response.ErrorMessage)
 
         return response.RaycastResults
 
@@ -1948,7 +1948,7 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
         if response.RC != Enums.ResponseCode.OK:
-            raise Exceptions.InputRequestError(response.ErrorMessage)
+            raise Exception(response.ErrorMessage)
 
         return True
 

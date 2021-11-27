@@ -1,4 +1,4 @@
-from . import ProtocolObjects, Messages, Exceptions, Serializers, Enums
+from . import ProtocolObjects, Messages, Serializers, Enums
 
 import asyncio, socket, sys
 import msgpack, uuid
