@@ -77,13 +77,20 @@ class Message:
         return f'{self.pack()}'
 
 class Cmd_GenericResponse(Message):
-    def __init__(self, StackTrace = None, ErrorMessage = None, InformationMessage = None, WarningMessage = None, RC = Enums.ResponseCode.OK, ReturnedValues = None):
-
-        self.StackTrace =         '' if StackTrace == None else StackTrace
-        self.ErrorMessage =       '' if ErrorMessage == None else ErrorMessage
-        self.InformationMessage = '' if InformationMessage == None else InformationMessage
-        self.WarningMessage =     '' if WarningMessage == None else WarningMessage
+    def __init__(self,
+            StackTrace : str,
+            ErrorMessage : str,
+            InformationMessage : str,
+            WarningMessage : str,
+            RC : Enums.ResponseCode,
+            ReturnedValues : list
+        ):
+        self.StackTrace = StackTrace
+        self.ErrorMessage = ErrorMessage
+        self.InformationMessage = InformationMessage
+        self.WarningMessage = WarningMessage
         self.RC = RC
+        self.ReturnedValues = ReturnedValues
 
     def IsError(self):
         return (len(self.ErrorMessage) > 1)
@@ -145,6 +152,9 @@ class Cmd_CallMethodRequest(Message):
                 )
 
 
+## CaptureScreenshot
+
+# Request
 class Cmd_CaptureScreenshotRequest(Message):
     # TODO: default filename
     # TODO: stereo capture mode = LeftEye (Enum)
@@ -154,8 +164,20 @@ class Cmd_CaptureScreenshotRequest(Message):
         self.SuperSize = SuperSize
         self.Mode = Mode
 
+# Response
 class Cmd_CaptureScreenshotResponse(Cmd_GenericResponse):
-    def __init__(self, ImageData, ImagePath, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):
+    def __init__(self,
+            ImageData : bytes,
+            ImagePath : str,
+            StackTrace : str,
+
+            # GenericResponse
+            ErrorMessage : str,
+            InformationMessage : str,
+            WarningMessage : str,
+            RC : Enums.ResponseCode,
+            ReturnedValues : list
+            ):
         super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
 
         self.ImageData = ImageData
