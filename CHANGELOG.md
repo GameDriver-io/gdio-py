@@ -1,7 +1,51 @@
 # Changelog
 
 ## Upcoming
- - pending
+ - Fixing slight differences between this and the original API so that tests can be run in either version without changing timings
+
+# 11-12-2021
+This version made progress on the rest of the client methods. Aside from around 15 of them, their functionality should be mostly complete. However, I have yet to test most of them. It also restuctures the oackage to be less cluttered; at least for the end user
+
+### Added:
+ - Added the following methods to `ApiClient`. Their functionality is not guaranteed.
+   - `CallMethod`
+   - `CallMethod_Void`
+   - `ClickObject`
+   - `ClickObjectEx`
+   - `DoubleClick`
+   - `DoubleClickEx`
+   - `DoubleClickObject`
+   - `DoubleClickObjectEx`
+   - `GetLastFPS`
+   - `GetObjectPosition`
+   - `KeyPress`
+   - `LoadScene`
+   - `MouseDrag`
+   - `MouseMoveToObject`
+   - `MouseMoveToPoint`
+   - `NavAgentMoveToPoint`
+   - `Raycast`
+   - `RegisterCollisionMonitor`
+   - `RotateObject_Quaternion`
+   - `RotateObject_Euler`
+   - `RotateObject_AxisAngle`
+   - `SetInputFieldText`
+   - Any new methods that werent mentioned here have also been added, but will throw a `NotImplementedError` when called.
+ - Logging via the standard library.
+   - Added an optional `debug` parameter to the `ApiClient` constructor that will enable debug level logging in both stdout and a file in the `logs` directory.
+ - Added docstrings to all methods in `ApiClient`.
+
+### Changed
+ - Changed the namespacing of the whole package to be closer to that of the original API.
+   - Everything is now moved into a sub-package called `_gdio`
+   - Another sub-package called `gdio` re-exports the public API in a much cleaner format.
+      - This way, all that is visible to the end user are the things that they will actually use.
+
+### Removed
+ - Removed the `Exceptions` module.
+   - I couldnt think of a way to use it meaningfully.
+   - Everything now throws standard exceptions with different messages. Essentially what the module was doing anyway.
+
 
 ## 9-27-2021
 This version reworked how messages are packed and unpacked. It also introduces a bug surrounding `ApiClient.WaitForEmptyInput()` where the method will just time out if the EmptyInput arrives before the method call. Otherwise, I'm happy with the overall structure for now. Next version will probably be focused on unit testing using PyTest; that way I can prove functionality across different platforms.
