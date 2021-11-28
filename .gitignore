@@ -117,3 +117,4 @@ dmypy.json
 # Repo specific stuff
 .vscode/
 *.code-workspace
+outputs/

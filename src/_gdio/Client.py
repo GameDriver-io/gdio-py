@@ -5,6 +5,10 @@ import msgpack, uuid
 import datetime, time
 from binascii import crc32
 
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+
+
 BYTE_ORDER = 'little'
 PROTOCOL_VERSION = '2.04.13.2021'
 
@@ -38,13 +42,13 @@ class Client:
         
         reader = self._reader if reader == None else reader
 
-        print('ReadHandler: Started Task')
+        logging.debug('ReadHandler task started')
         while not self._disposed:
             if reader.at_eof():
                 self._disposed = True
                 break
             try:
-                print('#########Reading#########')
+                logging.debug('Reading...')
                 msg_length = await reader.read(4)
                 #print(f'\n{bytes(msg_length)}')
 
@@ -62,7 +66,7 @@ class Client:
 
             except ValueError:
                 pass
-                print(f'{self.EventHandlers}')
+
 
     async def EventsPending(self, eventId):
         return True if eventId in self.EventCollection else False
@@ -72,51 +76,65 @@ class Client:
             del self.EventCollection[eventId]
     
     async def ProcessMessage(self, msg) -> None:
-        print(f'Processing: {msg}')
+        #logging.debug(f'Processing message: {msg}')
 
         if isinstance(msg.GDIOMsg, Messages.Cmd_GenericResponse):
+
             if msg.GDIOMsg.IsError():
                 raise Exception(msg.GDIOMsg.ErrorMessage)
+
             if msg.GDIOMsg.IsWarning():
                 raise Warning(msg.GDIOMsg.WarningMessage)
+
             if msg.GDIOMsg.IsInformation():
                 raise Warning(msg.GDIOMsg.InformationMessage)
 
-        print(f'[RECV] Command: {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}')
+        logging.debug(f'[RECV] {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}')
+
         if self._currentHandshakeState != Enums.HandshakeState.COMPLETE:
+
             if not isinstance(msg.GDIOMsg, Messages.Cmd_HandshakeResponse):
-                print(f'Dropping message before handshake is complete')
+
+                logging.error(f'Expected handshake response, got {msg.GDIOMsg.GetName()}. Dropping Message before handshake is complete')
+
                 return
             elif self._currentHandshakeState == Enums.HandshakeState.CLIENT_INFORMATION_SENT:
+
                 if msg.GDIOMsg.RC == Enums.HandshakeReasonCode.OK:
                     self.GCD = msg.GDIOMsg.GCD
                     self._currentHandshakeState = Enums.HandshakeState.COMPLETE
-                    print('Handshake Complete')
+                    logging.debug(f'Handshake complete')
+
                 else:
-                    print(f'Handshake Failed: {msg.GDIOMsg.RC}')
+                    logging.error(f'Handshake failed: {msg.GDIOMsg.RC}')
+
                 return
-            raise Exceptions.CorruptedHandshakeError
+
+            raise Exception('Handshake failed')
         
         if isinstance(msg.GDIOMsg, Messages.Evt_EmptyInput):
+            
             self.SetEventTimestamp(Messages.Evt_EmptyInput)
             return
 
         # NOTE: `dict.update()` will overwrite the value of overlapping keys
+        #    As far as I know, this should never happen
+        logging.debug(f'Registering response for {msg.CorrelationId}')
         self.Results.update({msg.CorrelationId : msg.GDIOMsg})
-        print(f'Registering Response: {msg.CorrelationId}')
+        
         
 
     async def GetResult(self, requestId):
         value = None
         while not requestId in self.Results:
             await asyncio.sleep(0)
-        print(f'retrieving result for: {requestId}')
+        logging.debug(f'Getting result for {requestId}')
         try:
             value = self.Results[requestId]
         except KeyError:
             pass
         else:
-            print(f'deleting: {requestId}')
+            logging.debug(f'Got result for {requestId}. Discarding...')
             self.Results.pop(requestId)
             self.EventHandlers.pop(requestId)
         finally:
@@ -129,7 +147,7 @@ class Client:
         self.LastEvent.update({eventType : datetime.datetime.now().timestamp()})
 
     async def WaitForEmptyInput(self, timestamp):
-        print('Waiting for empty input')
+        logging.debug(f'Waiting for empty input...')
         while (self.GetLastEventTimestamp(Messages.Evt_EmptyInput) >= timestamp) != True:
             await asyncio.sleep(0)
         return True
@@ -142,8 +160,7 @@ class Client:
             obj.RequestId = str(uuid.uuid4())
 
         self.EventHandlers.append(obj.RequestId)
-        print(f'Sending: {obj.pack()}')
-        print(f'RequestId: {obj.RequestId} is waiting for a result.\n')
+        logging.debug(f'[SEND] {obj.GDIOMsg.GetName()} as {obj.RequestId}. Waiting for a response...')
 
         await self.WriteMessage(obj, writer)
         return ProtocolObjects.RequestInfo(self, obj.RequestId, obj.Timestamp)
@@ -223,10 +240,7 @@ class Client:
         
         writer.close()
         await writer.wait_closed()
-    
-    def log(self, level, message):
-        # TODO: log_level
-        print(message)
+
         
     def __repr__(self):
         return self.ClientUID
