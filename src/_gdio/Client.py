@@ -6,14 +6,12 @@ import datetime, time
 from binascii import crc32
 
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
-
 
 BYTE_ORDER = 'little'
 PROTOCOL_VERSION = '2.04.13.2021'
 
-def isEvent(msg):
-    return True if msg.GDIOMsg.GetName()[len('Event'):] == 'Event' else False
+isEvent = lambda x: x.startswith('EVENT_')
+
 
 class Client:
     def __init__(self, hostname, port, connectionTimeout):
@@ -33,12 +31,13 @@ class Client:
 
         self.EventHandlers : list = []
         self.EventCollection : list = []
+
         self.Results : dict = {}
         self.LastEvent : dict = {}
 
         self.GCD = None
 
-    async def ReadHandler(self, reader=None):
+    async def _ReadHandler(self, reader=None):
         
         reader = self._reader if reader == None else reader
 
@@ -72,7 +71,9 @@ class Client:
         return True if eventId in self.EventCollection else False
 
     async def RemoveEventCollectionId(self, eventId):
+
         if eventId in self.EventCollection:
+
             del self.EventCollection[eventId]
     
     async def ProcessMessage(self, msg) -> None:
@@ -113,7 +114,7 @@ class Client:
             raise Exception('Handshake failed')
         
         if isinstance(msg.GDIOMsg, Messages.Evt_EmptyInput):
-            
+
             self.SetEventTimestamp(Messages.Evt_EmptyInput)
             return
 
@@ -214,7 +215,7 @@ class Client:
             if reader == None and writer == None:
                 reader, writer = await asyncio.wait_for(asyncio.open_connection(self.hostname, self.port), self.connectionTimeout)
             self._reader, self._writer = reader, writer
-            asyncio.shield(asyncio.create_task(self.ReadHandler()))
+            asyncio.shield(asyncio.create_task(self._ReadHandler()))
 
         await self.InitHandshake(writer)
         
@@ -241,6 +242,5 @@ class Client:
         writer.close()
         await writer.wait_closed()
 
-        
     def __repr__(self):
         return self.ClientUID

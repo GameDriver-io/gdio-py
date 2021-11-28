@@ -22,12 +22,22 @@ class ApiClient:
     '''
     GameDriver.io Unity API Client class.
     '''
-    def __init__(self):
+    def __init__(self, debug : bool = False):
         
         # Defined in self.Connect().
         self.client = None
         self.CurrentPlayDetails = None
         self.gameConnectionDetails = None
+
+        if debug:
+            import logging
+            log_file_path = f'logs/{datetime.datetime.now().date().strftime("%Y-%m-%d")}.log'
+            i = 1
+            while os.path.exists(log_file_path):
+                log_file_path = f'logs/{datetime.datetime.now().date().strftime(f"%Y-%m-%d-{i}")}.log'
+                i += 1
+
+            logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename=log_file_path, filemode='w')
 
     @requireClientConnection
     async def AxisPress(self,

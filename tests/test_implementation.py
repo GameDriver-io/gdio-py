@@ -3,15 +3,16 @@ from gdio.api import ApiClient
 from gdio.common.objects import *
 
 TIMEOUT = 5
+DEBUG = True
 
 @pytest.fixture
 async def api_notConnected():
-    api = ApiClient()
+    api = ApiClient(debug=DEBUG)
     yield api
 
 @pytest.fixture
 async def api_dummySockets():
-    api = ApiClient()
+    api = ApiClient(debug=DEBUG)
     reader = asyncio.StreamReader
     writer = asyncio.StreamWriter
     await api.Connect(reader=reader, writer=writer)
@@ -19,7 +20,7 @@ async def api_dummySockets():
 
 @pytest.fixture
 async def api_connectedlocal():
-    api = ApiClient()
+    api = ApiClient(debug=DEBUG)
     await api.Connect()
     yield api
 
@@ -76,7 +77,7 @@ async def test_InputEx(api_connectedlocal):
     await api.DisableHooks(HookingObject.ALL)
 
 
-
+# saving for later
 '''
 @pytest.mark.parametrize('method, methodArgs', [
     ('AxisPress',('Horizontal', 1.0, 500)),
