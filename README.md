@@ -22,7 +22,6 @@ After either one of the above steps, the module and its members can be imported 
 ```py
 from gdio.api import ApiClient
 from gdio.common.objects import *
-from gdio.common.exceptions import *
 
 api = ApiClient()
 ...
