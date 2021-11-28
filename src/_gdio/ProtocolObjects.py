@@ -1,50 +1,18 @@
+
 import datetime, uuid
 from msgpack import Timestamp as msgpackTime
-from enum import IntEnum, auto
-from . import Requests
 
-## TODO: This whole file seems like a bad idea
+from . import Messages
 
-def stampify(time : datetime.datetime):
-    assert type(time) == datetime.datetime
-    timestamp = time.timestamp()
-    seconds =  int(timestamp // 1)
-    nanoseconds = int(((timestamp - seconds) * 10**9) // 1)
-    return (seconds, nanoseconds)
-
-class HandshakeState(IntEnum):
-    NOT_STARTED = 0
-    CLIENT_INFORMATION_SENT = 1
-    COMPLETE = 2
-
-class ResponseCode(IntEnum):
-    OK = 0
-    WARNING = 1
-    ERROR = 2
-    INFORMATION = 3
-
-class HandshakeReasonCode(IntEnum):
-    OK = 0
-    ERROR = 1
-    VERSION_MISMATCH = 2
-    DUPLICATE_CLIENTUID = 3
-
-class Message:
-    def __init__(self):
-        pass
-
-    def GetName(self):
-        return f'{self.__class__.__name__}'
-
-    def pack(self):
-        return [Requests.CmdIds[self.__class__.__name__], vars(self)]
+# I dont know where to put this method
+stampify = lambda time: (int(time.timestamp() // 1), int(((time.timestamp() - int(time.timestamp() // 1)) * 10**9) // 1))
 
 class ProtocolMessage:
     def __init__(self,
             ClientUID       : str,
             RequestId       : str = None,
             CorrelationId   : str = None,
-            GDIOMsg         : Message = None,
+            GDIOMsg         : Messages.Message = None,
             IsAsync         : bool = False,
             Timestamp       : msgpackTime = None
         ):
@@ -55,19 +23,27 @@ class ProtocolMessage:
         self.GDIOMsg = GDIOMsg
         self.IsAsync = IsAsync
         self.Timestamp : msgpackTime = msgpackTime(*stampify(datetime.datetime.now())) if Timestamp == None else Timestamp
+        
+        if type(self.GDIOMsg) == list:
+            for key, value in Messages.CmdIds.items():
+                if value == self.GDIOMsg[0]:
+                    messageType = getattr(Messages, key)
+                    self.GDIOMsg = messageType(**self.GDIOMsg[1])
+                    break
     
     def pack(self):
         return {
             'ClientUID' : self.ClientUID,
             'RequestId' : self.RequestId,
             'CorrelationId' : self.CorrelationId,
-            'GDIOMsg' : self.GDIOMsg.pack(),
+            'GDIOMsg' : self.GDIOMsg,
             'IsAsync' : self.IsAsync,
             'Timestamp' : self.Timestamp
         }
 
     def __repr__(self):
         return f'{self.pack()}'
+
 
 class RequestInfo:
     def __init__(self, client, requestId, sentTimestamp):
@@ -110,10 +86,29 @@ class Vector2:
     def __repr__(self):
         return f'Vector2({self.x}, {self.y})'
 
-class MouseButtons(IntEnum):
-    LEFT = auto()
-    RIGHT = auto()
-    MIDDLE = auto()
+class Vector3:
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def __repr__(self):
+        return f'Vector3({self.x}, {self.y}, {self.z})'
+
+class Vector4:
+    def __init__(self, x, y, z, w):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.w = w
+
+    def __repr__(self):
+        return f'Vector4({self.x}, {self.y}, {self.z}, {self.w})'
 
 class Collision:
     pass
+
+class AutoPlayDetails:
+    def __init__(self, GCD = None, Addr = None) -> None:
+        self.GCD = GameConnectionDetails() if GCD == None else GCD
+        self.Addr = '' if Addr == None else Addr

@@ -6,24 +6,23 @@
 
 ## Installation
 
-Clone the repository and navigate into it using:
+Install the latest version of the package directly from the repository using:
+```sh
+pip install https://github.com/ethanavatar/gdio-py.git
+```
+
+Alternatively, to make local changes without recompiling, you can clone the repository and install the package in editable (-e) mode.
 ```sh
 clone https://github.com/ethanavatar/gdio-py.git
-cd gdio-py
+pip install -e gdio-py
 ```
+This way, the module refers directly to the installed folder rather than the version in site-packages, and all changes made to the source are immediately usable.
 
-Install the current directory in locally editable mode:
-```sh
-pip install -e .
-```
-
-Editable mode allows you to make changes to the source files without recompiling, so you should only need to run this once.
-
-You can now import the module and its members via:
+After either one of the above steps, the module and its members can be imported and used.
 ```py
-# TEMP: Namespace structure will be changed in the future.
-from gdio.ApiClient import ApiClient
-from gdio.Objects import Objects
+from gdio.api import ApiClient
+from gdio.common.objects import *
+from gdio.common.exceptions import *
 
 api = ApiClient()
 ...
