@@ -17,7 +17,7 @@ def requireClientConnection(function):
     async def inner(*args, **kwargs):
         if args[0].client == None:
             raise Exception("This method requires a client connection")
-        await function(*args, **kwargs)
+        return await function(*args, **kwargs)
     return inner
 
 class ApiClient:
@@ -1391,7 +1391,7 @@ class ApiClient:
         return response.Value3
 
     @requireClientConnection
-    async def GetSceneName(self, timeout : int = 30) -> bool:
+    async def GetSceneName(self, timeout : int = 30) -> str:
         '''
         <summary> Gets the name of the scene. </summary>
 

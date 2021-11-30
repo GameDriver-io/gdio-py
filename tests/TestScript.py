@@ -12,14 +12,16 @@ class TestFixture:
 
     async def Connect(self):
         await self.api.Connect('127.0.0.1', 19734, False, 5)
-        #print(await self.api.GetConnectedGameDetails())
-        #'''
-        #await self.api.LoadScene('Scenes/SampleScene')
-        await self.api.Wait(2000)
-        await self.api.EnableHooks(HookingObject.ALL)
+
         await self.api.Wait(1000)
+        await self.load_scene(self.api, 'MouseMoveObject')
+
+        await self.api.MouseMoveToObject("//*[@name='Cylinder']", 10)
         
-        await self.api.Tap_XY(600, 275, 1, 5)
+    async def load_scene(self, api, name):
+        await api.LoadScene(name, 5)
+        scene_name = await api.GetSceneName(5)
+        assert scene_name == name
 
 if __name__ == '__main__':
     Game = TestFixture()

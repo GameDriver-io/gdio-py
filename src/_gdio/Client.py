@@ -87,9 +87,6 @@ class Client:
             if msg.GDIOMsg.IsWarning():
                 raise Warning(msg.GDIOMsg.WarningMessage)
 
-            if msg.GDIOMsg.IsInformation():
-                raise Warning(msg.GDIOMsg.InformationMessage)
-
         logging.debug(f'[RECV] {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}')
 
         if self._currentHandshakeState != Enums.HandshakeState.COMPLETE:

@@ -5,6 +5,7 @@ from gdio.common.objects import *
 TIMEOUT = 5
 DEBUG = True
 
+
 @pytest.fixture
 async def api_connection():
     # Setup
@@ -18,13 +19,18 @@ async def api_connection():
     await api.DisableHooks(HookingObject.ALL)
     await api.Disconnect()
 
+async def load_scene(api, name):
+    await api.LoadScene(name, TIMEOUT)
+    scene_name = await api.GetSceneName(TIMEOUT)
+    assert scene_name == name
+
 
 @pytest.mark.asyncio
-async def test_main(api_connection):
+async def test_MouseMoveObject(api_connection):
     api = api_connection
 
     await api.Wait(1000)
-    scene_name = await api.GetSceneName(TIMEOUT)
-    assert scene_name == 'Menu'
+    await load_scene(api, 'MouseMoveObject')
 
-    #await api.Tap_XY(600, 275, 1, 5, TIMEOUT)
+    await api.MouseMoveToObject("//*[@name='Cylinder']", 10)
+    # TODO: Drag
