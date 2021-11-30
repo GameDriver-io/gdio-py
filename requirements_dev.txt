@@ -1,7 +1,6 @@
 pytest==6.2.5
 pytest-cov==2.12.1
 pytest-asyncio==0.15.1
-flake8==3.9.2
-mypy==0.910
+
 
 Appium-Python-Client==1.2.0
