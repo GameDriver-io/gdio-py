@@ -18,7 +18,7 @@ class ProtocolMessage:
         ):
 
         self.ClientUID = ClientUID
-        self.RequestId = str(uuid.uuid4()) if RequestId == None else RequestId
+        self.RequestId = str(uuid.uuid4())
         self.CorrelationId = '' if CorrelationId == None else CorrelationId
         self.GDIOMsg = GDIOMsg
         self.IsAsync = IsAsync

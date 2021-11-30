@@ -1,3 +1,5 @@
+# Still used as a fallback because logging doesnt work if pytest doesnt run to completion
+
 import os, asyncio
 from gdio.api import ApiClient
 from gdio.common.objects import *
@@ -16,29 +18,8 @@ class TestFixture:
         await self.api.Wait(2000)
         await self.api.EnableHooks(HookingObject.ALL)
         await self.api.Wait(1000)
-        #await self.test_Screenshot(f'{os.getcwd()}\\android-before.png')
-        await self.test_Movement()
-        #await self.test_Screenshot(f'{os.getcwd()}\\android-after.png')
-        await self.api.WaitForEmptyInput(5)
-        await self.api.DisableHooks(HookingObject.ALL)
-        await self.api.Wait(2000)
-
-    async def test_Screenshot(self, path):
-        await self.api.CaptureScreenshot(path, False, True, timeout=10)
-
-    async def test_Movement(self):
-        await self.api.AxisPress('Horizontal', 1.0, 500)
-        await self.api.Wait(200)
-        await self.api.ButtonPress('Jump', 100)
-        await self.api.Wait(700)
-        await self.api.ButtonPress('Jump', 100)
-
-    async def test_CallMethod(self):
-        # Unused
-        await self.api.CallMethod("//*[@name='Player']/fn:component('CustomScript')", "CustomMethod", { "string:The Test was run"})
-
-    async def Disconnect(self):
-        await self.api.Disconnect()
+        
+        await self.api.Tap_XY(600, 275, 1, 5)
 
 if __name__ == '__main__':
     Game = TestFixture()

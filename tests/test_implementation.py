@@ -55,7 +55,7 @@ async def api_connectedlocal():
 ])
 @pytest.mark.asyncio
 class Test_Methods:
-    #@pytest.mark.skip
+    @pytest.mark.skip
     async def test_InputMethods(self, api_connectedlocal, method, methodArgs):
         api = api_connectedlocal
         method = getattr(api, method)

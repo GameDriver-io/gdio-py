@@ -7,6 +7,8 @@ import os
 import asyncio, socket
 import time, datetime
 
+import logging
+
 
 AUTOPLAY_DEFAULT_PORT = 11002
 
@@ -30,7 +32,6 @@ class ApiClient:
         self.gameConnectionDetails = None
 
         if debug:
-            import logging
             log_file_path = f'logs/{datetime.datetime.now().date().strftime("%Y-%m-%d")}.log'
             i = 1
             while os.path.exists(log_file_path):
@@ -2036,14 +2037,19 @@ class ApiClient:
         ```
         </example>
         '''
-        request = Messages.Cmd_TapRequest(
-            X = x,
-            Y = y,
-            FrameCount = frameCount,
-            TapCount = tapCount
+        
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_TapRequest(
+                X = x,
+                Y = y,
+                FrameCount = frameCount,
+                TapCount = tapCount
+            )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
+        
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
@@ -2105,13 +2111,18 @@ class ApiClient:
         ```
         </example>
         '''
-        request = Messages.Cmd_TapRequest(
-            HierarchyPath = hierarchyPath,
-            FrameCount = frameCount,
-            TapCount = tapCount,
-            CameraHierarchyPath = cameraHierarchyPath
+
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_TapRequest(
+                HierarchyPath = hierarchyPath,
+                FrameCount = frameCount,
+                TapCount = tapCount,
+                CameraHierarchyPath = cameraHierarchyPath
+            )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
+
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
