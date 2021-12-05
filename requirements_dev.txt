@@ -1,3 +1,5 @@
+git+https://github.com/ethanavatar/docsgen-py.git
+
 pytest==6.2.5
 pytest-cov==2.12.1
 pytest-asyncio==0.15.1

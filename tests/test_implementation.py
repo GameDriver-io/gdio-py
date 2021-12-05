@@ -76,7 +76,6 @@ async def test_InputEx(api_connectedlocal):
 
     await api.DisableHooks(HookingObject.ALL)
 
-
 # saving for later
 '''
 @pytest.mark.parametrize('method, methodArgs', [

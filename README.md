@@ -3,17 +3,18 @@
 
  - [Installation](#Installation)
  - [Changelog](CHANGELOG.md)
+ - [API Reference](docs/ApiClient_Reference.md)
 
 ## Installation
 
-Install the latest version of the package directly from the repository using:
-```sh
-pip install https://github.com/ethanavatar/gdio-py.git
+Install the latest commit directly from the repository using:
+```bash
+pip install git+https://github.com/ethanavatar/gdio-py.git
 ```
 
 Alternatively, to make local changes without recompiling, you can clone the repository and install the package in editable (-e) mode.
-```sh
-clone https://github.com/ethanavatar/gdio-py.git
+```bash
+git clone https://github.com/ethanavatar/gdio-py.git
 pip install -e gdio-py
 ```
 This way, the module refers directly to the installed folder rather than the version in site-packages, and all changes made to the source are immediately usable.

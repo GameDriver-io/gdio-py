@@ -2,6 +2,8 @@
 import datetime, uuid
 from msgpack import Timestamp as msgpackTime
 
+from collections import namedtuple
+
 from . import Messages
 
 # I dont know where to put this method
@@ -78,32 +80,9 @@ class GameConnectionDetails:
     def __repr__(self):
         return f'{self.toDict()}'
 
-class Vector2:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __repr__(self):
-        return f'Vector2({self.x}, {self.y})'
-
-class Vector3:
-    def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def __repr__(self):
-        return f'Vector3({self.x}, {self.y}, {self.z})'
-
-class Vector4:
-    def __init__(self, x, y, z, w):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.w = w
-
-    def __repr__(self):
-        return f'Vector4({self.x}, {self.y}, {self.z}, {self.w})'
+Vector2 = namedtuple('Vector2', ['x', 'y'])
+Vector3 = namedtuple('Vector3', ['x', 'y'])
+Vector4 = namedtuple('Vector4', ['x', 'y'])
 
 class Collision:
     pass
