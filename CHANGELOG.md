@@ -3,6 +3,16 @@
 ## Upcoming
  - Fixing slight differences between this and the original API so that tests can be run in either version without changing timings
 
+# 12-5-2021
+
+### Added
+ - Added an API reference page for `ApiClient`
+   - This uses a generation script that depends on [docsgen-py](https://github.com/ethanavatar/docsgen-py). but it would be useful to port this over to `pdoc](https://pdoc3.github.io/pdoc/) in the future.
+
+### Changed
+ - Changed many of the docstrings to be more accurately decriptive.
+   - This is being done actively because GitHub Copilot wrote them initially, and they were mostly wrong.
+
 # 11-12-2021
 This version made progress on the rest of the client methods. Aside from around 15 of them, their functionality should be mostly complete. However, I have yet to test most of them. It also restuctures the oackage to be less cluttered; at least for the end user
 
@@ -60,7 +70,7 @@ This version reworked how messages are packed and unpacked. It also introduces a
     - Used in `Client.ProcessMessage()` in order to rebuild responses and do message-type-specific actions.
  - [`requirements_dev.txt`](requirements_dev.txt) holding packages useful to development but not to an end user.
     - Amended [`setup.cfg`](setup.cfg) appropriately.
-    - Added [`py.typed`](src/gdio/py.typed) to comply with the [`flake8`](https://github.com/pycqa/flake8) style checker.
+    - Added [`py.typed`](src/gdio/py.typed) to comply with the [flake8](https://github.com/pycqa/flake8) style checker.
  
 
 ### Changed:
