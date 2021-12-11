@@ -11,7 +11,7 @@
  - Added unity editor autoplay support.
 
 ### Changed
- - Made minor style changes to the [API reference](docs/ApiClient.md)
+ - Made minor style changes to the [API reference](docs/ApiClient_Reference.md)
 
 # 12-5-2021
 
