@@ -1,3 +1,3 @@
 | Name | Summary |
 | ---- | ---- |
-| {name} -> `{type}` | {summary} |
+| [`{name}`](#{name}) -> `{type}` | {summary} |

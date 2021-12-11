@@ -6,68 +6,68 @@ GameDriver.io Unity API Client class.
 
 | Name | Summary |
 | ---- | ---- |
-| AxisPress -> `bool` |  Presses the target axis for the specified number of frames.  |
-| ButtonPress -> `bool` |  Presses the target button for the specified number of frames.  |
-| CallMethod -> `bool` |  Calls a method on the target object.  |
-| CallMethod_Void -> `bool` |  Calls a void method on the target object.  |
-| CaptureScreenshot -> `str` |  Captures a screenshot of the currently connected app.  |
-| ClickEx_Vec2 -> `bool` |  Clicks a mouse button at the target coordinates with modifier keys.  |
-| ClickEx_XY -> `bool` |  Clicks a mouse button at the target coordinates with modifier keys.  |
-| ClickObject -> `bool` |  Clicks a mouse button at the position of the target object.  |
-| ClickObjectEx -> `bool` |  Clicks a mouse button at the position of the target object with modifier keys.  |
-| Click_Vec2 -> `bool` |  Clicks a mouse button at the target coordinates.  |
-| Click_XY -> `bool` |  Clicks a mouse button at the target coordinates.  |
-| Connect -> `bool` |  Connects to an agent at the target hostname and port.  |
-| DisableHooks -> `bool` |  Disables the ability to preform the target input type from the ApiClient.  |
-| DisableObjectCaching -> `bool` |  Disables object caching for HierarchyPath resolution.  |
-| Disconnect -> `None` |  Disconnects from the agent.  |
-| DoubleClickEx_Vec2 -> `bool` |  Clicks the mouse at the given coordinates.  |
-| DoubleClickEx_XY -> `bool` |  Clicks the mouse at the given coordinates.  |
-| DoubleClickObject -> `bool` |  Clicks the mouse at the given coordinates.  |
-| DoubleClickObjectEx -> `bool` |  Clicks the mouse at the given coordinates.  |
-| DoubleClick_Vec2 -> `bool` |  Clicks the mouse at the given coordinates.  |
-| DoubleClick_XY -> `bool` |  Clicks the mouse at the given coordinates.  |
-| EnableHooks -> `bool` |  Enables the given hooking object.  |
-| EnableObjectCaching -> `bool` |  Enables object caching.  |
-| FlushObjectLookupCache -> `bool` |  Flushes the object lookup cache.  |
-| GetConnectedGameDetails -> `ProtocolObjects.GameConnectionDetails` |  Gets the details of the connected game.  |
-| GetLastFPS -> `float` |  Gets the last FPS value.  |
-| GetNextCollisionEvent -> `ProtocolObjects.Collision` |  (**Not Implemented**) Gets the next collision event.  |
-| GetObjectDistance -> `float` |  (**Not Implemented**) Gets the distance between two objects.  |
-| GetObjectFieldValue -> `t` |  (**Not Implemented**) Gets the value of a field on an object.  |
-| GetObjectFieldValueByName -> `t` |  (**Not Implemented**) Gets the value of a field on an object.  |
-| GetObjectList -> `bool` |  Gets the list of objects.  |
-| GetObjectPosition -> `ProtocolObjects.Vector3` |  Gets the position of an object.  |
-| GetSceneName -> `bool` |  Gets the name of the scene.  |
-| GetVersionString -> `str` |  (**Not Implemented**) Gets the version string of the agent.  |
-| KeyPress -> `bool` |  Presses a key.  |
-| Launch -> `None` |  (**Not Implemented**) Launches a process.  |
-| LoadScene -> `bool` |  Loads a scene.  |
-| MouseDrag -> `bool` |  Drags the mouse.  |
-| MouseMoveToObject -> `bool` |  Moves the mouse to an object.  |
-| MouseMoveToPoint -> `bool` |  Moves the mouse to a point.  |
-| NavAgentMoveToPoint -> `bool` |  Moves the nav agent to a point.  |
-| Raycast -> `list` |  Performs a raycast.  |
-| RegisterCollisionMonitor -> `bool` |  Registers a collision monitor.  |
-| RotateObject_AxisAngle -> `bool` |  Rotates an object.  |
-| RotateObject_Euler -> `bool` |  Rotates an object.  |
-| RotateObject_Quaternion -> `bool` |  Rotates an object.  |
-| SetInputFieldText -> `bool` |  Sets the text of an input field.  |
-| SetObjectFieldValue -> `bool` |  (**Not Implemented**) Sets the value of an object field.  |
-| TapObject -> `bool` |  Taps an object.  |
-| Tap_Vec2 -> `bool` |  Taps an object.  |
-| Tap_XY -> `bool` |  Taps an object.  |
-| TerminateGame -> `bool` |  (**Not Implemented**) Terminates the game.  |
-| ToggleEditorPause -> `bool` |  (**Not Implemented**) Toggles the editor pause.  |
-| ToggleEditorPlay -> `bool` |  (**Not Implemented**) Toggles the editor play.  |
-| TouchInput -> `bool` |  Touches an object.  |
-| UnregisterCollisionMonitor -> `bool` |  Unregisters a collision monitor.  |
-| Wait -> `None` |  Waits for a specified number of miliseconds.  |
-| WaitForCollisionEvent -> `ProtocolObjects.Collision` |  (**Not Implemented**) Waits for a collision event.  |
-| WaitForEmptyInput -> `bool` |  Waits for an empty input event.  |
-| waitForObject -> `bool` |  (**Not Implemented**) Waits for an object.  |
-| waitForObjectValue -> `bool` |  (**Not Implemented**) Waits for an object value.  |
-### `bool` AxisPress(axisId : `str`, value : `float`, numberOfFrames : `int`, timeout : `int`)
+| [`AxisPress`](#AxisPress) -> `bool` |  Presses the target axis for the specified number of frames.  |
+| [`ButtonPress`](#ButtonPress) -> `bool` |  Presses the target button for the specified number of frames.  |
+| [`CallMethod`](#CallMethod) -> `bool` |  Calls a method on the target object.  |
+| [`CallMethod_Void`](#CallMethod_Void) -> `bool` |  Calls a void method on the target object.  |
+| [`CaptureScreenshot`](#CaptureScreenshot) -> `str` |  Captures a screenshot of the currently connected app.  |
+| [`ClickEx_Vec2`](#ClickEx_Vec2) -> `bool` |  Clicks a mouse button at the target coordinates with modifier keys.  |
+| [`ClickEx_XY`](#ClickEx_XY) -> `bool` |  Clicks a mouse button at the target coordinates with modifier keys.  |
+| [`ClickObject`](#ClickObject) -> `bool` |  Clicks a mouse button at the position of the target object.  |
+| [`ClickObjectEx`](#ClickObjectEx) -> `bool` |  Clicks a mouse button at the position of the target object with modifier keys.  |
+| [`Click_Vec2`](#Click_Vec2) -> `bool` |  Clicks a mouse button at the target coordinates.  |
+| [`Click_XY`](#Click_XY) -> `bool` |  Clicks a mouse button at the target coordinates.  |
+| [`Connect`](#Connect) -> `bool` |  Connects to an agent at the target hostname and port.  |
+| [`DisableHooks`](#DisableHooks) -> `bool` |  Disables the ability to preform the target input type from the ApiClient.  |
+| [`DisableObjectCaching`](#DisableObjectCaching) -> `bool` |  Disables object caching for HierarchyPath resolution.  |
+| [`Disconnect`](#Disconnect) -> `None` |  Disconnects from the agent.  |
+| [`DoubleClickEx_Vec2`](#DoubleClickEx_Vec2) -> `bool` |  Clicks the mouse at the given coordinates.  |
+| [`DoubleClickEx_XY`](#DoubleClickEx_XY) -> `bool` |  Clicks the mouse at the given coordinates.  |
+| [`DoubleClickObject`](#DoubleClickObject) -> `bool` |  Clicks the mouse at the given coordinates.  |
+| [`DoubleClickObjectEx`](#DoubleClickObjectEx) -> `bool` |  Clicks the mouse at the given coordinates.  |
+| [`DoubleClick_Vec2`](#DoubleClick_Vec2) -> `bool` |  Clicks the mouse at the given coordinates.  |
+| [`DoubleClick_XY`](#DoubleClick_XY) -> `bool` |  Clicks the mouse at the given coordinates.  |
+| [`EnableHooks`](#EnableHooks) -> `bool` |  Enables the given hooking object.  |
+| [`EnableObjectCaching`](#EnableObjectCaching) -> `bool` |  Enables object caching.  |
+| [`FlushObjectLookupCache`](#FlushObjectLookupCache) -> `bool` |  Flushes the object lookup cache.  |
+| [`GetConnectedGameDetails`](#GetConnectedGameDetails) -> `ProtocolObjects.GameConnectionDetails` |  Gets the details of the connected game.  |
+| [`GetLastFPS`](#GetLastFPS) -> `float` |  Gets the last FPS value.  |
+| [`GetNextCollisionEvent`](#GetNextCollisionEvent) -> `ProtocolObjects.Collision` |  (**Not Implemented**) Gets the next collision event.  |
+| [`GetObjectDistance`](#GetObjectDistance) -> `float` |  (**Not Implemented**) Gets the distance between two objects.  |
+| [`GetObjectFieldValue`](#GetObjectFieldValue) -> `t` |  (**Not Implemented**) Gets the value of a field on an object.  |
+| [`GetObjectFieldValueByName`](#GetObjectFieldValueByName) -> `t` |  (**Not Implemented**) Gets the value of a field on an object.  |
+| [`GetObjectList`](#GetObjectList) -> `bool` |  Gets the list of objects.  |
+| [`GetObjectPosition`](#GetObjectPosition) -> `ProtocolObjects.Vector3` |  Gets the position of an object.  |
+| [`GetSceneName`](#GetSceneName) -> `bool` |  Gets the name of the scene.  |
+| [`GetVersionString`](#GetVersionString) -> `str` |  (**Not Implemented**) Gets the version string of the agent.  |
+| [`KeyPress`](#KeyPress) -> `bool` |  Presses a key.  |
+| [`Launch`](#Launch) -> `None` |  (**Not Implemented**) Launches a process.  |
+| [`LoadScene`](#LoadScene) -> `bool` |  Loads a scene.  |
+| [`MouseDrag`](#MouseDrag) -> `bool` |  Drags the mouse.  |
+| [`MouseMoveToObject`](#MouseMoveToObject) -> `bool` |  Moves the mouse to an object.  |
+| [`MouseMoveToPoint`](#MouseMoveToPoint) -> `bool` |  Moves the mouse to a point.  |
+| [`NavAgentMoveToPoint`](#NavAgentMoveToPoint) -> `bool` |  Moves the nav agent to a point.  |
+| [`Raycast`](#Raycast) -> `list` |  Performs a raycast.  |
+| [`RegisterCollisionMonitor`](#RegisterCollisionMonitor) -> `bool` |  Registers a collision monitor.  |
+| [`RotateObject_AxisAngle`](#RotateObject_AxisAngle) -> `bool` |  Rotates an object.  |
+| [`RotateObject_Euler`](#RotateObject_Euler) -> `bool` |  Rotates an object.  |
+| [`RotateObject_Quaternion`](#RotateObject_Quaternion) -> `bool` |  Rotates an object.  |
+| [`SetInputFieldText`](#SetInputFieldText) -> `bool` |  Sets the text of an input field.  |
+| [`SetObjectFieldValue`](#SetObjectFieldValue) -> `bool` |  (**Not Implemented**) Sets the value of an object field.  |
+| [`TapObject`](#TapObject) -> `bool` |  Taps an object.  |
+| [`Tap_Vec2`](#Tap_Vec2) -> `bool` |  Taps an object.  |
+| [`Tap_XY`](#Tap_XY) -> `bool` |  Taps an object.  |
+| [`TerminateGame`](#TerminateGame) -> `bool` |  (**Not Implemented**) Terminates the game.  |
+| [`ToggleEditorPause`](#ToggleEditorPause) -> `bool` |  (**Not Implemented**) Toggles the editor pause.  |
+| [`ToggleEditorPlay`](#ToggleEditorPlay) -> `bool` |  (**Not Implemented**) Toggles the editor play.  |
+| [`TouchInput`](#TouchInput) -> `bool` |  Touches an object.  |
+| [`UnregisterCollisionMonitor`](#UnregisterCollisionMonitor) -> `bool` |  Unregisters a collision monitor.  |
+| [`Wait`](#Wait) -> `None` |  Waits for a specified number of miliseconds.  |
+| [`WaitForCollisionEvent`](#WaitForCollisionEvent) -> `ProtocolObjects.Collision` |  (**Not Implemented**) Waits for a collision event.  |
+| [`WaitForEmptyInput`](#WaitForEmptyInput) -> `bool` |  Waits for an empty input event.  |
+| [`waitForObject`](#waitForObject) -> `bool` |  (**Not Implemented**) Waits for an object.  |
+| [`waitForObjectValue`](#waitForObjectValue) -> `bool` |  (**Not Implemented**) Waits for an object value.  |
+### <a id='AxisPress'></a>`bool` AxisPress(axisId : `str`, value : `float`, numberOfFrames : `int`, timeout : `int`)
 
  Presses the target axis for the specified number of frames. 
 
@@ -94,7 +94,7 @@ GameDriver.io Unity API Client class.
  # Move the horizontal axis to the right for 100 frames.
  await api.AxisPress(axisId='Horizontal', value=1.0, numberOfFrames=100)
  ```
- ### `bool` ButtonPress(buttonId : `str`, numberOfFrames : `int`, timeout : `int`)
+ ### <a id='ButtonPress'></a>`bool` ButtonPress(buttonId : `str`, numberOfFrames : `int`, timeout : `int`)
 
  Presses the target button for the specified number of frames. 
 
@@ -120,7 +120,7 @@ GameDriver.io Unity API Client class.
  # Press the Jump button for 100 frames.
  await api.ButtonPress(buttonId='Jump', numberOfFrames=100)
  ```
- ### `bool` CallMethod(t : `type`, hierarchyPath : `str`, methodName : `str`, arguments : `list[any]`, timeout : `int`)
+ ### <a id='CallMethod'></a>`bool` CallMethod(t : `type`, hierarchyPath : `str`, methodName : `str`, arguments : `list[any]`, timeout : `int`)
 
  Calls a method on the target object. 
 
@@ -133,7 +133,7 @@ GameDriver.io Unity API Client class.
  - t : `type` -  The type of the return value. 
  - hierarchyPath : `str` -  The HierarchyPath for an object and the script attached to it. 
  - methodName : `str` -  The name of the method to call within the script. 
- - arguments : `list[any]` -  (**Not Implemented**) The list of arguments to pass into the method. 
+ - arguments : `list[any]` -  The list of arguments to pass into the method. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
 
@@ -147,7 +147,7 @@ GameDriver.io Unity API Client class.
  
  await api.CallMethod(t=int, hierarchyPath="//*[@name='Player']/fn:component('PlayerController')", methodName="Jump")
  ```
- ### `bool` CallMethod_Void(hierarchyPath : `str`, methodName : `str`, arguments : `list[any]`, timeout : `int`)
+ ### <a id='CallMethod_Void'></a>`bool` CallMethod_Void(hierarchyPath : `str`, methodName : `str`, arguments : `list[any]`, timeout : `int`)
 
  Calls a void method on the target object. 
 
@@ -159,7 +159,7 @@ GameDriver.io Unity API Client class.
 
  - hierarchyPath : `str` -  The HierarchyPath for an object and the script attached to it. 
  - methodName : `str` -  The name of the method to call within the script. 
- - arguments : `list[any]` -  (**Not Implemented**) The list of arguments to pass into the method. 
+ - arguments : `list[any]` -  The list of arguments to pass into the method. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
 
@@ -174,7 +174,7 @@ GameDriver.io Unity API Client class.
  # Call the `Jump` method on the `Player` object at the scene root.
  await api.CallMethod("//*[@name='Player']/fn:component('PlayerController')", "Jump")
  ```
- ### `str` CaptureScreenshot(filename : `str`, storeInGameFolder : `bool`, overwriteExisting : `bool`, timeout : `int`)
+ ### <a id='CaptureScreenshot'></a>`str` CaptureScreenshot(filename : `str`, storeInGameFolder : `bool`, overwriteExisting : `bool`, timeout : `int`)
 
  Captures a screenshot of the currently connected app. 
 
@@ -200,7 +200,7 @@ GameDriver.io Unity API Client class.
  
  await api.CaptureScreenshot(filename='/path/to/file')
  ```
- ### `bool` ClickEx_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, keys : `list[Enums.KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[Enums.KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
+ ### <a id='ClickEx_Vec2'></a>`bool` ClickEx_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, keys : `list[Enums.KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[Enums.KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
 
  Clicks a mouse button at the target coordinates with modifier keys. 
 
@@ -232,7 +232,7 @@ GameDriver.io Unity API Client class.
  # Shift+Left click the screen at (100, 100) for 5 frames.
  await api.ClickEx_XY(buttonId=Enums.MouseButtons.Left, position=(100, 100), clickFrameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
  ```
- ### `bool` ClickEx_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list[Enums.KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[Enums.KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
+ ### <a id='ClickEx_XY'></a>`bool` ClickEx_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list[Enums.KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[Enums.KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
 
  Clicks a mouse button at the target coordinates with modifier keys. 
 
@@ -265,7 +265,7 @@ GameDriver.io Unity API Client class.
  # Shift+Left click the screen at (100, 100) for 5 frames.
  await api.ClickEx_XY(buttonId=Enums.MouseButtons.Left, x=100, y=100, clickFrameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
  ```
- ### `bool` ClickObject(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, cameraHierarchyPath : `str`, timeout : `int`)
+ ### <a id='ClickObject'></a>`bool` ClickObject(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, cameraHierarchyPath : `str`, timeout : `int`)
 
  Clicks a mouse button at the position of the target object. 
 
@@ -293,7 +293,7 @@ GameDriver.io Unity API Client class.
  # Left click the screen at the position of the `Player` object for 5 frames.
  await api.ClickObject(buttonId=Enums.MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5)
  ```
- ### `bool` ClickObjectEx(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, cameraHierarchyPath : `str`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
+ ### <a id='ClickObjectEx'></a>`bool` ClickObjectEx(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, cameraHierarchyPath : `str`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
 
  Clicks a mouse button at the position of the target object with modifier keys. 
 
@@ -326,7 +326,7 @@ GameDriver.io Unity API Client class.
  # Shift+Left click the screen at the position of the `Player` object for 5 frames.
  await api.ClickObjectEx(buttonId=Enums.MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
  ```
- ### `bool` Click_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, timeout : `int`)
+ ### <a id='Click_Vec2'></a>`bool` Click_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, timeout : `int`)
 
  Clicks a mouse button at the target coordinates. 
 
@@ -353,7 +353,7 @@ GameDriver.io Unity API Client class.
  # Left click the screen at (100, 100) for 5 frames.
  await api.Click_XY(ButtonId=Enums.MouseButtons.Left, position=(100, 100), clickFrameCount=5)
  ```
- ### `bool` Click_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`)
+ ### <a id='Click_XY'></a>`bool` Click_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`)
 
  Clicks a mouse button at the target coordinates. 
 
@@ -381,7 +381,7 @@ GameDriver.io Unity API Client class.
  # Left click the screen at (100, 100) for 5 frames.
  await api.Click_XY(ButtonId=Enums.MouseButtons.Left, x=100, y=100, clickFrameCount=5)
  ```
- ### `bool` Connect(hostname : `str`, port : `int`, autoplay : `bool`, timeout : `int`, autoPortResolution : `bool`)
+ ### <a id='Connect'></a>`bool` Connect(hostname : `str`, port : `int`, autoplay : `bool`, timeout : `int`, autoPortResolution : `bool`)
 
  Connects to an agent at the target hostname and port. 
 
@@ -407,7 +407,7 @@ GameDriver.io Unity API Client class.
  if await api.Connect(hostname='localhost', port=19734):
  print("Connected!")
  ```
- ### `bool` DisableHooks(Enums.HookingObject : `str`, timeout : `int`)
+ ### <a id='DisableHooks'></a>`bool` DisableHooks(Enums.HookingObject : `str`, timeout : `int`)
 
  Disables the ability to preform the target input type from the ApiClient. 
 
@@ -432,7 +432,7 @@ GameDriver.io Unity API Client class.
  # Disable Keyboard, Mouse, Touch and Controller hooks globally.
  await api.DisableHooks(hookingObject=Enums.HookingObject.All)
  ```
- ### `bool` DisableObjectCaching(timeout : `int`)
+ ### <a id='DisableObjectCaching'></a>`bool` DisableObjectCaching(timeout : `int`)
 
  Disables object caching for HierarchyPath resolution. 
 
@@ -455,7 +455,7 @@ GameDriver.io Unity API Client class.
  
  await api.DisableObjectCaching()
  ```
- ### `None` Disconnect()
+ ### <a id='Disconnect'></a>`None` Disconnect()
 
  Disconnects from the agent. 
 
@@ -477,7 +477,7 @@ GameDriver.io Unity API Client class.
 
  await api.Disconnect()
  ```
- ### `bool` DoubleClickEx_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
+ ### <a id='DoubleClickEx_Vec2'></a>`bool` DoubleClickEx_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
 
  Clicks the mouse at the given coordinates. 
 
@@ -508,7 +508,7 @@ GameDriver.io Unity API Client class.
  
  await api.DoubleClickEx_Vec2(Enums.MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
  ```
- ### `bool` DoubleClickEx_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
+ ### <a id='DoubleClickEx_XY'></a>`bool` DoubleClickEx_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
 
  Clicks the mouse at the given coordinates. 
 
@@ -540,7 +540,7 @@ GameDriver.io Unity API Client class.
  
  await api.DoubleClickEx_XY(Enums.MouseButtons.LEFT, 500, 500, 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
  ```
- ### `bool` DoubleClickObject(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, timeout : `int`)
+ ### <a id='DoubleClickObject'></a>`bool` DoubleClickObject(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, timeout : `int`)
 
  Clicks the mouse at the given coordinates. 
 
@@ -566,7 +566,7 @@ GameDriver.io Unity API Client class.
  
  await api.DoubleClickObject(Enums.MouseButtons.LEFT, "HierarchyPath", 5)
  ```
- ### `bool` DoubleClickObjectEx(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
+ ### <a id='DoubleClickObjectEx'></a>`bool` DoubleClickObjectEx(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
 
  Clicks the mouse at the given coordinates. 
 
@@ -597,7 +597,7 @@ GameDriver.io Unity API Client class.
  
  await api.DoubleClickObjectEx(Enums.MouseButtons.LEFT, "HierarchyPath", 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
  ```
- ### `bool` DoubleClick_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, timeout : `int`)
+ ### <a id='DoubleClick_Vec2'></a>`bool` DoubleClick_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, timeout : `int`)
 
  Clicks the mouse at the given coordinates. 
 
@@ -623,7 +623,7 @@ GameDriver.io Unity API Client class.
  
  await api.DoubleClick_Vec2(Enums.MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5)
  ```
- ### `bool` DoubleClick_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`)
+ ### <a id='DoubleClick_XY'></a>`bool` DoubleClick_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`)
 
  Clicks the mouse at the given coordinates. 
 
@@ -650,7 +650,7 @@ GameDriver.io Unity API Client class.
  
  await api.DoubleClick_XY(Enums.MouseButtons.LEFT, 500, 500, 5)
  ```
- ### `bool` EnableHooks(hookingObject : `Enums.HookingObject`, timeout : `int`)
+ ### <a id='EnableHooks'></a>`bool` EnableHooks(hookingObject : `Enums.HookingObject`, timeout : `int`)
 
  Enables the given hooking object. 
 
@@ -674,7 +674,7 @@ GameDriver.io Unity API Client class.
  
  await api.EnableHooks(Enums.HookingObject.MOUSE)
  ```
- ### `bool` EnableObjectCaching(timeout : `int`)
+ ### <a id='EnableObjectCaching'></a>`bool` EnableObjectCaching(timeout : `int`)
 
  Enables object caching. 
 
@@ -697,7 +697,7 @@ GameDriver.io Unity API Client class.
  
  await api.EnableObjectCaching()
  ```
- ### `bool` FlushObjectLookupCache(timeout : `int`)
+ ### <a id='FlushObjectLookupCache'></a>`bool` FlushObjectLookupCache(timeout : `int`)
 
  Flushes the object lookup cache. 
 
@@ -720,7 +720,7 @@ GameDriver.io Unity API Client class.
  
  await api.FlushObjectLookupCache()
  ```
- ### `ProtocolObjects.GameConnectionDetails` GetConnectedGameDetails()
+ ### <a id='GetConnectedGameDetails'></a>`ProtocolObjects.GameConnectionDetails` GetConnectedGameDetails()
 
  Gets the details of the connected game. 
 
@@ -743,7 +743,7 @@ GameDriver.io Unity API Client class.
  details = await api.GetConnectedGameDetails()
  print(details.GameName)
  ```
- ### `float` GetLastFPS(timeout : `int`)
+ ### <a id='GetLastFPS'></a>`float` GetLastFPS(timeout : `int`)
 
  Gets the last FPS value. 
 
@@ -767,7 +767,7 @@ GameDriver.io Unity API Client class.
  fps = await api.GetLastFPS()
  print(fps)
  ```
- ### `ProtocolObjects.Collision` GetNextCollisionEvent()
+ ### <a id='GetNextCollisionEvent'></a>`ProtocolObjects.Collision` GetNextCollisionEvent()
 
  (**Not Implemented**) Gets the next collision event. 
 
@@ -790,7 +790,7 @@ GameDriver.io Unity API Client class.
  collision = await api.GetNextCollisionEvent()
  print(collision.ObjectA.Name)
  ```
- ### `float` GetObjectDistance(objectA_HierarchyPath : `str`, objectB_HierarchyPath : `str`, timeout : `int`)
+ ### <a id='GetObjectDistance'></a>`float` GetObjectDistance(objectA_HierarchyPath : `str`, objectB_HierarchyPath : `str`, timeout : `int`)
 
  (**Not Implemented**) Gets the distance between two objects. 
 
@@ -816,7 +816,7 @@ GameDriver.io Unity API Client class.
  distance = await api.GetObjectDistance('ObjectA', 'ObjectB')
  print(distance)
  ```
- ### `t` GetObjectFieldValue(t : `type`, hierarchyPath : `str`, timeout : `int`)
+ ### <a id='GetObjectFieldValue'></a>`t` GetObjectFieldValue(t : `type`, hierarchyPath : `str`, timeout : `int`)
 
  (**Not Implemented**) Gets the value of a field on an object. 
 
@@ -842,7 +842,7 @@ GameDriver.io Unity API Client class.
  value = await api.GetObjectFieldValue(type(int), 'ObjectA')
  print(value)
  ```
- ### `t` GetObjectFieldValueByName(hierarchyPath : `str`, fieldName : `str`, timeout : `int`)
+ ### <a id='GetObjectFieldValueByName'></a>`t` GetObjectFieldValueByName(hierarchyPath : `str`, fieldName : `str`, timeout : `int`)
 
  (**Not Implemented**) Gets the value of a field on an object. 
 
@@ -868,7 +868,7 @@ GameDriver.io Unity API Client class.
  value = await api.GetObjectFieldValueByName('ObjectA', 'Position')
  print(value)
  ```
- ### `bool` GetObjectList(timeout : `int`)
+ ### <a id='GetObjectList'></a>`bool` GetObjectList(timeout : `int`)
 
  Gets the list of objects. 
 
@@ -892,7 +892,7 @@ GameDriver.io Unity API Client class.
  objects = await api.GetObjectList()
  print(objects)
  ```
- ### `ProtocolObjects.Vector3` GetObjectPosition(hierarchyPath : `str`, coordSpace : `Enums.CoordinateConversion`, cameraHierarchyPath : `str`, timeout : `int`)
+ ### <a id='GetObjectPosition'></a>`ProtocolObjects.Vector3` GetObjectPosition(hierarchyPath : `str`, coordSpace : `Enums.CoordinateConversion`, cameraHierarchyPath : `str`, timeout : `int`)
 
  Gets the position of an object. 
 
@@ -919,7 +919,7 @@ GameDriver.io Unity API Client class.
  position = await api.GetObjectPosition('ObjectA')
  print(position)
  ```
- ### `bool` GetSceneName(timeout : `int`)
+ ### <a id='GetSceneName'></a>`bool` GetSceneName(timeout : `int`)
 
  Gets the name of the scene. 
 
@@ -943,7 +943,7 @@ GameDriver.io Unity API Client class.
  sceneName = await api.GetSceneName()
  print(sceneName)
  ```
- ### `str` GetVersionString()
+ ### <a id='GetVersionString'></a>`str` GetVersionString()
 
  (**Not Implemented**) Gets the version string of the agent. 
 
@@ -963,7 +963,7 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  print(api.GetVersionString())
  ```
- ### `bool` KeyPress(keys : `list`, numberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
+ ### <a id='KeyPress'></a>`bool` KeyPress(keys : `list`, numberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`)
 
  Presses a key. 
 
@@ -991,7 +991,7 @@ GameDriver.io Unity API Client class.
  
  await api.KeyPress(['A', 'B'], 10)
  ```
- ### `None` Launch(filename : `str`, arguments : `str`)
+ ### <a id='Launch'></a>`None` Launch(filename : `str`, arguments : `str`)
 
  (**Not Implemented**) Launches a process. 
 
@@ -1012,7 +1012,7 @@ GameDriver.io Unity API Client class.
  ```python
  # TODO
  ```
- ### `bool` LoadScene(sceneName : `str`, timeout : `int`)
+ ### <a id='LoadScene'></a>`bool` LoadScene(sceneName : `str`, timeout : `int`)
 
  Loads a scene. 
 
@@ -1036,7 +1036,7 @@ GameDriver.io Unity API Client class.
  
  await api.LoadScene('SceneA')
  ```
- ### `bool` MouseDrag(button : `Enums.MouseButtons`, dx : `float`, dy : `float`, frameCount : `float`, ox : `float`, oy : `float`, waitForEmptyInput : `bool`, timeout : `int`)
+ ### <a id='MouseDrag'></a>`bool` MouseDrag(button : `Enums.MouseButtons`, dx : `float`, dy : `float`, frameCount : `float`, ox : `float`, oy : `float`, waitForEmptyInput : `bool`, timeout : `int`)
 
  Drags the mouse. 
 
@@ -1066,7 +1066,7 @@ GameDriver.io Unity API Client class.
  
  await api.MouseDrag(Enums.MouseButtons.Left, 10, 10, 10)
  ```
- ### `bool` MouseMoveToObject(objectHierarchyPath : `str`, frameCount : `float`, waitForObject : `bool`, waitForEmptyInput : `bool`, timeout : `int`)
+ ### <a id='MouseMoveToObject'></a>`bool` MouseMoveToObject(objectHierarchyPath : `str`, frameCount : `float`, waitForObject : `bool`, waitForEmptyInput : `bool`, timeout : `int`)
 
  Moves the mouse to an object. 
 
@@ -1093,7 +1093,7 @@ GameDriver.io Unity API Client class.
  
  await api.MouseMoveToObject('/root/SceneA/UI/ButtonA', 10)
  ```
- ### `bool` MouseMoveToPoint(dx : `float`, dy : `float`, frameCount : `float`, ox : `float`, oy : `float`, waitForEmptyInput : `bool`, timeout : `int`)
+ ### <a id='MouseMoveToPoint'></a>`bool` MouseMoveToPoint(dx : `float`, dy : `float`, frameCount : `float`, ox : `float`, oy : `float`, waitForEmptyInput : `bool`, timeout : `int`)
 
  Moves the mouse to a point. 
 
@@ -1122,7 +1122,7 @@ GameDriver.io Unity API Client class.
  
  await api.MouseMoveToPoint(10, 10, 10)
  ```
- ### `bool` NavAgentMoveToPoint(navAgent_HierarchyPath : `str`, dx : `float`, dy : `float`, waitForMoveToComplete : `bool`, timeout : `int`)
+ ### <a id='NavAgentMoveToPoint'></a>`bool` NavAgentMoveToPoint(navAgent_HierarchyPath : `str`, dx : `float`, dy : `float`, waitForMoveToComplete : `bool`, timeout : `int`)
 
  Moves the nav agent to a point. 
 
@@ -1149,7 +1149,7 @@ GameDriver.io Unity API Client class.
  
  await api.NavAgentMoveToPoint('/root/SceneA/NavAgentA', 10, 10)
  ```
- ### `list` Raycast(raycastPoint : `ProtocolObjects.Vector3`, cameraHierarchyPath : `str`, timeout : `int`)
+ ### <a id='Raycast'></a>`list` Raycast(raycastPoint : `ProtocolObjects.Vector3`, cameraHierarchyPath : `str`, timeout : `int`)
 
  Performs a raycast. 
 
@@ -1176,7 +1176,7 @@ GameDriver.io Unity API Client class.
  cameraHierarchyPath = '/root/SceneA/CameraA'
  raycastResults = await api.Raycast(raycastPoint, cameraHierarchyPath)
  ```
- ### `bool` RegisterCollisionMonitor(HierarchyPath : `str`, timeout : `int`)
+ ### <a id='RegisterCollisionMonitor'></a>`bool` RegisterCollisionMonitor(HierarchyPath : `str`, timeout : `int`)
 
  Registers a collision monitor. 
 
@@ -1200,7 +1200,7 @@ GameDriver.io Unity API Client class.
  
  await api.RegisterCollisionMonitor('/root/SceneA/ObjectA')
  ```
- ### `bool` RotateObject_AxisAngle(hierarchyPath : `str`, xAngle : `float`, yAngle : `float`, zAngle : `float`, relativeTo : `Enums.Space`, waitForObject : `bool`, timeout : `int`)
+ ### <a id='RotateObject_AxisAngle'></a>`bool` RotateObject_AxisAngle(hierarchyPath : `str`, xAngle : `float`, yAngle : `float`, zAngle : `float`, relativeTo : `Enums.Space`, waitForObject : `bool`, timeout : `int`)
 
  Rotates an object. 
 
@@ -1229,7 +1229,7 @@ GameDriver.io Unity API Client class.
  
  await api.RotateObject_AxisAngle('/root/SceneA/ObjectA', 1, 1, 1)
  ```
- ### `bool` RotateObject_Euler(hierarchyPath : `str`, euler : `ProtocolObjects.Vector3`, relativeTo : `Enums.Space`, waitForObject : `bool`, timeout : `int`)
+ ### <a id='RotateObject_Euler'></a>`bool` RotateObject_Euler(hierarchyPath : `str`, euler : `ProtocolObjects.Vector3`, relativeTo : `Enums.Space`, waitForObject : `bool`, timeout : `int`)
 
  Rotates an object. 
 
@@ -1256,7 +1256,7 @@ GameDriver.io Unity API Client class.
  
  await api.RotateObject_Euler('/root/SceneA/ObjectA', ProtocolObjects.Vector3(1, 1, 1))
  ```
- ### `bool` RotateObject_Quaternion(hierarchyPath : `str`, quaternion : `ProtocolObjects.Vector4`, waitForObject : `bool`, timeout : `int`)
+ ### <a id='RotateObject_Quaternion'></a>`bool` RotateObject_Quaternion(hierarchyPath : `str`, quaternion : `ProtocolObjects.Vector4`, waitForObject : `bool`, timeout : `int`)
 
  Rotates an object. 
 
@@ -1282,7 +1282,7 @@ GameDriver.io Unity API Client class.
  
  await api.RotateObject_Quaternion('/root/SceneA/ObjectA', ProtocolObjects.Vector4(1, 1, 1, 1))
  ```
- ### `bool` SetInputFieldText(hierarchyPath : `str`, text : `str`, waitForObject : `bool`, timeout : `int`)
+ ### <a id='SetInputFieldText'></a>`bool` SetInputFieldText(hierarchyPath : `str`, text : `str`, waitForObject : `bool`, timeout : `int`)
 
  Sets the text of an input field. 
 
@@ -1308,7 +1308,7 @@ GameDriver.io Unity API Client class.
  
  await api.SetInputFieldText('/root/SceneA/ObjectA', 'Hello World')
  ```
- ### `bool` SetObjectFieldValue()
+ ### <a id='SetObjectFieldValue'></a>`bool` SetObjectFieldValue()
 
  (**Not Implemented**) Sets the value of an object field. 
 
@@ -1323,7 +1323,7 @@ GameDriver.io Unity API Client class.
 
 #### Example
 
-### `bool` TapObject(hierarchyPath : `str`, tapCount : `int`, frameCount : `int`, cameraHierarchyPath : `str`, timeout : `int`)
+### <a id='TapObject'></a>`bool` TapObject(hierarchyPath : `str`, tapCount : `int`, frameCount : `int`, cameraHierarchyPath : `str`, timeout : `int`)
 
  Taps an object. 
 
@@ -1350,7 +1350,7 @@ GameDriver.io Unity API Client class.
  
  await api.TapObject('/root/SceneA/ObjectA')
  ```
- ### `bool` Tap_Vec2(position : `ProtocolObjects.Vector2`, tapCount : `int`, frameCount : `int`, timeout : `int`)
+ ### <a id='Tap_Vec2'></a>`bool` Tap_Vec2(position : `ProtocolObjects.Vector2`, tapCount : `int`, frameCount : `int`, timeout : `int`)
 
  Taps an object. 
 
@@ -1376,7 +1376,7 @@ GameDriver.io Unity API Client class.
  
  await api.Tap_Vec2(ProtocolObjects.Vector2(1, 1))
  ```
- ### `bool` Tap_XY(x : `float`, y : `float`, tapCount : `int`, frameCount : `int`, timeout : `int`)
+ ### <a id='Tap_XY'></a>`bool` Tap_XY(x : `float`, y : `float`, tapCount : `int`, frameCount : `int`, timeout : `int`)
 
  Taps an object. 
 
@@ -1403,7 +1403,7 @@ GameDriver.io Unity API Client class.
  
  await api.Tap_XY(1, 1)
  ```
- ### `bool` TerminateGame()
+ ### <a id='TerminateGame'></a>`bool` TerminateGame()
 
  (**Not Implemented**) Terminates the game. 
 
@@ -1425,7 +1425,7 @@ GameDriver.io Unity API Client class.
  
  await api.TerminateGame()
  ```
- ### `bool` ToggleEditorPause()
+ ### <a id='ToggleEditorPause'></a>`bool` ToggleEditorPause()
 
  (**Not Implemented**) Toggles the editor pause. 
 
@@ -1447,7 +1447,7 @@ GameDriver.io Unity API Client class.
  
  await api.ToggleEditorPause()
  ```
- ### `bool` ToggleEditorPlay()
+ ### <a id='ToggleEditorPlay'></a>`bool` ToggleEditorPlay()
 
  (**Not Implemented**) Toggles the editor play. 
 
@@ -1469,7 +1469,7 @@ GameDriver.io Unity API Client class.
  
  await api.ToggleEditorPlay()
  ```
- ### `bool` TouchInput(x1 : `float`, y1 : `float`, x2 : `float`, y2 : `float`, fingerId : `int`, tapCount : `int`, frameCount : `int`, waitForEmptyInput : `bool`, radius : `float`, pressure : `float`, altitudeAngle : `float`, azmulthAngle : `float`, maximumPossiblePressure : `float`, timeout : `int`)
+ ### <a id='TouchInput'></a>`bool` TouchInput(x1 : `float`, y1 : `float`, x2 : `float`, y2 : `float`, fingerId : `int`, tapCount : `int`, frameCount : `int`, waitForEmptyInput : `bool`, radius : `float`, pressure : `float`, altitudeAngle : `float`, azmulthAngle : `float`, maximumPossiblePressure : `float`, timeout : `int`)
 
  Touches an object. 
 
@@ -1505,7 +1505,7 @@ GameDriver.io Unity API Client class.
  
  await api.TouchInput(1, 1, 1, 1, 1)
  ```
- ### `bool` UnregisterCollisionMonitor(hierarchyPath : `str`, timeout : `int`)
+ ### <a id='UnregisterCollisionMonitor'></a>`bool` UnregisterCollisionMonitor(hierarchyPath : `str`, timeout : `int`)
 
  Unregisters a collision monitor. 
 
@@ -1529,7 +1529,7 @@ GameDriver.io Unity API Client class.
  
  await api.UnregisterCollisionMonitor('/root/SceneA/ObjectA')
  ```
- ### `None` Wait(miliseconds : `int`)
+ ### <a id='Wait'></a>`None` Wait(miliseconds : `int`)
 
  Waits for a specified number of miliseconds. 
 
@@ -1551,7 +1551,7 @@ GameDriver.io Unity API Client class.
  
  await api.Wait(1000)
  ```
- ### `ProtocolObjects.Collision` WaitForCollisionEvent(eventId : `str`, timeout : `int`)
+ ### <a id='WaitForCollisionEvent'></a>`ProtocolObjects.Collision` WaitForCollisionEvent(eventId : `str`, timeout : `int`)
 
  (**Not Implemented**) Waits for a collision event. 
 
@@ -1575,7 +1575,7 @@ GameDriver.io Unity API Client class.
  
  await api.WaitForCollisionEvent('123')
  ```
- ### `bool` WaitForEmptyInput(timeout : `int`)
+ ### <a id='WaitForEmptyInput'></a>`bool` WaitForEmptyInput(timeout : `int`)
 
  Waits for an empty input event. 
 
@@ -1598,7 +1598,7 @@ GameDriver.io Unity API Client class.
  
  await api.WaitForEmptyInput()
  ```
- ### `bool` waitForObject(hierarchyPath : `str`, timeout : `int`)
+ ### <a id='waitForObject'></a>`bool` waitForObject(hierarchyPath : `str`, timeout : `int`)
 
  (**Not Implemented**) Waits for an object. 
 
@@ -1622,7 +1622,7 @@ GameDriver.io Unity API Client class.
  
  await api.WaitForObject('/root/SceneA/ObjectA')
  ```
- ### `bool` waitForObjectValue(hierarchyPath : `str`, timeout : `int`)
+ ### <a id='waitForObjectValue'></a>`bool` waitForObjectValue(hierarchyPath : `str`, timeout : `int`)
 
  (**Not Implemented**) Waits for an object value. 
 
