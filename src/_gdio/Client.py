@@ -7,8 +7,7 @@ from binascii import crc32
 
 import logging
 
-BYTE_ORDER = 'little'
-PROTOCOL_VERSION = '2.04.13.2021'
+from .constants import *
 
 isEvent = lambda x: x.startswith('EVENT_')
 
@@ -160,18 +159,13 @@ class Client:
         self.EventHandlers.append(obj.RequestId)
         logging.debug(f'[SEND] {obj.GDIOMsg.GetName()} as {obj.RequestId}. Waiting for a response...')
 
-        await self.WriteMessage(obj, writer)
-        return ProtocolObjects.RequestInfo(self, obj.RequestId, obj.Timestamp)
-
-    async def WriteMessage(self, obj, writer=None):
-
-        writer = self._writer if writer == None else writer
-
         serialized = msgpack.packb(obj, default=Serializers.customSerializer)
         msg_payload = await self.ConstructPayload(serialized)
         payload_bytes = bytes(msg_payload)
         writer.write(payload_bytes)
         await writer.drain()
+
+        return ProtocolObjects.RequestInfo(self, obj.RequestId, obj.Timestamp)
 
     async def ConstructPayload(self, msg):
         assert type(msg) == bytes

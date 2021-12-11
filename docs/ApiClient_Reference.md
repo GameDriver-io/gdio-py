@@ -4,7 +4,7 @@ GameDriver.io Unity API Client class.
 
 ## Methods
 
-| Name | Summary |
+| Method Name | Summary |
 | ---- | ---- |
 | [`AxisPress`](#AxisPress) -> `bool` |  Presses the target axis for the specified number of frames.  |
 | [`ButtonPress`](#ButtonPress) -> `bool` |  Presses the target button for the specified number of frames.  |

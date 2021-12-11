@@ -9,8 +9,7 @@ import time, datetime
 
 import logging
 
-
-AUTOPLAY_DEFAULT_PORT = 11002
+from .constants import *
 
 def requireClientConnection(function):
     @wraps(function)
@@ -610,18 +609,15 @@ class ApiClient:
         # Try to connect to the target game.
         try:
             if autoplay:
-                raise NotImplementedError("Autoplay is not yet implemented.")
-                # TODO: _ManageAutoPlay()
-                autoPlayDetails = self._ManageAutoPlay(hostname)
-                if len(autoPlayDetails) == 0:
+                logging.debug("Looking for an editor to use for autoplay..")
+                islistening = self._VerifyEditorInstance(hostname, timeout)
+                if len(islistening) == 0:
                     raise Exception("No compatible game found on the specified hostname.")
-                gameConnectionDetails = autoPlayDetails[0].GCD
-                self.CurrentPlayDetails = autoPlayDetails[0]
 
+                logging.debug(f"Autoplaying on the editor instance at {hostname}:{AUTOPLAY_DEFAULT_PORT}")
                 # This uses the socket module becuase I don't know how to use the asyncio module for UDP.
                 UdpClient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                endPoint = (autoPlayDetails[0].Addr, AUTOPLAY_DEFAULT_PORT)
-                UdpClient.sendto(bytes('agent|startplay'), endPoint)
+                UdpClient.sendto(bytes('agent|startplay', 'utf-8'), (hostname, AUTOPLAY_DEFAULT_PORT))
                 UdpClient.close()
 
 
@@ -1555,11 +1551,24 @@ class ApiClient:
         
         return True
 
-    def _ManageAutoPlay(self, hostname : str) -> list:
+    def _VerifyEditorInstance(self, hostname : str, timeout = 30) -> list:
         '''
 
         '''
-        raise NotImplementedError
+        ReceiveClient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        ReceiveClient.bind(('', AUTOPLAY_RECEIVE_PORT))
+        ReceiveClient.settimeout(timeout)
+
+        SendClient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        SendClient.connect((hostname, AUTOPLAY_DEFAULT_PORT))
+        payload = bytes(f'agent|getgameinfo|{AUTOPLAY_RECEIVE_PORT}', 'utf-8')
+        SendClient.send(payload)
+        SendClient.close()
+
+        data, addr = ReceiveClient.recvfrom(1024)
+        ReceiveClient.close()
+
+        return data
 
     @requireClientConnection
     async def MouseDrag(self,

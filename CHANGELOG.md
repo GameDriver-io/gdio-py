@@ -7,7 +7,8 @@
 # 12-10-2021
 
 ### Added
- - Added support for built-in types as arguments in `ApiClient.CallMethod` and `ApiClient.CallMethod_Void`
+ - Added support for built-in types as arguments in `ApiClient.CallMethod` and `ApiClient.CallMethod_Void`.
+ - Added unity editor autoplay support.
 
 ### Changed
  - Made minor style changes to the [API reference](docs/ApiClient.md)

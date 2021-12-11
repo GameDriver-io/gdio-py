@@ -11,7 +11,7 @@ class TestFixture:
         self.api = ApiClient(debug=True)
 
     async def Connect(self):
-        await self.api.Connect('127.0.0.1', 19734, False, 5)
+        await self.api.Connect('127.0.0.1', 19734, True, 5)
 
         await self.api.Wait(1000)
 
