@@ -17,7 +17,7 @@
 
 ### Added
  - Added an [API reference page for `ApiClient`](docs/ApiClient_Reference.md)
-   - This uses a generation script that depends on [docsgen-py](https://github.com/ethanavatar/docsgen-py). but it would be useful to port this over to `pdoc](https://pdoc3.github.io/pdoc/) in the future.
+   - This uses a generation script that depends on [docsgen-py](https://github.com/ethanavatar/docsgen-py). But it would be useful to port this over to [pdoc](https://pdoc3.github.io/pdoc/) in the future.
 
 ### Changed
  - Changed many of the docstrings to be more accurately decriptive.
