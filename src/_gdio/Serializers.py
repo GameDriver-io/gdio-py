@@ -1,4 +1,4 @@
-from . import ProtocolObjects
+from . import ProtocolObjects, Messages
 
 import msgpack
 
@@ -22,6 +22,9 @@ class SerializedObject:
         self.NonSerializedObject = NonSerializedObject
         self.SerializedObjectData = SerializedObjectData
         self.CustomSerialization = CustomSerialization
+
+    def pack(self):
+        return vars(self)
 
 
 def customSerializer(obj):

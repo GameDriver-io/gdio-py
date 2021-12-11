@@ -2,11 +2,20 @@
 
 ## Upcoming
  - Fixing slight differences between this and the original API so that tests can be run in either version without changing timings
+ - Custom types as arguments to `ApiClient.CallMethod` and `ApiClient.CallMethod_Void`
+
+# 12-10-2021
+
+### Added
+ - Added support for built-in types as arguments in `ApiClient.CallMethod` and `ApiClient.CallMethod_Void`
+
+### Changed
+ - Made minor style changes to the [API reference](docs/ApiClient.md)
 
 # 12-5-2021
 
 ### Added
- - Added an API reference page for `ApiClient`
+ - Added an [API reference page for `ApiClient`](docs/ApiClient_Reference.md)
    - This uses a generation script that depends on [docsgen-py](https://github.com/ethanavatar/docsgen-py). but it would be useful to port this over to `pdoc](https://pdoc3.github.io/pdoc/) in the future.
 
 ### Changed
@@ -18,8 +27,8 @@ This version made progress on the rest of the client methods. Aside from around 
 
 ### Added:
  - Added the following methods to `ApiClient`. Their functionality is not guaranteed.
-   - `CallMethod`
-   - `CallMethod_Void`
+   - `CallMethod` (no argument support)
+   - `CallMethod_Void` (no argument support)
    - `ClickObject`
    - `ClickObjectEx`
    - `DoubleClick`
@@ -57,7 +66,7 @@ This version made progress on the rest of the client methods. Aside from around 
    - Everything now throws standard exceptions with different messages. Essentially what the module was doing anyway.
 
 
-## 9-27-2021
+# 9-27-2021
 This version reworked how messages are packed and unpacked. It also introduces a bug surrounding `ApiClient.WaitForEmptyInput()` where the method will just time out if the EmptyInput arrives before the method call. Otherwise, I'm happy with the overall structure for now. Next version will probably be focused on unit testing using PyTest; that way I can prove functionality across different platforms.
 
 ### Added:
@@ -81,14 +90,14 @@ This version reworked how messages are packed and unpacked. It also introduces a
 ### Removed:
  - `Objects.getGDIOMsgData()` that hasn't been used in a few versions because it was mostly used in patchwork functionality.
 
-## 9-19-2021
+# 9-19-2021
 
 ### Changed:
 
  - Added a loop in `Client.GetResult()` to check for pending results and retry if there arent any.
     - This has seemingly fixed the main issues from last version... agent side errors strangely.
 
-## 9-18-2021
+# 9-18-2021
 This version fixed the problem with responses being received in the wrong order. It also has agent-side issues that I don't yet understand.
 
 ### Added:
@@ -104,7 +113,7 @@ This version fixed the problem with responses being received in the wrong order.
  - `Client.Receive()` is no longer referenced.
     - It might still be useful when using the module through a REPL, in which case it will be migrated outside [`Client.py`](src/gdio/Client.py).
 
-## 9-15-2021
+# 9-15-2021
 This version focused on breaking everything as little as possible whilst changing everything into a coroutine.
 
 ### Added:
@@ -123,7 +132,7 @@ This version focused on breaking everything as little as possible whilst changin
  - Removed `Client.Wait(requestInfo, timeout)`
     - Aside from timeout which has been moved elsewhere, It was essentially just a logger for only `RequestInfo` objects.
 
-## 9-14-2021
+# 9-14-2021
 In this version, every [`ApiClient`](src/gdio/ApiClient.py) method handles its own response blind to CorrelationID. It relies purely on receival order. As a result, calling a method before the previous one receives its response will mix up the receival order and break everything. I already wrote a POC for the proper way to do this using a ReadHandler loop as an async task, but I will first need to convert basically everything into coroutines.
 
 There are skeletons of all the outward facing methods in [`ApiClient`](src/gdio/ApiClient.py), but most of them will throw a `NotImplementedError`. The same is true for the corresponding request and response objects.

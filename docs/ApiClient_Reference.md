@@ -32,16 +32,16 @@ GameDriver.io Unity API Client class.
 | FlushObjectLookupCache -> `bool` |  Flushes the object lookup cache.  |
 | GetConnectedGameDetails -> `ProtocolObjects.GameConnectionDetails` |  Gets the details of the connected game.  |
 | GetLastFPS -> `float` |  Gets the last FPS value.  |
-| GetNextCollisionEvent -> `ProtocolObjects.Collision` |  **Not Implemented** Gets the next collision event.  |
-| GetObjectDistance -> `float` |  **Not Implemented** Gets the distance between two objects.  |
-| GetObjectFieldValue -> `t` |  **Not Implemented** Gets the value of a field on an object.  |
-| GetObjectFieldValueByName -> `t` |  **Not Implemented** Gets the value of a field on an object.  |
+| GetNextCollisionEvent -> `ProtocolObjects.Collision` |  (**Not Implemented**) Gets the next collision event.  |
+| GetObjectDistance -> `float` |  (**Not Implemented**) Gets the distance between two objects.  |
+| GetObjectFieldValue -> `t` |  (**Not Implemented**) Gets the value of a field on an object.  |
+| GetObjectFieldValueByName -> `t` |  (**Not Implemented**) Gets the value of a field on an object.  |
 | GetObjectList -> `bool` |  Gets the list of objects.  |
 | GetObjectPosition -> `ProtocolObjects.Vector3` |  Gets the position of an object.  |
 | GetSceneName -> `bool` |  Gets the name of the scene.  |
-| GetVersionString -> `str` |  **Not Implemented** Gets the version string of the agent.  |
+| GetVersionString -> `str` |  (**Not Implemented**) Gets the version string of the agent.  |
 | KeyPress -> `bool` |  Presses a key.  |
-| Launch -> `None` |  **Not Implemented** Launches a process.  |
+| Launch -> `None` |  (**Not Implemented**) Launches a process.  |
 | LoadScene -> `bool` |  Loads a scene.  |
 | MouseDrag -> `bool` |  Drags the mouse.  |
 | MouseMoveToObject -> `bool` |  Moves the mouse to an object.  |
@@ -53,20 +53,20 @@ GameDriver.io Unity API Client class.
 | RotateObject_Euler -> `bool` |  Rotates an object.  |
 | RotateObject_Quaternion -> `bool` |  Rotates an object.  |
 | SetInputFieldText -> `bool` |  Sets the text of an input field.  |
-| SetObjectFieldValue -> `bool` |  **Not Implemented** Sets the value of an object field.  |
+| SetObjectFieldValue -> `bool` |  (**Not Implemented**) Sets the value of an object field.  |
 | TapObject -> `bool` |  Taps an object.  |
 | Tap_Vec2 -> `bool` |  Taps an object.  |
 | Tap_XY -> `bool` |  Taps an object.  |
-| TerminateGame -> `bool` |  **Not Implemented** Terminates the game.  |
-| ToggleEditorPause -> `bool` |  **Not Implemented** Toggles the editor pause.  |
-| ToggleEditorPlay -> `bool` |  **Not Implemented** Toggles the editor play.  |
+| TerminateGame -> `bool` |  (**Not Implemented**) Terminates the game.  |
+| ToggleEditorPause -> `bool` |  (**Not Implemented**) Toggles the editor pause.  |
+| ToggleEditorPlay -> `bool` |  (**Not Implemented**) Toggles the editor play.  |
 | TouchInput -> `bool` |  Touches an object.  |
 | UnregisterCollisionMonitor -> `bool` |  Unregisters a collision monitor.  |
 | Wait -> `None` |  Waits for a specified number of miliseconds.  |
-| WaitForCollisionEvent -> `ProtocolObjects.Collision` |  **Not Implemented** Waits for a collision event.  |
+| WaitForCollisionEvent -> `ProtocolObjects.Collision` |  (**Not Implemented**) Waits for a collision event.  |
 | WaitForEmptyInput -> `bool` |  Waits for an empty input event.  |
-| waitForObject -> `bool` |  **Not Implemented** Waits for an object.  |
-| waitForObjectValue -> `bool` |  **Not Implemented** Waits for an object value.  |
+| waitForObject -> `bool` |  (**Not Implemented**) Waits for an object.  |
+| waitForObjectValue -> `bool` |  (**Not Implemented**) Waits for an object value.  |
 ### `bool` AxisPress(axisId : `str`, value : `float`, numberOfFrames : `int`, timeout : `int`)
 
  Presses the target axis for the specified number of frames. 
@@ -133,7 +133,7 @@ GameDriver.io Unity API Client class.
  - t : `type` -  The type of the return value. 
  - hierarchyPath : `str` -  The HierarchyPath for an object and the script attached to it. 
  - methodName : `str` -  The name of the method to call within the script. 
- - arguments : `list[any]` -  **Not Implemented** The list of arguments to pass into the method. 
+ - arguments : `list[any]` -  (**Not Implemented**) The list of arguments to pass into the method. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
 
@@ -159,7 +159,7 @@ GameDriver.io Unity API Client class.
 
  - hierarchyPath : `str` -  The HierarchyPath for an object and the script attached to it. 
  - methodName : `str` -  The name of the method to call within the script. 
- - arguments : `list[any]` -  **Not Implemented** The list of arguments to pass into the method. 
+ - arguments : `list[any]` -  (**Not Implemented**) The list of arguments to pass into the method. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
 
@@ -185,7 +185,7 @@ GameDriver.io Unity API Client class.
 #### Parameters
 
  - filename : `str` -  The path and filename of the screen capture. 
- - storeInGameFolder : `bool` -  **Not Implemented** Save the screenshot on the device the game is running on rather than returning it to the client. 
+ - storeInGameFolder : `bool` -  (**Not Implemented**) Save the screenshot on the device the game is running on rather than returning it to the client. 
  - overwriteExisting : `bool` -  Overwrite if the file already exists. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
@@ -393,9 +393,9 @@ GameDriver.io Unity API Client class.
 
  - hostname : `str` -  The hostname of the device running the target game. 
  - port : `int` -  The port that the target Gamedriver agent is configured to use. 
- - autoplay : `bool` -  **Not Implemented** Start the game automatically within the Unity Editor. 
+ - autoplay : `bool` -  (**Not Implemented**) Start the game automatically within the Unity Editor. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
- - autoPortResolution : `bool` -  **Not Implemented** Automatically resolve the port a Gamedriver Agent is running on. 
+ - autoPortResolution : `bool` -  (**Not Implemented**) Automatically resolve the port a Gamedriver Agent is running on. 
 
 
 
@@ -769,7 +769,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `ProtocolObjects.Collision` GetNextCollisionEvent()
 
- **Not Implemented** Gets the next collision event. 
+ (**Not Implemented**) Gets the next collision event. 
 
 #### Returns
 
@@ -792,7 +792,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `float` GetObjectDistance(objectA_HierarchyPath : `str`, objectB_HierarchyPath : `str`, timeout : `int`)
 
- **Not Implemented** Gets the distance between two objects. 
+ (**Not Implemented**) Gets the distance between two objects. 
 
 #### Returns
 
@@ -818,7 +818,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `t` GetObjectFieldValue(t : `type`, hierarchyPath : `str`, timeout : `int`)
 
- **Not Implemented** Gets the value of a field on an object. 
+ (**Not Implemented**) Gets the value of a field on an object. 
 
 #### Returns
 
@@ -844,7 +844,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `t` GetObjectFieldValueByName(hierarchyPath : `str`, fieldName : `str`, timeout : `int`)
 
- **Not Implemented** Gets the value of a field on an object. 
+ (**Not Implemented**) Gets the value of a field on an object. 
 
 #### Returns
 
@@ -945,7 +945,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `str` GetVersionString()
 
- **Not Implemented** Gets the version string of the agent. 
+ (**Not Implemented**) Gets the version string of the agent. 
 
 #### Returns
 
@@ -993,7 +993,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `None` Launch(filename : `str`, arguments : `str`)
 
- **Not Implemented** Launches a process. 
+ (**Not Implemented**) Launches a process. 
 
 #### Returns
 
@@ -1310,7 +1310,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `bool` SetObjectFieldValue()
 
- **Not Implemented** Sets the value of an object field. 
+ (**Not Implemented**) Sets the value of an object field. 
 
 #### Returns
 
@@ -1405,7 +1405,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `bool` TerminateGame()
 
- **Not Implemented** Terminates the game. 
+ (**Not Implemented**) Terminates the game. 
 
 #### Returns
 
@@ -1427,7 +1427,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `bool` ToggleEditorPause()
 
- **Not Implemented** Toggles the editor pause. 
+ (**Not Implemented**) Toggles the editor pause. 
 
 #### Returns
 
@@ -1449,7 +1449,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `bool` ToggleEditorPlay()
 
- **Not Implemented** Toggles the editor play. 
+ (**Not Implemented**) Toggles the editor play. 
 
 #### Returns
 
@@ -1553,7 +1553,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `ProtocolObjects.Collision` WaitForCollisionEvent(eventId : `str`, timeout : `int`)
 
- **Not Implemented** Waits for a collision event. 
+ (**Not Implemented**) Waits for a collision event. 
 
 #### Returns
 
@@ -1600,7 +1600,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `bool` waitForObject(hierarchyPath : `str`, timeout : `int`)
 
- **Not Implemented** Waits for an object. 
+ (**Not Implemented**) Waits for an object. 
 
 #### Returns
 
@@ -1624,7 +1624,7 @@ GameDriver.io Unity API Client class.
  ```
  ### `bool` waitForObjectValue(hierarchyPath : `str`, timeout : `int`)
 
- **Not Implemented** Waits for an object value. 
+ (**Not Implemented**) Waits for an object value. 
 
 #### Returns
 

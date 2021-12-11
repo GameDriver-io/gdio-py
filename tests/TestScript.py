@@ -14,9 +14,16 @@ class TestFixture:
         await self.api.Connect('127.0.0.1', 19734, False, 5)
 
         await self.api.Wait(1000)
-        await self.load_scene(self.api, 'MouseMoveObject')
 
-        await self.api.MouseMoveToObject("//*[@name='Cylinder']", 10)
+        await self.api.CallMethod_Void("//*[@name='Player']", 'Jump', [1, 2])
+
+        await self.api.Wait(1000)
+
+        self.api.Disconnect()
+
+        #await self.load_scene(self.api, 'MouseMoveObject')
+
+        #await self.api.MouseMoveToObject("//*[@name='Cylinder']", 10)
         
     async def load_scene(self, api, name):
         await api.LoadScene(name, 5)

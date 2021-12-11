@@ -142,7 +142,7 @@ class ApiClient:
 
         <param name="hierarchyPath" type="str"> The HierarchyPath for an object and the script attached to it. </param>
         <param name="methodName" type="str"> The name of the method to call within the script. </param>
-        <param name="arguments" type="list[any]"> **Not Implemented** The list of arguments to pass into the method. </param>
+        <param name="arguments" type="list[any]"> The list of arguments to pass into the method. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
         <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
@@ -168,7 +168,7 @@ class ApiClient:
 
         # TODO: Set and serialize the method's arguments.
         if arguments:
-            raise NotImplementedError('Arguments are not yet supported.')
+            #raise NotImplementedError('Arguments are not yet supported.')
             msg.GDIOMsg.SetArguments(arguments)
 
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -197,7 +197,7 @@ class ApiClient:
         <param name="t" type="type"> The type of the return value. </param>
         <param name="hierarchyPath" type="str"> The HierarchyPath for an object and the script attached to it. </param>
         <param name="methodName" type="str"> The name of the method to call within the script. </param>
-        <param name="arguments" type="list[any]"> **Not Implemented** The list of arguments to pass into the method. </param>
+        <param name="arguments" type="list[any]"> The list of arguments to pass into the method. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
         <returns value="bool"> The return value of the target method of type `t`. </returns>
@@ -243,7 +243,7 @@ class ApiClient:
         <summary> Captures a screenshot of the currently connected app. </summary>
 
         <param name="filename" type="str"> The path and filename of the screen capture. </param>
-        <param name="storeInGameFolder" type="bool"> **Not Implemented** Save the screenshot on the device the game is running on rather than returning it to the client. </param>
+        <param name="storeInGameFolder" type="bool"> (**Not Implemented**) Save the screenshot on the device the game is running on rather than returning it to the client. </param>
         <param name="overwriteExisting" type="bool"> Overwrite if the file already exists. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
@@ -593,9 +593,9 @@ class ApiClient:
 
         <param name="hostname" type="str"> The hostname of the device running the target game. </param>
         <param name="port" type="int"> The port that the target Gamedriver agent is configured to use. </param>
-        <param name="autoplay" type="bool"> **Not Implemented** Start the game automatically within the Unity Editor. </param>
+        <param name="autoplay" type="bool"> (**Not Implemented**) Start the game automatically within the Unity Editor. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
-        <param name="autoPortResolution" type="bool"> **Not Implemented** Automatically resolve the port a Gamedriver Agent is running on. </param>
+        <param name="autoPortResolution" type="bool"> (**Not Implemented**) Automatically resolve the port a Gamedriver Agent is running on. </param>
 
         <returns value="bool"> True if nothing went wrong while trying to connect; None otherwise </returns>
 
@@ -1187,7 +1187,7 @@ class ApiClient:
     @requireClientConnection
     async def GetNextCollisionEvent(self) -> ProtocolObjects.Collision:
         '''
-        <summary> **Not Implemented** Gets the next collision event. </summary>
+        <summary> (**Not Implemented**) Gets the next collision event. </summary>
 
         <returns value="ProtocolObjects.Collision"> The next collision event. </returns>
 
@@ -1210,7 +1210,7 @@ class ApiClient:
             timeout : int = 30
         ) -> float:
         '''
-        <summary> **Not Implemented** Gets the distance between two objects. </summary>
+        <summary> (**Not Implemented**) Gets the distance between two objects. </summary>
 
         <param name="objectA_HierarchyPath" type="str"> The hierarchy path of the first object. </param>
         <param name="objectB_HierarchyPath" type="str"> The hierarchy path of the second object. </param>
@@ -1253,7 +1253,7 @@ class ApiClient:
             timeout : int = 30
         ):
         '''
-        <summary> **Not Implemented** Gets the value of a field on an object. </summary>
+        <summary> (**Not Implemented**) Gets the value of a field on an object. </summary>
 
         <param name="t" type="type"> The type of the field. </param>
         <param name="hierarchyPath" type="str"> The hierarchy path of the object. </param>
@@ -1297,7 +1297,7 @@ class ApiClient:
             timeout : int = 30
         ):
         '''
-        <summary> **Not Implemented** Gets the value of a field on an object. </summary>
+        <summary> (**Not Implemented**) Gets the value of a field on an object. </summary>
 
         <param name="hierarchyPath" type="str"> The hierarchy path of the object. </param>
         <param name="fieldName" type="str"> The name of the field. </param>
@@ -1441,7 +1441,7 @@ class ApiClient:
 
     def GetVersionString(self) -> str:
         '''
-        <summary> **Not Implemented** Gets the version string of the agent. </summary>
+        <summary> (**Not Implemented**) Gets the version string of the agent. </summary>
 
         <returns value="str"> The version string of the agent. </returns>
 
@@ -1510,7 +1510,7 @@ class ApiClient:
 
     def Launch(self, filename : str, arguments : str = None):
         '''
-        <summary> **Not Implemented** Launches a process. </summary>
+        <summary> (**Not Implemented**) Launches a process. </summary>
 
         <param name="filename" type="str"> The filename of the process to launch. </param>
         <param name="arguments" type="str"> The arguments to launch the process with. </param>
@@ -2021,7 +2021,7 @@ class ApiClient:
     @requireClientConnection
     async def SetObjectFieldValue() -> bool:
         '''
-        <summary> **Not Implemented** Sets the value of an object field. </summary>
+        <summary> (**Not Implemented**) Sets the value of an object field. </summary>
 
         <returns value="bool"> True if successful, false otherwise. </returns>
 
@@ -2156,7 +2156,7 @@ class ApiClient:
     @requireClientConnection
     async def TerminateGame(self):
         '''
-        <summary> **Not Implemented** Terminates the game. </summary>
+        <summary> (**Not Implemented**) Terminates the game. </summary>
 
         <returns value="bool"> True if successful, false otherwise. </returns>
 
@@ -2174,7 +2174,7 @@ class ApiClient:
     @requireClientConnection
     async def ToggleEditorPause(self):
         '''
-        <summary> **Not Implemented** Toggles the editor pause. </summary>
+        <summary> (**Not Implemented**) Toggles the editor pause. </summary>
 
         <returns value="bool"> True if successful, false otherwise. </returns>
 
@@ -2192,7 +2192,7 @@ class ApiClient:
     @requireClientConnection
     async def ToggleEditorPlay(self):
         '''
-        <summary> **Not Implemented** Toggles the editor play. </summary>
+        <summary> (**Not Implemented**) Toggles the editor play. </summary>
 
         <returns value="bool"> True if successful, false otherwise. </returns>
 
@@ -2349,7 +2349,7 @@ class ApiClient:
             timeout : int = 30
         ) -> ProtocolObjects.Collision:
         '''
-        <summary> **Not Implemented** Waits for a collision event. </summary>
+        <summary> (**Not Implemented**) Waits for a collision event. </summary>
 
         <param name="eventId" type="str"> The event ID. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
@@ -2372,7 +2372,7 @@ class ApiClient:
             timeout : int = 30
         ) -> bool:
         '''
-        <summary> **Not Implemented** Waits for an object. </summary>
+        <summary> (**Not Implemented**) Waits for an object. </summary>
 
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to wait for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
@@ -2395,7 +2395,7 @@ class ApiClient:
             timeout : int = 30
         ) -> bool:
         '''
-        <summary> **Not Implemented** Waits for an object value. </summary>
+        <summary> (**Not Implemented**) Waits for an object value. </summary>
 
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to wait for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>

@@ -114,21 +114,27 @@ class Cmd_CallMethodRequest(Message):
     def SetArguments(self, arguments = None, serializer = None):
         customSerializer : Serializers.CustomSerializer = self._serializer if serializer == None else serializer
         serializedObjectData = None
+        nonSerializedObject = None
         if arguments == None:
             return
-        if len(arguments) == 1:
-            if not Serializers.IsBuiltin(arguments[0]):
+        for argument in arguments:
+            if not Serializers.IsBuiltin(argument):
+                raise NotImplementedError(f'{argument} is not a builtin type. Custom type serialization is not supported yet.')
                 if (customSerializer == None):
                     raise Exception(f'CustomSerializer is not defined for type: {type(arguments[0])}')
                     
                 serializedObjectData = customSerializer.Serialize(arguments[0])
 
-            self.Arguments.append(Serializers.SerializedObject(
-                SerializedObjectType = type(arguments[0]),
-                SerializedObjectData = serializedObjectData
-            ))
-            return
+            else:
+                nonSerializedObject = argument
 
+            self.Arguments.append(Serializers.SerializedObject(
+                SerializedObjectType = type(argument),
+                SerializedObjectData = serializedObjectData,
+                NonSerializedObject = nonSerializedObject
+            ).pack())
+
+        '''
         ret = []
         for obj in arguments:
             if isinstance(obj, object):
@@ -150,6 +156,7 @@ class Cmd_CallMethodRequest(Message):
                         NonSerializedObject=obj
                     )
                 )
+        '''
 
 
 ## CaptureScreenshot
