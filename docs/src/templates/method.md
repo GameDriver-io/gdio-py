@@ -1,4 +1,4 @@
-### <a id='{obj.__name__}'></a>`{type}` {obj.__name__}({", ".join([f'{param["name"]} : `{param["type"]}`' for param in params])})
+### <a id='{obj.__name__}'></a> {obj.__name__}({", ".join([f'{param["name"]} : `{param["type"]}`' for param in params])}) -> `{type}`
 
 {summary}
 

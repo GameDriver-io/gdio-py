@@ -15,7 +15,7 @@ class TestFixture:
 
         await self.api.Wait(1000)
 
-        await self.api.CallMethod_Void("//*[@name='Player']", 'Jump', [1, 2])
+        await self.api.CallMethod_Void("//*[@name='Player']/fn:component('TestScript')", 'Sum_Void', [1, 2])
 
         await self.api.Wait(1000)
 
