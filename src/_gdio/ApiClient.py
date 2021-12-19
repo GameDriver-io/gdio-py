@@ -63,13 +63,6 @@ class ApiClient:
 
             logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename=log_file_path, filemode='w')
 
-    async def __aenter__(self):
-        await self.Connect(self.hostname, self.port, self.autoplay, self.connectionTimeout, self.autoPortResolution)
-        return self
-
-    async def __aexit__(self, exc_type, exc_value, traceback):
-        await self.Disconnect()
-
     @requireClientConnectionAsync
     async def AxisPress(self,
             axisId         : str,      # The name of the target input axis as defined in the Unity Input Manager.
