@@ -11,7 +11,7 @@ import logging
 
 from .constants import *
 
-def requireClientConnection(function):
+def requireClientConnectionAsync(function):
     @wraps(function)
     async def inner(*args, **kwargs):
         if args[0].client == None:
@@ -19,11 +19,35 @@ def requireClientConnection(function):
         return await function(*args, **kwargs)
     return inner
 
+def requireClientConnection(function):
+    @wraps(function)
+    def inner(*args, **kwargs):
+        if args[0].client == None:
+            raise Exception("This method requires a client connection")
+        return function(*args, **kwargs)
+    return inner
+
 class ApiClient:
     '''
     GameDriver.io Unity API Client class.
     '''
-    def __init__(self, debug : bool = False):
+    def __init__(self,
+
+            hostname           : str = '127.0.0.1', # The hostname of the device running the target game.
+            port               : int = 19734,       # The port that the target Gamedriver agent is configured to use.
+            autoplay           : bool = False,      # TODO: Start the game automatically within the Unity Editor.
+            connectionTimeout  : int = 30,          # The number of seconds to wait for the command to be recieved by the agent.
+            autoPortResolution : bool = True,       # TODO: Automatically resolve the port a Gamedriver Agent is running on.
+
+            debug : bool = False
+        ):
+
+        self.hostname = hostname
+        self.port = port
+        self.autoplay = autoplay
+        self.connectionTimeout = connectionTimeout
+        self.autoPortResolution = autoPortResolution
+    
         
         # Defined in self.Connect().
         self.client = None
@@ -39,7 +63,7 @@ class ApiClient:
 
             logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename=log_file_path, filemode='w')
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def AxisPress(self,
             axisId         : str,      # The name of the target input axis as defined in the Unity Input Manager.
             value          : float,    # The value of change on the target axis from -1.0 to +1.0.
@@ -84,7 +108,7 @@ class ApiClient:
 
         return (cmd_GenericResponse.RC == Enums.ResponseCode.OK)
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def ButtonPress(self,
             buttonId       : str,      # The name of the target input button as defined in the Unity Input Manager.
             numberOfFrames : int,      # The number of frames to hold the input for.
@@ -129,7 +153,7 @@ class ApiClient:
     
     ## Void overload.
     # TODO: Can probably be merged with the typed version by defaulting `t` to `None`.
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def CallMethod_Void(self,
             hierarchyPath : str,         # The HierarchyPath for an object and the script attached to it.
             methodName    : str,         # The name of the method to call within the script.
@@ -182,7 +206,7 @@ class ApiClient:
         return
 
     ## Return value overload
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def CallMethod(self,
             t             : type,
             hierarchyPath : str,      # The HierarchyPath for an object and the script attached to it.
@@ -231,7 +255,7 @@ class ApiClient:
 
         return t(cmd_GenericResponse.ReturnValues)
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def CaptureScreenshot(self,
             filename          : str,          # The path and filename of the screen capture.
             storeInGameFolder : bool = False, # TODO: Save the screenshot on the device the game is running on rather than returning it to the client.
@@ -285,7 +309,7 @@ class ApiClient:
         return filename
         
     ## Float positions overload
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def Click_XY(self,
             buttonId        : Enums.MouseButtons, # The button to click.
             x               : float,              # The x position in screen coordinates at which to click.
@@ -296,7 +320,7 @@ class ApiClient:
         '''
         <summary> Clicks a mouse button at the target coordinates. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="x" type="float"> The x position in screen coordinates at which to click. </param>
         <param name="y" type="float"> The y position in screen coordinates at which to click. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
@@ -310,7 +334,7 @@ class ApiClient:
         await api.Connect()
         
         # Left click the screen at (100, 100) for 5 frames.
-        await api.Click_XY(ButtonId=Enums.MouseButtons.Left, x=100, y=100, clickFrameCount=5)
+        await api.Click_XY(ButtonId=MouseButtons.Left, x=100, y=100, clickFrameCount=5)
         ```
         </example>
         '''
@@ -334,7 +358,7 @@ class ApiClient:
 
     ## Vector2 positions overload
     # TODO: Can probably combine this with the XY overload
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def Click_Vec2(self,
             buttonId        : Enums.MouseButtons,      # The button to click.
             position        : ProtocolObjects.Vector2, # The position in screen coordinates at which to click.
@@ -344,7 +368,7 @@ class ApiClient:
         '''
         <summary> Clicks a mouse button at the target coordinates. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="position" type="ProtocolObjects.Vector2"> The position in screen coordinates at which to click. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
@@ -357,14 +381,14 @@ class ApiClient:
         await api.Connect()
         
         # Left click the screen at (100, 100) for 5 frames.
-        await api.Click_XY(ButtonId=Enums.MouseButtons.Left, position=(100, 100), clickFrameCount=5)
+        await api.Click_XY(ButtonId=MouseButtons.Left, position=(100, 100), clickFrameCount=5)
         ```
         </example>
         '''
         return await self.Click_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
 
     ## Float positions overload
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def ClickEx_XY(self,
             buttonId                : Enums.MouseButtons, # The button to click.
             x                       : float,              # The x position in screen coordinates at which to click.
@@ -380,13 +404,13 @@ class ApiClient:
         '''
         <summary> Clicks a mouse button at the target coordinates with modifier keys. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="x" type="float"> The x position in screen coordinates at which to click. </param>
         <param name="y" type="float"> The y position in screen coordinates at which to click. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
-        <param name="keys" type="list[Enums.KeyCode]"> The list of keys to press while clicking. </param>
+        <param name="keys" type="list[KeyCode]"> The list of keys to press while clicking. </param>
         <param name="keysNumberOfFrames" type="int"> The number of frames to hold the keys for. </param>
-        <param name="modifiers" type="list[Enums.KeyCode]"> The list of modifier keys to press while clicking. </param>
+        <param name="modifiers" type="list[KeyCode]"> The list of modifier keys to press while clicking. </param>
         <param name="modifiersNumberOfFrames" type="int"> The number of frames to hold the modifier keys for. </param>
         <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers before clicking the keys. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
@@ -399,7 +423,7 @@ class ApiClient:
         await api.Connect()
         
         # Shift+Left click the screen at (100, 100) for 5 frames.
-        await api.ClickEx_XY(buttonId=Enums.MouseButtons.Left, x=100, y=100, clickFrameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
+        await api.ClickEx_XY(buttonId=MouseButtons.Left, x=100, y=100, clickFrameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
         ```
         </example>
         '''
@@ -444,12 +468,12 @@ class ApiClient:
         '''
         <summary> Clicks a mouse button at the target coordinates with modifier keys. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="position" type="ProtocolObjects.Vector2"> The position in screen coordinates at which to click. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
-        <param name="keys" type="list[Enums.KeyCode]"> The list of keys to press while clicking. </param>
+        <param name="keys" type="list[KeyCode]"> The list of keys to press while clicking. </param>
         <param name="keysNumberOfFrames" type="int"> The number of frames to hold the keys for. </param>
-        <param name="modifiers" type="list[Enums.KeyCode]"> The list of modifier keys to press while clicking. </param>
+        <param name="modifiers" type="list[KeyCode]"> The list of modifier keys to press while clicking. </param>
         <param name="modifiersNumberOfFrames" type="int"> The number of frames to hold the modifier keys for. </param>
         <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers before clicking the keys. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
@@ -462,13 +486,13 @@ class ApiClient:
         await api.Connect()
         
         # Shift+Left click the screen at (100, 100) for 5 frames.
-        await api.ClickEx_XY(buttonId=Enums.MouseButtons.Left, position=(100, 100), clickFrameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
+        await api.ClickEx_XY(buttonId=MouseButtons.Left, position=(100, 100), clickFrameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
         ```
         </example>
         '''
         return await self.ClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
     
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def ClickObject(self,
             buttonId            : Enums.MouseButtons, # The button to click.
             hierarchyPath       : str,                # The hierarchy path of the object to click.
@@ -479,7 +503,7 @@ class ApiClient:
         '''
         <summary> Clicks a mouse button at the position of the target object. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to click. </param>
         <param name="frameCount" type="int"> The number of frames to click for. </param>
         <param name="cameraHierarchyPath" type="str"> The hierarchy path of the camera to use to find the object. </param>
@@ -493,7 +517,7 @@ class ApiClient:
         await api.Connect()
         
         # Left click the screen at the position of the `Player` object for 5 frames.
-        await api.ClickObject(buttonId=Enums.MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5)
+        await api.ClickObject(buttonId=MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5)
         ```
         </example>
         '''
@@ -516,7 +540,7 @@ class ApiClient:
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def ClickObjectEx(self,
             buttonId                : Enums.MouseButtons,
             hierarchyPath           : str,
@@ -532,7 +556,7 @@ class ApiClient:
         '''
         <summary> Clicks a mouse button at the position of the target object with modifier keys. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to click. </param>
         <param name="frameCount" type="int"> The number of frames to click for. </param>
         <param name="cameraHierarchyPath" type="str"> The hierarchy path of the camera to use to find the object. </param>
@@ -551,7 +575,7 @@ class ApiClient:
         await api.Connect()
         
         # Shift+Left click the screen at the position of the `Player` object for 5 frames.
-        await api.ClickObjectEx(buttonId=Enums.MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
+        await api.ClickObjectEx(buttonId=MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
         ```
         </example>
         '''
@@ -633,10 +657,12 @@ class ApiClient:
 
         # If no exception is thrown
         else:
-            # and connection details havent been saved yet,
+            # and connection details haven't been saved yet,
             if self.gameConnectionDetails == None:
+                logging.debug(f"Saving connection details to ApiClient for connection: {self.client.GCD}")
                 # save the connection details that the client recieved.
                 self.gameConnectionDetails = self.client.GCD
+                
 
         # No exceptions thrown; return
         return True
@@ -648,12 +674,12 @@ class ApiClient:
         return
     '''
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def DisableHooks(self, hookingObject : Enums.HookingObject, timeout : int = 30) -> bool:
         '''
         <summary> Disables the ability to preform the target input type from the ApiClient. </summary>
 
-        <param name="Enums.HookingObject" type="str"> The input type to disable. </param>
+        <param name="HookingObject" type="str"> The input type to disable. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
         <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
@@ -664,7 +690,7 @@ class ApiClient:
         await api.Connect()
         
         # Disable Keyboard, Mouse, Touch and Controller hooks globally.
-        await api.DisableHooks(hookingObject=Enums.HookingObject.All)
+        await api.DisableHooks(hookingObject=HookingObject.All)
         ```
         </example>
         '''
@@ -688,7 +714,7 @@ class ApiClient:
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def DisableObjectCaching(self, timeout : int = 30) -> bool:
         '''
         <summary> Disables object caching for HierarchyPath resolution. </summary>
@@ -749,7 +775,7 @@ class ApiClient:
         await self.client.Disconnect()
 
     ## Float positions overload
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def DoubleClick_XY(self,
             buttonId : Enums.MouseButtons,
             x : float,
@@ -760,7 +786,7 @@ class ApiClient:
         '''
         <summary> Clicks the mouse at the given coordinates. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="x" type="float"> The x position to click at. </param>
         <param name="y" type="float"> The y position to click at. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click. </param>
@@ -773,7 +799,7 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.DoubleClick_XY(Enums.MouseButtons.LEFT, 500, 500, 5)
+        await api.DoubleClick_XY(MouseButtons.LEFT, 500, 500, 5)
         ```
         </example>
         '''
@@ -806,7 +832,7 @@ class ApiClient:
         '''
         <summary> Clicks the mouse at the given coordinates. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="position" type="ProtocolObjects.Vector2"> The position to click at. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
@@ -818,14 +844,14 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.DoubleClick_Vec2(Enums.MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5)
+        await api.DoubleClick_Vec2(MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5)
         ```
         </example>
         '''
         return await self.DoubleClick_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
 
     ## Float positions overload
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def DoubleClickEx_XY(self,
             buttonId : Enums.MouseButtons,
             x : float,
@@ -841,7 +867,7 @@ class ApiClient:
         '''
         <summary> Clicks the mouse at the given coordinates. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="x" type="float"> The x position to click at. </param>
         <param name="y" type="float"> The y position to click at. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click. </param>
@@ -859,7 +885,7 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.DoubleClickEx_XY(Enums.MouseButtons.LEFT, 500, 500, 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
+        await api.DoubleClickEx_XY(MouseButtons.LEFT, 500, 500, 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 3, 500)
         ```
         </example>
         '''
@@ -900,7 +926,7 @@ class ApiClient:
         '''
         <summary> Clicks the mouse at the given coordinates. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="position" type="ProtocolObjects.Vector2"> The position to click at. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click. </param>
         <param name="keys" type="list"> The list of keys to press. </param>
@@ -917,14 +943,14 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.DoubleClickEx_Vec2(Enums.MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
+        await api.DoubleClickEx_Vec2(MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 3, 500)
         ```
         </example>
         '''
         return await self.DoubleClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
 
     ## Float positions overload
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def DoubleClickObject(self,
             buttonId : Enums.MouseButtons,
             hierarchyPath : str,
@@ -934,7 +960,7 @@ class ApiClient:
         '''
         <summary> Clicks the mouse at the given coordinates. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to click. </param>
         <param name="frameCount" type="int"> The number of frames to click. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
@@ -946,7 +972,7 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.DoubleClickObject(Enums.MouseButtons.LEFT, "HierarchyPath", 5)
+        await api.DoubleClickObject(MouseButtons.LEFT, "HierarchyPath", 5)
         ```
         </example>
         '''
@@ -968,7 +994,7 @@ class ApiClient:
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def DoubleClickObjectEx(self,
             buttonId : Enums.MouseButtons,
             hierarchyPath : str,
@@ -983,7 +1009,7 @@ class ApiClient:
         '''
         <summary> Clicks the mouse at the given coordinates. </summary>
 
-        <param name="buttonId" type="Enums.MouseButtons"> The button to click. </param>
+        <param name="buttonId" type="MouseButtons"> The button to click. </param>
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to click. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click. </param>
         <param name="keys" type="list"> The list of keys to press. </param>
@@ -1000,7 +1026,7 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.DoubleClickObjectEx(Enums.MouseButtons.LEFT, "HierarchyPath", 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
+        await api.DoubleClickObjectEx(MouseButtons.LEFT, "HierarchyPath", 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 3, 500)
         ```
         </example>
         '''
@@ -1024,12 +1050,12 @@ class ApiClient:
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def EnableHooks(self, hookingObject, timeout : int = 30) -> bool:
         '''
         <summary> Enables the given hooking object. </summary>
 
-        <param name="hookingObject" type="Enums.HookingObject"> The hooking object to enable. </param>
+        <param name="hookingObject" type="HookingObject"> The hooking object to enable. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
         <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
@@ -1039,7 +1065,7 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.EnableHooks(Enums.HookingObject.MOUSE)
+        await api.EnableHooks(HookingObject.MOUSE)
         ```
         </example>
         '''
@@ -1064,7 +1090,7 @@ class ApiClient:
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def EnableObjectCaching(self, timeout : int = 30) -> bool:
         '''
         <summary> Enables object caching. </summary>
@@ -1097,7 +1123,7 @@ class ApiClient:
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def FlushObjectLookupCache(self, timeout : int = 30) -> bool:
         '''
         <summary> Flushes the object lookup cache. </summary>
@@ -1129,7 +1155,7 @@ class ApiClient:
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     @requireClientConnection
-    async def GetConnectedGameDetails(self) -> ProtocolObjects.GameConnectionDetails:
+    def GetConnectedGameDetails(self) -> ProtocolObjects.GameConnectionDetails:
         '''
         <summary> Gets the details of the connected game. </summary>
 
@@ -1147,7 +1173,7 @@ class ApiClient:
         '''
         return self.gameConnectionDetails
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def GetLastFPS(self, timeout=30) -> float:
         '''
         <summary> Gets the last FPS value. </summary>
@@ -1180,7 +1206,7 @@ class ApiClient:
         return cmd_GenericResponse.ReturnedValues['FPS']
         
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def GetNextCollisionEvent(self) -> ProtocolObjects.Collision:
         '''
         <summary> (**Not Implemented**) Gets the next collision event. </summary>
@@ -1199,7 +1225,7 @@ class ApiClient:
         '''
         raise NotImplementedError
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def GetObjectDistance(self,
             objectA_HierarchyPath : str,
             objectB_HierarchyPath : str,
@@ -1242,7 +1268,7 @@ class ApiClient:
 
         return cmd_GenericResponse
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def GetObjectFieldValue(self,
             t : type,
             hierarchyPath : str,
@@ -1286,7 +1312,7 @@ class ApiClient:
 
         return cmd_GenericResponse
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def GetObjectFieldValueByName(self,
             hierarchyPath : str,
             fieldName : str,
@@ -1329,7 +1355,7 @@ class ApiClient:
         return response
 
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def GetObjectList(self, timeout : int = 30) -> bool:
         '''
         <summary> Gets the list of objects. </summary>
@@ -1361,7 +1387,7 @@ class ApiClient:
 
         return cmd_GenericResponse.Objects
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def GetObjectPosition(self,
             hierarchyPath : str,
             coordSpace : Enums.CoordinateConversion = Enums.CoordinateConversion.NONE,
@@ -1372,7 +1398,7 @@ class ApiClient:
         <summary> Gets the position of an object. </summary>
 
         <param name="hierarchyPath" type="str"> The hierarchy path of the object. </param>
-        <param name="coordSpace" type="Enums.CoordinateConversion"> The coordinate space to use. </param>
+        <param name="coordSpace" type="CoordinateConversion"> The coordinate space to use. </param>
         <param name="cameraHierarchyPath" type="str"> The hierarchy path of the camera to use. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
@@ -1403,7 +1429,7 @@ class ApiClient:
 
         return response.Value3
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def GetSceneName(self, timeout : int = 30) -> str:
         '''
         <summary> Gets the name of the scene. </summary>
@@ -1451,7 +1477,7 @@ class ApiClient:
         raise NotImplementedError
         return
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def KeyPress(self,
             keys : list,
             numberOfFrames : int,
@@ -1520,7 +1546,7 @@ class ApiClient:
         ## Not sure what this one does yet
         raise NotImplementedError
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def LoadScene(self, sceneName : str, timeout : int = 30) -> bool:
         '''
         <summary> Loads a scene. </summary>
@@ -1570,7 +1596,7 @@ class ApiClient:
 
         return data
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def MouseDrag(self,
             button : Enums.MouseButtons,
             dx : float,
@@ -1584,7 +1610,7 @@ class ApiClient:
         '''
         <summary> Drags the mouse. </summary>
 
-        <param name="button" type="Enums.MouseButtons"> The button to drag with. </param>
+        <param name="button" type="MouseButtons"> The button to drag with. </param>
         <param name="dx" type="float"> The amount to drag the mouse in the X direction. </param>
         <param name="dy" type="float"> The amount to drag the mouse in the Y direction. </param>
         <param name="frameCount" type="float"> The number of frames to drag the mouse. </param>
@@ -1600,7 +1626,7 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.MouseDrag(Enums.MouseButtons.Left, 10, 10, 10)
+        await api.MouseDrag(MouseButtons.Left, 10, 10, 10)
         ```
         </example>
         '''
@@ -1622,7 +1648,7 @@ class ApiClient:
 
         return True
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def MouseMoveToObject(self,
             objectHierarchyPath : str,
             frameCount : float,
@@ -1668,7 +1694,7 @@ class ApiClient:
 
         return True
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def MouseMoveToPoint(self,
             dx : float,
             dy : float,
@@ -1717,7 +1743,7 @@ class ApiClient:
 
         return True
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def NavAgentMoveToPoint(self,
             navAgent_HierarchyPath : str,
             dx : float,
@@ -1760,7 +1786,7 @@ class ApiClient:
 
         return True
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def Raycast(self,
             raycastPoint : ProtocolObjects.Vector3,
             cameraHierarchyPath : str,
@@ -1800,7 +1826,7 @@ class ApiClient:
 
         return response.RaycastResults
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def RegisterCollisionMonitor(self,
             HierarchyPath : str,
             timeout : int = 30    
@@ -1835,7 +1861,7 @@ class ApiClient:
 
         return str(response.ReturnedValues['Id'])
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def RotateObject_Quaternion(self,
             hierarchyPath : str,
             quaternion : ProtocolObjects.Vector4,
@@ -1869,7 +1895,7 @@ class ApiClient:
         )
         return await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def RotateObject_Euler(self,
             hierarchyPath : str,
             euler : ProtocolObjects.Vector3,
@@ -1882,7 +1908,7 @@ class ApiClient:
 
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to rotate. </param>
         <param name="euler" type="ProtocolObjects.Vector3"> The Euler angles to rotate the object by. </param>
-        <param name="relativeTo" type="Enums.Space"> The space to rotate the object in. </param>
+        <param name="relativeTo" type="Space"> The space to rotate the object in. </param>
         <param name="waitForObject" type="bool"> Whether or not to wait for the object to rotate. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
@@ -1907,7 +1933,7 @@ class ApiClient:
 
         return await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def RotateObject_AxisAngle(self,
             hierarchyPath : str,
             xAngle : float,
@@ -1924,7 +1950,7 @@ class ApiClient:
         <param name="xAngle" type="float"> The X angle to rotate the object by. </param>
         <param name="yAngle" type="float"> The Y angle to rotate the object by. </param>
         <param name="zAngle" type="float"> The Z angle to rotate the object by. </param>
-        <param name="relativeTo" type="Enums.Space"> The space to rotate the object in. </param>
+        <param name="relativeTo" type="Space"> The space to rotate the object in. </param>
         <param name="waitForObject" type="bool"> Whether or not to wait for the object to rotate. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
@@ -1950,7 +1976,7 @@ class ApiClient:
         )
         return await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def _RotateObject(self,
             HierarchyPath : str,
             request : Messages.Cmd_RotateRequest,
@@ -1988,7 +2014,7 @@ class ApiClient:
 
         return True
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def SetInputFieldText(self,
             hierarchyPath : str,
             text : str,
@@ -2027,7 +2053,7 @@ class ApiClient:
 
         return True
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def SetObjectFieldValue() -> bool:
         '''
         <summary> (**Not Implemented**) Sets the value of an object field. </summary>
@@ -2042,7 +2068,7 @@ class ApiClient:
         # TODO: Big one
         raise NotImplementedError
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def Tap_XY(self,
             x : float,
             y : float,
@@ -2088,7 +2114,7 @@ class ApiClient:
 
         return True
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def Tap_Vec2(self,
             position : ProtocolObjects.Vector2,
             tapCount : int = 1,
@@ -2116,7 +2142,7 @@ class ApiClient:
         '''
         return await self.Tap_XY(position.X, position.Y, tapCount, frameCount, timeout)
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def TapObject(self,
             hierarchyPath : str,
             tapCount : int = 1,
@@ -2162,7 +2188,7 @@ class ApiClient:
 
         return True
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def TerminateGame(self):
         '''
         <summary> (**Not Implemented**) Terminates the game. </summary>
@@ -2180,7 +2206,7 @@ class ApiClient:
         '''
         raise NotImplementedError
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def ToggleEditorPause(self):
         '''
         <summary> (**Not Implemented**) Toggles the editor pause. </summary>
@@ -2198,7 +2224,7 @@ class ApiClient:
         '''
         raise NotImplementedError
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def ToggleEditorPlay(self):
         '''
         <summary> (**Not Implemented**) Toggles the editor play. </summary>
@@ -2216,7 +2242,7 @@ class ApiClient:
         '''
         raise NotImplementedError
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def TouchInput(self,
             x1 : float,
             y1 : float,
@@ -2284,7 +2310,7 @@ class ApiClient:
         return True
 
     
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def UnregisterCollisionMonitor(self,
             hierarchyPath : str,
             timeout : int = 30
@@ -2332,7 +2358,7 @@ class ApiClient:
         '''
         time.sleep(miliseconds * 0.001)
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def WaitForEmptyInput(self, timeout : int = 30) -> bool:
         '''
         <summary> Waits for an empty input event. </summary>
@@ -2352,7 +2378,7 @@ class ApiClient:
         '''
         await asyncio.wait_for(self.client.WaitForEmptyInput(datetime.datetime.now().timestamp()), timeout)
 
-    @requireClientConnection
+    @requireClientConnectionAsync
     async def WaitForCollisionEvent(self,
             eventId : str,
             timeout : int = 30

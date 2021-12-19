@@ -48,14 +48,9 @@ class Client:
             try:
                 logging.debug('Reading...')
                 msg_length = await reader.read(4)
-                #print(f'\n{bytes(msg_length)}')
-
                 msg_crc = await reader.read(4)
-                #print(bytes(msg_crc))
-
                 msg_data = await reader.read(int.from_bytes(msg_length[:4], byteorder=BYTE_ORDER, signed=False))
-                #print(bytes(msg_data))
-
+                
                 unpacked = msgpack.unpackb(msg_data)
                 #print(f'\n{unpacked}\n')
                 
@@ -76,46 +71,59 @@ class Client:
             del self.EventCollection[eventId]
     
     async def ProcessMessage(self, msg) -> None:
-        #logging.debug(f'Processing message: {msg}')
-
+        
+        # If the message is a generic response,
         if isinstance(msg.GDIOMsg, Messages.Cmd_GenericResponse):
-
+            # check if it has any errors worth reporting.
             if msg.GDIOMsg.IsError():
                 raise Exception(msg.GDIOMsg.ErrorMessage)
 
-            if msg.GDIOMsg.IsWarning():
-                raise Warning(msg.GDIOMsg.WarningMessage)
-
+        # If the message is not a generic response or there are no errors
         logging.debug(f'[RECV] {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}')
 
+        # If the handshake is not complete,
         if self._currentHandshakeState != Enums.HandshakeState.COMPLETE:
-
+            
+            # and the message is a not a handshake response,
             if not isinstance(msg.GDIOMsg, Messages.Cmd_HandshakeResponse):
-
+                
+                # skip processing the message.
                 logging.error(f'Expected handshake response, got {msg.GDIOMsg.GetName()}. Dropping Message before handshake is complete')
-
-                return
-            elif self._currentHandshakeState == Enums.HandshakeState.CLIENT_INFORMATION_SENT:
-
-                if msg.GDIOMsg.RC == Enums.HandshakeReasonCode.OK:
-                    self.GCD = msg.GDIOMsg.GCD
-                    self._currentHandshakeState = Enums.HandshakeState.COMPLETE
-                    logging.debug(f'Handshake complete')
-
-                else:
-                    logging.error(f'Handshake failed: {msg.GDIOMsg.RC}')
-
                 return
 
-            raise Exception('Handshake failed')
-        
+        # The handshake is still expecting a response,
+        elif self._currentHandshakeState == Enums.HandshakeState.CLIENT_INFORMATION_SENT:
+
+            # and the message returns OK,
+            if msg.GDIOMsg.RC == Enums.HandshakeReasonCode.OK:
+
+                # Save the response details.
+                logging.debug(f'Saving connection details to Client ({self.ClientUID}) for connection {msg.GDIOMsg.GCD} ')
+                self.GCD = msg.GDIOMsg.GCD
+
+                # Set the handshake state to complete.
+                self._currentHandshakeState = Enums.HandshakeState.COMPLETE
+                logging.debug(f'Handshake complete')
+
+            # If the message returns anything other than OK,
+            else:
+                # raise an exception.
+                logging.error(f'Handshake failed: {msg.GDIOMsg.RC}')
+                raise Exception('Handshake failed')
+
+            return
+
+        # If the message is an empty input event,
         if isinstance(msg.GDIOMsg, Messages.Evt_EmptyInput):
-
+            # save the timestamp that it was received.
             self.SetEventTimestamp(Messages.Evt_EmptyInput)
             return
 
+        # If the message is anything else, register the response data to be grabbed later.
+
         # NOTE: `dict.update()` will overwrite the value of overlapping keys
         #    As far as I know, this should never happen
+        
         logging.debug(f'Registering response for {msg.CorrelationId}')
         self.Results.update({msg.CorrelationId : msg.GDIOMsg})
         
