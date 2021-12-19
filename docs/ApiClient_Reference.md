@@ -200,7 +200,7 @@ GameDriver.io Unity API Client class.
  
  await api.CaptureScreenshot(filename='/path/to/file')
  ```
- ### <a id='ClickEx_Vec2'></a> ClickEx_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, keys : `list[Enums.KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[Enums.KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
+ ### <a id='ClickEx_Vec2'></a> ClickEx_Vec2(buttonId : `MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, keys : `list[KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
 
  Clicks a mouse button at the target coordinates with modifier keys. 
 
@@ -210,12 +210,12 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - position : `ProtocolObjects.Vector2` -  The position in screen coordinates at which to click. 
  - clickFrameCount : `int` -  The number of frames to click for. 
- - keys : `list[Enums.KeyCode]` -  The list of keys to press while clicking. 
+ - keys : `list[KeyCode]` -  The list of keys to press while clicking. 
  - keysNumberOfFrames : `int` -  The number of frames to hold the keys for. 
- - modifiers : `list[Enums.KeyCode]` -  The list of modifier keys to press while clicking. 
+ - modifiers : `list[KeyCode]` -  The list of modifier keys to press while clicking. 
  - modifiersNumberOfFrames : `int` -  The number of frames to hold the modifier keys for. 
  - delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers before clicking the keys. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
@@ -230,9 +230,9 @@ GameDriver.io Unity API Client class.
  await api.Connect()
  
  # Shift+Left click the screen at (100, 100) for 5 frames.
- await api.ClickEx_XY(buttonId=Enums.MouseButtons.Left, position=(100, 100), clickFrameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
+ await api.ClickEx_XY(buttonId=MouseButtons.Left, position=(100, 100), clickFrameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
  ```
- ### <a id='ClickEx_XY'></a> ClickEx_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list[Enums.KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[Enums.KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
+ ### <a id='ClickEx_XY'></a> ClickEx_XY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list[KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
 
  Clicks a mouse button at the target coordinates with modifier keys. 
 
@@ -242,13 +242,13 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - x : `float` -  The x position in screen coordinates at which to click. 
  - y : `float` -  The y position in screen coordinates at which to click. 
  - clickFrameCount : `int` -  The number of frames to click for. 
- - keys : `list[Enums.KeyCode]` -  The list of keys to press while clicking. 
+ - keys : `list[KeyCode]` -  The list of keys to press while clicking. 
  - keysNumberOfFrames : `int` -  The number of frames to hold the keys for. 
- - modifiers : `list[Enums.KeyCode]` -  The list of modifier keys to press while clicking. 
+ - modifiers : `list[KeyCode]` -  The list of modifier keys to press while clicking. 
  - modifiersNumberOfFrames : `int` -  The number of frames to hold the modifier keys for. 
  - delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers before clicking the keys. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
@@ -263,9 +263,9 @@ GameDriver.io Unity API Client class.
  await api.Connect()
  
  # Shift+Left click the screen at (100, 100) for 5 frames.
- await api.ClickEx_XY(buttonId=Enums.MouseButtons.Left, x=100, y=100, clickFrameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
+ await api.ClickEx_XY(buttonId=MouseButtons.Left, x=100, y=100, clickFrameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
  ```
- ### <a id='ClickObject'></a> ClickObject(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, cameraHierarchyPath : `str`, timeout : `int`) -> `bool`
+ ### <a id='ClickObject'></a> ClickObject(buttonId : `MouseButtons`, hierarchyPath : `str`, frameCount : `int`, cameraHierarchyPath : `str`, timeout : `int`) -> `bool`
 
  Clicks a mouse button at the position of the target object. 
 
@@ -275,7 +275,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - hierarchyPath : `str` -  The hierarchy path of the object to click. 
  - frameCount : `int` -  The number of frames to click for. 
  - cameraHierarchyPath : `str` -  The hierarchy path of the camera to use to find the object. 
@@ -291,9 +291,9 @@ GameDriver.io Unity API Client class.
  await api.Connect()
  
  # Left click the screen at the position of the `Player` object for 5 frames.
- await api.ClickObject(buttonId=Enums.MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5)
+ await api.ClickObject(buttonId=MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5)
  ```
- ### <a id='ClickObjectEx'></a> ClickObjectEx(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, cameraHierarchyPath : `str`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
+ ### <a id='ClickObjectEx'></a> ClickObjectEx(buttonId : `MouseButtons`, hierarchyPath : `str`, frameCount : `int`, cameraHierarchyPath : `str`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
 
  Clicks a mouse button at the position of the target object with modifier keys. 
 
@@ -303,7 +303,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - hierarchyPath : `str` -  The hierarchy path of the object to click. 
  - frameCount : `int` -  The number of frames to click for. 
  - cameraHierarchyPath : `str` -  The hierarchy path of the camera to use to find the object. 
@@ -324,9 +324,9 @@ GameDriver.io Unity API Client class.
  await api.Connect()
  
  # Shift+Left click the screen at the position of the `Player` object for 5 frames.
- await api.ClickObjectEx(buttonId=Enums.MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5, keys=[Enums.KeyCode.LShift], keysNumberOfFrames=5)
+ await api.ClickObjectEx(buttonId=MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
  ```
- ### <a id='Click_Vec2'></a> Click_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, timeout : `int`) -> `bool`
+ ### <a id='Click_Vec2'></a> Click_Vec2(buttonId : `MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, timeout : `int`) -> `bool`
 
  Clicks a mouse button at the target coordinates. 
 
@@ -336,7 +336,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - position : `ProtocolObjects.Vector2` -  The position in screen coordinates at which to click. 
  - clickFrameCount : `int` -  The number of frames to click for. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
@@ -351,9 +351,9 @@ GameDriver.io Unity API Client class.
  await api.Connect()
  
  # Left click the screen at (100, 100) for 5 frames.
- await api.Click_XY(ButtonId=Enums.MouseButtons.Left, position=(100, 100), clickFrameCount=5)
+ await api.Click_XY(ButtonId=MouseButtons.Left, position=(100, 100), clickFrameCount=5)
  ```
- ### <a id='Click_XY'></a> Click_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`) -> `bool`
+ ### <a id='Click_XY'></a> Click_XY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`) -> `bool`
 
  Clicks a mouse button at the target coordinates. 
 
@@ -363,7 +363,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - x : `float` -  The x position in screen coordinates at which to click. 
  - y : `float` -  The y position in screen coordinates at which to click. 
  - clickFrameCount : `int` -  The number of frames to click for. 
@@ -379,7 +379,7 @@ GameDriver.io Unity API Client class.
  await api.Connect()
  
  # Left click the screen at (100, 100) for 5 frames.
- await api.Click_XY(ButtonId=Enums.MouseButtons.Left, x=100, y=100, clickFrameCount=5)
+ await api.Click_XY(ButtonId=MouseButtons.Left, x=100, y=100, clickFrameCount=5)
  ```
  ### <a id='Connect'></a> Connect(hostname : `str`, port : `int`, autoplay : `bool`, timeout : `int`, autoPortResolution : `bool`) -> `bool`
 
@@ -407,7 +407,7 @@ GameDriver.io Unity API Client class.
  if await api.Connect(hostname='localhost', port=19734):
  print("Connected!")
  ```
- ### <a id='DisableHooks'></a> DisableHooks(Enums.HookingObject : `str`, timeout : `int`) -> `bool`
+ ### <a id='DisableHooks'></a> DisableHooks(HookingObject : `str`, timeout : `int`) -> `bool`
 
  Disables the ability to preform the target input type from the ApiClient. 
 
@@ -417,7 +417,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - Enums.HookingObject : `str` -  The input type to disable. 
+ - HookingObject : `str` -  The input type to disable. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
 
@@ -430,7 +430,7 @@ GameDriver.io Unity API Client class.
  await api.Connect()
  
  # Disable Keyboard, Mouse, Touch and Controller hooks globally.
- await api.DisableHooks(hookingObject=Enums.HookingObject.All)
+ await api.DisableHooks(hookingObject=HookingObject.All)
  ```
  ### <a id='DisableObjectCaching'></a> DisableObjectCaching(timeout : `int`) -> `bool`
 
@@ -477,7 +477,7 @@ GameDriver.io Unity API Client class.
 
  await api.Disconnect()
  ```
- ### <a id='DoubleClickEx_Vec2'></a> DoubleClickEx_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
+ ### <a id='DoubleClickEx_Vec2'></a> DoubleClickEx_Vec2(buttonId : `MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
 
  Clicks the mouse at the given coordinates. 
 
@@ -487,7 +487,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - position : `ProtocolObjects.Vector2` -  The position to click at. 
  - clickFrameCount : `int` -  The number of frames to click. 
  - keys : `list` -  The list of keys to press. 
@@ -506,9 +506,9 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  await api.Connect()
  
- await api.DoubleClickEx_Vec2(Enums.MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
+ await api.DoubleClickEx_Vec2(MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 3, 500)
  ```
- ### <a id='DoubleClickEx_XY'></a> DoubleClickEx_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
+ ### <a id='DoubleClickEx_XY'></a> DoubleClickEx_XY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
 
  Clicks the mouse at the given coordinates. 
 
@@ -518,7 +518,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - x : `float` -  The x position to click at. 
  - y : `float` -  The y position to click at. 
  - clickFrameCount : `int` -  The number of frames to click. 
@@ -538,9 +538,9 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  await api.Connect()
  
- await api.DoubleClickEx_XY(Enums.MouseButtons.LEFT, 500, 500, 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
+ await api.DoubleClickEx_XY(MouseButtons.LEFT, 500, 500, 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 3, 500)
  ```
- ### <a id='DoubleClickObject'></a> DoubleClickObject(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, frameCount : `int`, timeout : `int`) -> `bool`
+ ### <a id='DoubleClickObject'></a> DoubleClickObject(buttonId : `MouseButtons`, hierarchyPath : `str`, frameCount : `int`, timeout : `int`) -> `bool`
 
  Clicks the mouse at the given coordinates. 
 
@@ -550,7 +550,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - hierarchyPath : `str` -  The hierarchy path of the object to click. 
  - frameCount : `int` -  The number of frames to click. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
@@ -564,9 +564,9 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  await api.Connect()
  
- await api.DoubleClickObject(Enums.MouseButtons.LEFT, "HierarchyPath", 5)
+ await api.DoubleClickObject(MouseButtons.LEFT, "HierarchyPath", 5)
  ```
- ### <a id='DoubleClickObjectEx'></a> DoubleClickObjectEx(buttonId : `Enums.MouseButtons`, hierarchyPath : `str`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
+ ### <a id='DoubleClickObjectEx'></a> DoubleClickObjectEx(buttonId : `MouseButtons`, hierarchyPath : `str`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `bool`
 
  Clicks the mouse at the given coordinates. 
 
@@ -576,7 +576,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - hierarchyPath : `str` -  The hierarchy path of the object to click. 
  - clickFrameCount : `int` -  The number of frames to click. 
  - keys : `list` -  The list of keys to press. 
@@ -595,9 +595,9 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  await api.Connect()
  
- await api.DoubleClickObjectEx(Enums.MouseButtons.LEFT, "HierarchyPath", 5, [Enums.Keys.SHIFT, Enums.Keys.CONTROL], 5, [Enums.Modifiers.SHIFT, Enums.Modifiers.CONTROL], 3, 500)
+ await api.DoubleClickObjectEx(MouseButtons.LEFT, "HierarchyPath", 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 3, 500)
  ```
- ### <a id='DoubleClick_Vec2'></a> DoubleClick_Vec2(buttonId : `Enums.MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, timeout : `int`) -> `bool`
+ ### <a id='DoubleClick_Vec2'></a> DoubleClick_Vec2(buttonId : `MouseButtons`, position : `ProtocolObjects.Vector2`, clickFrameCount : `int`, timeout : `int`) -> `bool`
 
  Clicks the mouse at the given coordinates. 
 
@@ -607,7 +607,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - position : `ProtocolObjects.Vector2` -  The position to click at. 
  - clickFrameCount : `int` -  The number of frames to click. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
@@ -621,9 +621,9 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  await api.Connect()
  
- await api.DoubleClick_Vec2(Enums.MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5)
+ await api.DoubleClick_Vec2(MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5)
  ```
- ### <a id='DoubleClick_XY'></a> DoubleClick_XY(buttonId : `Enums.MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`) -> `bool`
+ ### <a id='DoubleClick_XY'></a> DoubleClick_XY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`) -> `bool`
 
  Clicks the mouse at the given coordinates. 
 
@@ -633,7 +633,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `Enums.MouseButtons` -  The button to click. 
+ - buttonId : `MouseButtons` -  The button to click. 
  - x : `float` -  The x position to click at. 
  - y : `float` -  The y position to click at. 
  - clickFrameCount : `int` -  The number of frames to click. 
@@ -648,9 +648,9 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  await api.Connect()
  
- await api.DoubleClick_XY(Enums.MouseButtons.LEFT, 500, 500, 5)
+ await api.DoubleClick_XY(MouseButtons.LEFT, 500, 500, 5)
  ```
- ### <a id='EnableHooks'></a> EnableHooks(hookingObject : `Enums.HookingObject`, timeout : `int`) -> `bool`
+ ### <a id='EnableHooks'></a> EnableHooks(hookingObject : `HookingObject`, timeout : `int`) -> `bool`
 
  Enables the given hooking object. 
 
@@ -660,7 +660,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hookingObject : `Enums.HookingObject` -  The hooking object to enable. 
+ - hookingObject : `HookingObject` -  The hooking object to enable. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
 
@@ -672,7 +672,7 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  await api.Connect()
  
- await api.EnableHooks(Enums.HookingObject.MOUSE)
+ await api.EnableHooks(HookingObject.MOUSE)
  ```
  ### <a id='EnableObjectCaching'></a> EnableObjectCaching(timeout : `int`) -> `bool`
 
@@ -892,7 +892,7 @@ GameDriver.io Unity API Client class.
  objects = await api.GetObjectList()
  print(objects)
  ```
- ### <a id='GetObjectPosition'></a> GetObjectPosition(hierarchyPath : `str`, coordSpace : `Enums.CoordinateConversion`, cameraHierarchyPath : `str`, timeout : `int`) -> `ProtocolObjects.Vector3`
+ ### <a id='GetObjectPosition'></a> GetObjectPosition(hierarchyPath : `str`, coordSpace : `CoordinateConversion`, cameraHierarchyPath : `str`, timeout : `int`) -> `ProtocolObjects.Vector3`
 
  Gets the position of an object. 
 
@@ -903,7 +903,7 @@ GameDriver.io Unity API Client class.
 #### Parameters
 
  - hierarchyPath : `str` -  The hierarchy path of the object. 
- - coordSpace : `Enums.CoordinateConversion` -  The coordinate space to use. 
+ - coordSpace : `CoordinateConversion` -  The coordinate space to use. 
  - cameraHierarchyPath : `str` -  The hierarchy path of the camera to use. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
@@ -1036,7 +1036,7 @@ GameDriver.io Unity API Client class.
  
  await api.LoadScene('SceneA')
  ```
- ### <a id='MouseDrag'></a> MouseDrag(button : `Enums.MouseButtons`, dx : `float`, dy : `float`, frameCount : `float`, ox : `float`, oy : `float`, waitForEmptyInput : `bool`, timeout : `int`) -> `bool`
+ ### <a id='MouseDrag'></a> MouseDrag(button : `MouseButtons`, dx : `float`, dy : `float`, frameCount : `float`, ox : `float`, oy : `float`, waitForEmptyInput : `bool`, timeout : `int`) -> `bool`
 
  Drags the mouse. 
 
@@ -1046,7 +1046,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - button : `Enums.MouseButtons` -  The button to drag with. 
+ - button : `MouseButtons` -  The button to drag with. 
  - dx : `float` -  The amount to drag the mouse in the X direction. 
  - dy : `float` -  The amount to drag the mouse in the Y direction. 
  - frameCount : `float` -  The number of frames to drag the mouse. 
@@ -1064,7 +1064,7 @@ GameDriver.io Unity API Client class.
  api = ApiClient()
  await api.Connect()
  
- await api.MouseDrag(Enums.MouseButtons.Left, 10, 10, 10)
+ await api.MouseDrag(MouseButtons.Left, 10, 10, 10)
  ```
  ### <a id='MouseMoveToObject'></a> MouseMoveToObject(objectHierarchyPath : `str`, frameCount : `float`, waitForObject : `bool`, waitForEmptyInput : `bool`, timeout : `int`) -> `bool`
 
@@ -1200,7 +1200,7 @@ GameDriver.io Unity API Client class.
  
  await api.RegisterCollisionMonitor('/root/SceneA/ObjectA')
  ```
- ### <a id='RotateObject_AxisAngle'></a> RotateObject_AxisAngle(hierarchyPath : `str`, xAngle : `float`, yAngle : `float`, zAngle : `float`, relativeTo : `Enums.Space`, waitForObject : `bool`, timeout : `int`) -> `bool`
+ ### <a id='RotateObject_AxisAngle'></a> RotateObject_AxisAngle(hierarchyPath : `str`, xAngle : `float`, yAngle : `float`, zAngle : `float`, relativeTo : `Space`, waitForObject : `bool`, timeout : `int`) -> `bool`
 
  Rotates an object. 
 
@@ -1214,7 +1214,7 @@ GameDriver.io Unity API Client class.
  - xAngle : `float` -  The X angle to rotate the object by. 
  - yAngle : `float` -  The Y angle to rotate the object by. 
  - zAngle : `float` -  The Z angle to rotate the object by. 
- - relativeTo : `Enums.Space` -  The space to rotate the object in. 
+ - relativeTo : `Space` -  The space to rotate the object in. 
  - waitForObject : `bool` -  Whether or not to wait for the object to rotate. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 
@@ -1229,7 +1229,7 @@ GameDriver.io Unity API Client class.
  
  await api.RotateObject_AxisAngle('/root/SceneA/ObjectA', 1, 1, 1)
  ```
- ### <a id='RotateObject_Euler'></a> RotateObject_Euler(hierarchyPath : `str`, euler : `ProtocolObjects.Vector3`, relativeTo : `Enums.Space`, waitForObject : `bool`, timeout : `int`) -> `bool`
+ ### <a id='RotateObject_Euler'></a> RotateObject_Euler(hierarchyPath : `str`, euler : `ProtocolObjects.Vector3`, relativeTo : `Space`, waitForObject : `bool`, timeout : `int`) -> `bool`
 
  Rotates an object. 
 
@@ -1241,7 +1241,7 @@ GameDriver.io Unity API Client class.
 
  - hierarchyPath : `str` -  The hierarchy path of the object to rotate. 
  - euler : `ProtocolObjects.Vector3` -  The Euler angles to rotate the object by. 
- - relativeTo : `Enums.Space` -  The space to rotate the object in. 
+ - relativeTo : `Space` -  The space to rotate the object in. 
  - waitForObject : `bool` -  Whether or not to wait for the object to rotate. 
  - timeout : `int` -  The number of seconds to wait for the command to be recieved by the agent. 
 

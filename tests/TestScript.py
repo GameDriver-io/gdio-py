@@ -7,30 +7,16 @@ from gdio.common.objects import *
 class TestFixture:
 
     def __init__(self):
+        pass
 
-        self.api = ApiClient(debug=True)
+    async def test(self):
+        async with ApiClient(debug=True) as api:
 
-    async def Connect(self):
-        await self.api.Connect('127.0.0.1', 19734, True, 5)
-
-        await self.api.Wait(1000)
-
-        await self.api.CallMethod_Void("//*[@name='Player']/fn:component('TestScript')", 'Sum_Void', [1, 2])
-
-        await self.api.Wait(1000)
-
-        self.api.Disconnect()
-
-        #await self.load_scene(self.api, 'MouseMoveObject')
-
-        #await self.api.MouseMoveToObject("//*[@name='Cylinder']", 10)
-        
-    async def load_scene(self, api, name):
-        await api.LoadScene(name, 5)
-        scene_name = await api.GetSceneName(5)
-        assert scene_name == name
+            await api.Wait(1000)
+            gcd = api.GetConnectedGameDetails()
+            print(gcd)
 
 if __name__ == '__main__':
     Game = TestFixture()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(Game.Connect())
+    loop.run_until_complete(Game.test())
