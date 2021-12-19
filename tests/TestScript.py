@@ -5,6 +5,8 @@ import os, asyncio
 from gdio.api import ApiClient
 from gdio.common.objects import *
 
+import time
+
 class TestFixture:
 
     def __init__(self):
@@ -12,11 +14,23 @@ class TestFixture:
 
     async def test(self):
         api = ApiClient(debug=True)
-        await api.Connect()
+        isConnected = await api.Connect()
+        if not isConnected:
+            return
 
         await api.Wait(1000)
         gcd = api.GetConnectedGameDetails()
         print(gcd)
+
+        await api.EnableHooks(HookingObject.ALL)
+
+        await api.ButtonPress('Jump', 100)
+
+        await api.DisableHooks(HookingObject.ALL)
+
+        await api.Wait(1000)
+        await api.Disconnect()
+
 
 if __name__ == '__main__':
     Game = TestFixture()

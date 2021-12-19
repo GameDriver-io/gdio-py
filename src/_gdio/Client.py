@@ -91,27 +91,21 @@ class Client:
                 logging.error(f'Expected handshake response, got {msg.GDIOMsg.GetName()}. Dropping Message before handshake is complete')
                 return
 
-        # The handshake is still expecting a response,
-        elif self._currentHandshakeState == Enums.HandshakeState.CLIENT_INFORMATION_SENT:
+            # The handshake is still expecting a response,
+            elif self._currentHandshakeState == Enums.HandshakeState.CLIENT_INFORMATION_SENT:
 
-            # and the message returns OK,
-            if msg.GDIOMsg.RC == Enums.HandshakeReasonCode.OK:
+                if msg.GDIOMsg.RC == Enums.HandshakeReasonCode.OK:
+                    logging.debug(f'Saving connection details to Client for connection {msg.GDIOMsg.GCD}')
+                    self.GCD = msg.GDIOMsg.GCD
+                    self._currentHandshakeState = Enums.HandshakeState.COMPLETE
+                    logging.debug(f'Handshake complete')
 
-                # Save the response details.
-                logging.debug(f'Saving connection details to Client ({self.ClientUID}) for connection {msg.GDIOMsg.GCD} ')
-                self.GCD = msg.GDIOMsg.GCD
+                else:
+                    logging.error(f'Handshake failed: {msg.GDIOMsg.RC}')
 
-                # Set the handshake state to complete.
-                self._currentHandshakeState = Enums.HandshakeState.COMPLETE
-                logging.debug(f'Handshake complete')
+                return
 
-            # If the message returns anything other than OK,
-            else:
-                # raise an exception.
-                logging.error(f'Handshake failed: {msg.GDIOMsg.RC}')
-                raise Exception('Handshake failed')
-
-            return
+            raise Exception('Handshake failed')
 
         # If the message is an empty input event,
         if isinstance(msg.GDIOMsg, Messages.Evt_EmptyInput):
@@ -233,6 +227,8 @@ class Client:
         return msgpack.unpackb(response_data)
 
     async def Disconnect(self, writer=None):
+
+        logging.debug('Disconnecting...')
 
         writer = self._writer if writer == None else writer        
 
