@@ -1,4 +1,4 @@
-from . import ProtocolObjects, Messages
+from . import ProtocolObjects
 
 import msgpack
 

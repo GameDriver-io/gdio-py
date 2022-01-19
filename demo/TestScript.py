@@ -113,9 +113,11 @@ class TestFixture:
 
         await api.Wait(1000)
 
-        distance = await api.GetObjectFieldValue(float, "//Player[@name='Player']/fn:component('UnityEngine.Rigidbody2D')/@simulated")
-        if distance:
-            print (distance)
+        isSimulated1 = await api.GetObjectFieldValue(bool, "//Player[@name='Player']/fn:component('UnityEngine.Rigidbody2D')/@simulated")
+        isSimulated2 = await api.GetObjectFieldValueByName("//Player[@name='Player']/fn:component('UnityEngine.Rigidbody2D')", "simulated")
+        if isSimulated1 and isSimulated2:
+            print(isSimulated1)
+            print(isSimulated2)
 
         await api.Wait(5000)
         await api.Disconnect()
@@ -123,6 +125,30 @@ class TestFixture:
         await api.Wait(100)
         api.StopEditorPlay()
 
+    async def test_customtypes(self):
+
+        from .CustomTypes import Color, Serializer
+        
+        api = ApiClient(debug=True, customSerializers=[Serializer])
+
+        isConnected = await api.Connect(autoplay=True)
+
+        if not isConnected:
+            return
+
+        await api.Wait(1000)
+
+        ## TEST
+
+        
+
+        ## /TEST
+
+        await api.Wait(5000)
+        await api.Disconnect()
+
+        await api.Wait(100)
+        api.StopEditorPlay()
 
 if __name__ == '__main__':
     Game = TestFixture()

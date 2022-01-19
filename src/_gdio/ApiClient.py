@@ -1,4 +1,5 @@
 from sqlite3 import connect
+
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
 
@@ -48,7 +49,8 @@ class ApiClient:
             connectionTimeout  : int = 30,          # The number of seconds to wait for the command to be recieved by the agent.
             autoPortResolution : bool = True,       # TODO: Automatically resolve the port a Gamedriver Agent is running on.
 
-            debug : bool = False
+            debug : bool = False,
+            customSerializers : list = None
         ):
 
         self.hostname = hostname
@@ -58,7 +60,7 @@ class ApiClient:
         self.autoPortResolution = autoPortResolution
     
         
-        # Defined in self.Connect().
+        # Defined in self.Connect()
         self.client = None
         self.CurrentPlayDetails = None
         self.gameConnectionDetails = None
@@ -71,6 +73,8 @@ class ApiClient:
                 i += 1
 
             logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename=log_file_path, filemode='w')
+
+        self.CustomSerializers = customSerializers
 
     @requireClientConnectionAsync
     async def AxisPress(self,
@@ -594,10 +598,8 @@ class ApiClient:
 
                 logging.debug(f"Autoplaying on the editor instance at {hostname}:{AUTOPLAY_DEFAULT_PORT}")
 
-
                 # This uses the socket module becuase I don't know how to use the asyncio module for UDP.
                 UDPsend(hostname, AUTOPLAY_DEFAULT_PORT, 'agent|startplay')
-
 
             self.client = Client(hostname, port, timeout)
             connected = await (self.client.Connect(internalComms=False, reader=reader, writer=writer))
@@ -678,7 +680,6 @@ class ApiClient:
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
-
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
@@ -1280,7 +1281,7 @@ class ApiClient:
                 HierarchyPath = hierarchyPath,
 
                 # This probably doesn't work like this
-                TypeFullName = t.__class__
+                TypeFullName = Enums.CSTypeFullName[t.__name__]
             )
         )
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -1289,7 +1290,7 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             return -1
 
-        return cmd_GenericResponse
+        return msgpack.unpackb(cmd_GenericResponse.Value)
 
     @requireClientConnectionAsync
     async def GetObjectFieldValueByName(self,
@@ -1316,22 +1317,21 @@ class ApiClient:
         ```
         </example>
         '''
-        # TODO : weird deserialization thingy at the end
-        raise NotImplementedError
+        
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_GetObjectValueRequest(
                 HierarchyPath = hierarchyPath,
-                FieldName = fieldName
+                ObjectFieldOrPropertyName = fieldName
             )
         )
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
+        cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if response.RC != Enums.ResponseCode.OK:
+        if cmd_GetObjectValueResponse.RC != Enums.ResponseCode.OK:
             return -1
 
-        return response
+        return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
 
 
     @requireClientConnectionAsync

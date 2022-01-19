@@ -248,9 +248,13 @@ class Cmd_GetObjectPositionRequest(Message):
 class Cmd_GetObjectValueRequest(Message):
     def __init__(self, HierarchyPath = None, ObjectFieldOrPropertyName = None, TypeFullName = None):
         self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
-        self.ObjectFieldOrPropertyName = '' if ObjectFieldOrPropertyName == None else ObjectFieldOrPropertyName
-        self.TypeFullName = '' if TypeFullName == None else TypeFullName
 
+        if ObjectFieldOrPropertyName is not None:
+            self.ObjectFieldOrPropertyName = ObjectFieldOrPropertyName
+
+        if TypeFullName is not None:
+            self.TypeFullName = TypeFullName
+            
 class Cmd_GetObjectValueResponse(Cmd_GenericResponse):
     def __init__(self, Value, SerializeObjectType, Serializer, directObject, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):
         super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)

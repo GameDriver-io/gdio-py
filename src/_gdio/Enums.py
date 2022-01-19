@@ -1,5 +1,18 @@
 from enum import IntEnum, auto
 
+CSTypeFullName = {
+    'str' : 'System.String',
+    'int' : 'System.Int32',
+    'float' : 'System.Double',
+    'bool' : 'System.Boolean',
+
+    # Not sure about these ones
+    'list' : 'System.Object',
+    'dict' : 'System.Object',
+    'tuple' : 'System.Object',
+    'set' : 'System.Object',
+}
+
 class MouseButtons(IntEnum):
     LEFT = auto()
     RIGHT = auto()
