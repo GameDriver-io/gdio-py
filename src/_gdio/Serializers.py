@@ -7,28 +7,15 @@ def IsBuiltin(obj):
 
 class CustomSerializer:
     def Serialize(self, obj):
-        pass
+        raise NotImplementedError
+
     def Deserialize(self, obj):
-        pass
+        raise NotImplementedError
 
-class SerializedObject:
-    def __init__(self,
-            SerializedObjectType : type = None,
-            NonSerializedObject : object = None,
-            SerializedObjectData : list = None,
-            CustomSerialization : bool = False
-        ):
-        self.SerializedObjectType = SerializedObjectType
-        self.NonSerializedObject = NonSerializedObject
-        self.SerializedObjectData = SerializedObjectData
-        self.CustomSerialization = CustomSerialization
-
-    def pack(self):
-        return vars(self)
-
-
-def customSerializer(obj):
+def msgSerialize(obj):
     if isinstance(obj, ProtocolObjects.ProtocolMessage):
-        obj.GDIOMsg = obj.GDIOMsg.pack()
         return obj.pack()
-    
+
+def msgDeserialize(obj):
+    if isinstance(obj, msgpack.Timestamp):
+        return obj.to_unix()

@@ -4,6 +4,8 @@ from msgpack import Timestamp as msgpackTime
 
 from collections import namedtuple
 
+from msgpack.ext import Timestamp
+
 from . import Messages
 
 # I dont know where to put this method
@@ -38,13 +40,28 @@ class ProtocolMessage:
             'ClientUID' : self.ClientUID,
             'RequestId' : self.RequestId,
             'CorrelationId' : self.CorrelationId,
-            'GDIOMsg' : self.GDIOMsg,
+            'GDIOMsg' : self.GDIOMsg.pack(),
             'IsAsync' : self.IsAsync,
             'Timestamp' : self.Timestamp
         }
 
     def __repr__(self):
         return f'{self.pack()}'
+
+class SerializedObject:
+    def __init__(self,
+            SerializedObjectType : type = None,
+            NonSerializedObject : object = None,
+            SerializedObjectData : list = None,
+            CustomSerialization : bool = False
+        ):
+        self.SerializedObjectType = SerializedObjectType
+        self.NonSerializedObject = NonSerializedObject
+        self.SerializedObjectData = SerializedObjectData
+        self.CustomSerialization = CustomSerialization
+
+    def pack(self):
+        return vars(self)
 
 
 class RequestInfo:

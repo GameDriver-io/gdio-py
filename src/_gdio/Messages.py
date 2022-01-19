@@ -61,6 +61,7 @@ CmdIds = {
 
     "Cmd_SceneLoaded" : 81,
     "Evt_EmptyInput" : 80,
+    "Evt_Collision" : 83,
 }
 
 class Message:
@@ -104,15 +105,29 @@ class Cmd_GenericResponse(Message):
 
 class Cmd_CallMethodRequest(Message):
     # TODO: custom serializer
-    def __init__(self, HierarchyPath = None, MethodName = None, Arguments = None, Arguments2 = None, _serializer = None):
-        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
-        self.MethodName = '' if MethodName == None else MethodName
-        self.Arguments = [] if Arguments == None else Arguments
-        self.Arguments2 = [] if Arguments2 == None else Arguments2
-        self._serializer = _serializer
+    def __init__(self,
+            HierarchyPath : str = None,
+            MethodName : str = None,
+            Arguments : list = None,
+            Arguments2 : list = None,
+            _serializer : Serializers.CustomSerializer = None
+        ):
+        
+        self.HierarchyPath = HierarchyPath
+        self.MethodName = MethodName
+        self.Arguments = Arguments if Arguments else []
+
+        if Arguments2:
+            self.Arguments2 = Arguments2
+        
+        if _serializer:
+            self._serializer = _serializer
 
     def SetArguments(self, arguments = None, serializer = None):
-        customSerializer : Serializers.CustomSerializer = self._serializer if serializer == None else serializer
+        try:
+            customSerializer : Serializers.CustomSerializer = self._serializer if serializer == None else serializer
+        except:
+            pass
         serializedObjectData = None
         nonSerializedObject = None
         if arguments == None:
@@ -128,35 +143,11 @@ class Cmd_CallMethodRequest(Message):
             else:
                 nonSerializedObject = argument
 
-            self.Arguments.append(Serializers.SerializedObject(
+            self.Arguments.append(ProtocolObjects.SerializedObject(
                 SerializedObjectType = type(argument),
                 SerializedObjectData = serializedObjectData,
                 NonSerializedObject = nonSerializedObject
             ).pack())
-
-        '''
-        ret = []
-        for obj in arguments:
-            if isinstance(obj, object):
-                if  not Serializers.IsBuiltin(obj) and (customSerializer == None):
-                    raise Exception(f'CustomSerializer is not defined for type: {type(obj)}')
-                serializedObjectData = msgpack.packb(obj) if customSerializer == None else customSerializer.Serialize(obj)
-                if serializedObjectData == None:
-                    raise Exception(f'Failed to serialized object of type: {type(obj)}')
-                ret.append(
-                    Serializers.SerializedObject(
-                        SerializedObjectType = type(obj),
-                        SerializedObjectData = serializedObjectData,
-                        CustomSerialization = True
-                    )
-                )
-            else:
-                ret.append(
-                    Serializers.SerializedObject(
-                        NonSerializedObject=obj
-                    )
-                )
-        '''
 
 
 ## CaptureScreenshot
@@ -261,10 +252,10 @@ class Cmd_GetObjectValueRequest(Message):
         self.TypeFullName = '' if TypeFullName == None else TypeFullName
 
 class Cmd_GetObjectValueResponse(Cmd_GenericResponse):
-    def __init__(self, _cmdID, SerializeObjectType, Serializer, directObject, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):
+    def __init__(self, Value, SerializeObjectType, Serializer, directObject, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):
         super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
 
-        self._CmdID = _cmdID
+        self.Value = Value
         self.SerializeObjectType = SerializeObjectType
         self.Serializer = Serializer
         self.directObject = directObject
@@ -384,8 +375,8 @@ class Cmd_RaycastResponse(Cmd_GenericResponse):
 
 
 class Cmd_RegisterCollisionMonitorRequest(Message):
-    def __init__(self, HierarchyPath = None):
-        HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+    def __init__(self, HierarchyPath):
+        self.HierarchyPath = HierarchyPath
 
 
 class Cmd_RotateRequest(Message):
@@ -524,6 +515,9 @@ class Cmd_HandshakeResponse(Message):
 
 
 class Evt_EmptyInput(Message):
+    pass
+
+class Evt_Collision(Message):
     pass
 
 class Cmd_SceneLoaded(Message):

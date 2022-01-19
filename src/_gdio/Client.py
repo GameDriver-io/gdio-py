@@ -1,7 +1,7 @@
 from . import ProtocolObjects, Messages, Serializers, Enums
 
 import asyncio, socket, sys
-import msgpack, uuid
+import msgpack, uuid, json
 import datetime, time
 from binascii import crc32
 
@@ -51,6 +51,7 @@ class Client:
                 msg_crc = await reader.read(4)
                 msg_data = await reader.read(int.from_bytes(msg_length[:4], byteorder=BYTE_ORDER, signed=False))
                 
+                #unpacked = msgpack.unpackb(msg_data, object_hook=Serializers.msgDeserialize)
                 unpacked = msgpack.unpackb(msg_data)
                 #print(f'\n{unpacked}\n')
                 
@@ -61,14 +62,21 @@ class Client:
                 pass
 
 
-    async def EventsPending(self, eventId):
+    def EventsPending(self, eventId):
         return True if eventId in self.EventCollection else False
 
-    async def RemoveEventCollectionId(self, eventId):
+    def RemoveEventCollectionId(self, eventId):
 
         if eventId in self.EventCollection:
 
             del self.EventCollection[eventId]
+
+    def GetNextEvent(self, eventId):
+        if len(self.EventCollection) == 0:
+            raise Exception('Error getting next event. No events registered.')
+        for index, key in enumerate(self.EventCollection):
+            if key == eventId:
+                return self.EventCollection.pop(index)
     
     async def ProcessMessage(self, msg) -> None:
         
@@ -79,7 +87,7 @@ class Client:
                 raise Exception(msg.GDIOMsg.ErrorMessage)
 
         # If the message is not a generic response or there are no errors
-        logging.debug(f'[RECV] {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}')
+        logging.debug(f'[RECV] {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}:\n{json.dumps(msg.pack(), indent=4, default=Serializers.msgDeserialize)}')
 
         # If the handshake is not complete,
         if self._currentHandshakeState != Enums.HandshakeState.COMPLETE:
@@ -95,7 +103,7 @@ class Client:
             elif self._currentHandshakeState == Enums.HandshakeState.CLIENT_INFORMATION_SENT:
 
                 if msg.GDIOMsg.RC == Enums.HandshakeReasonCode.OK:
-                    logging.debug(f'Saving connection details to Client for connection {msg.GDIOMsg.GCD}')
+                    logging.debug(f'Recieved connection details {msg.GDIOMsg.GCD}')
                     self.GCD = msg.GDIOMsg.GCD
                     self._currentHandshakeState = Enums.HandshakeState.COMPLETE
                     logging.debug(f'Handshake complete')
@@ -107,19 +115,32 @@ class Client:
 
             raise Exception('Handshake failed')
 
-        # If the message is an empty input event,
-        if isinstance(msg.GDIOMsg, Messages.Evt_EmptyInput):
-            # save the timestamp that it was received.
-            self.SetEventTimestamp(Messages.Evt_EmptyInput)
-            return
+        # If the message is an event
+        if 'Evt_' in msg.GDIOMsg.GetName():
 
-        # If the message is anything else, register the response data to be grabbed later.
+            logging.debug(f'Recieved event {msg.GDIOMsg.GetName()} in response to {msg.GDIOMsg.CorrelationId}. Registering event...')
 
-        # NOTE: `dict.update()` will overwrite the value of overlapping keys
-        #    As far as I know, this should never happen
-        
-        logging.debug(f'Registering response for {msg.CorrelationId}')
-        self.Results.update({msg.CorrelationId : msg.GDIOMsg})
+            # If the message is an empty input event,
+            if isinstance(msg.GDIOMsg, Messages.Evt_EmptyInput):
+
+                # save the timestamp that it was received.
+                self.SetEventTimestamp(Messages.Evt_EmptyInput)
+                return
+
+            if isinstance(msg.GDIOMsg, Messages.Evt_Collision):
+
+                self.SetEventTimestamp(Messages.Evt_EmptyInput)
+                self.EventCollection.Update({msg.CorrelationId : msg.GDIOMsg})
+                return
+
+        else:
+            # If the message is anything else, register the response data to be grabbed later.
+
+            # NOTE: `dict.update()` will overwrite the value of overlapping keys
+            #    As far as I know, this should never happen
+            
+            logging.debug(f'Registering response for {msg.CorrelationId}')
+            self.Results.update({msg.CorrelationId : msg.GDIOMsg})
         
         
 
@@ -151,6 +172,13 @@ class Client:
             await asyncio.sleep(0)
         return True
 
+    async def SendArbitrary(self, data, writer=None):
+        writer = self._writer if writer == None else writer
+        
+        logging.debug(f'Sending arbitrary data...')
+        writer.write(data)
+        await writer.drain()
+
     async def SendMessage(self, obj, writer=None):
 
         writer = self._writer if writer == None else writer
@@ -159,13 +187,16 @@ class Client:
             obj.RequestId = str(uuid.uuid4())
 
         self.EventHandlers.append(obj.RequestId)
-        logging.debug(f'[SEND] {obj.GDIOMsg.GetName()} as {obj.RequestId}. Waiting for a response...')
+        serialized = msgpack.packb(obj, default=Serializers.msgSerialize)
 
-        serialized = msgpack.packb(obj, default=Serializers.customSerializer)
+        logging.debug(f'[SEND] {obj.GDIOMsg.GetName()} as {obj.RequestId}:\n{json.dumps(obj.pack(), indent=4, default=Serializers.msgDeserialize)}')
+        
         msg_payload = await self.ConstructPayload(serialized)
         payload_bytes = bytes(msg_payload)
         writer.write(payload_bytes)
         await writer.drain()
+
+        logging.debug(f'{obj.RequestId} is waiting for a response...')
 
         return ProtocolObjects.RequestInfo(self, obj.RequestId, obj.Timestamp)
 

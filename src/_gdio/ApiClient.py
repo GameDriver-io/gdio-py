@@ -1,8 +1,10 @@
+from sqlite3 import connect
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
 
 from functools import wraps
 
+import msgpack
 import os
 import asyncio, socket
 import time, datetime
@@ -26,6 +28,13 @@ def requireClientConnection(function):
             raise Exception("This method requires a client connection")
         return function(*args, **kwargs)
     return inner
+
+
+def UDPsend(hostname, port, data):
+    UdpClient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    UdpClient.sendto(bytes(data, 'utf-8'), (hostname, port))
+    UdpClient.close()
+
 
 class ApiClient:
     '''
@@ -150,70 +159,15 @@ class ApiClient:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return (cmd_GenericResponse.RC == Enums.ResponseCode.OK)
-    
-    ## Void overload.
-    # TODO: Can probably be merged with the typed version by defaulting `t` to `None`.
-    @requireClientConnectionAsync
-    async def CallMethod_Void(self,
-            hierarchyPath : str,         # The HierarchyPath for an object and the script attached to it.
-            methodName    : str,         # The name of the method to call within the script.
-            arguments     : list = None, # TODO: The list of arguments to pass into the method.
-            timeout       : int = 30,    # The number of seconds to wait for the command to be recieved by the agent.
-        ) -> None:
-        '''
-        <summary> Calls a void method on the target object. </summary>
-
-        <param name="hierarchyPath" type="str"> The HierarchyPath for an object and the script attached to it. </param>
-        <param name="methodName" type="str"> The name of the method to call within the script. </param>
-        <param name="arguments" type="list[any]"> The list of arguments to pass into the method. </param>
-        <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
-
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
-
-        <example>
-        ```python
-        api = ApiClient()
-        await api.Connect()
-
-        # Call the `Jump` method on the `Player` object at the scene root.
-        await api.CallMethod("//*[@name='Player']/fn:component('PlayerController')", "Jump")
-        ```
-        </example>
-        '''
-
-        msg = ProtocolObjects.ProtocolMessage(
-            ClientUID = self.client.ClientUID,
-            GDIOMsg = Messages.Cmd_CallMethodRequest(
-                HierarchyPath = hierarchyPath,
-                MethodName = methodName,
-            )
-        )
-
-        # TODO: Set and serialize the method's arguments.
-        if arguments:
-            #raise NotImplementedError('Arguments are not yet supported.')
-            msg.GDIOMsg.SetArguments(arguments)
-
-        requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
-
-        # If the response is an error, warning, or information message,
-        if cmd_GenericResponse.RC != 0:
-            # throw an exception containing the response data.
-            raise Exception(cmd_GenericResponse.ErrorMessage)
-
-        # The message didn't timeout, and the response was OK; return
-        return
 
     ## Return value overload
     @requireClientConnectionAsync
     async def CallMethod(self,
-            t             : type,
             hierarchyPath : str,      # The HierarchyPath for an object and the script attached to it.
             methodName    : str,      # The name of the method to call within the script.
             arguments     : list,     # TODO: The list of arguments to pass into the method.
             timeout       : int = 30, # The number of seconds to wait for the command to be recieved by the agent.
-        ) -> None:
+        ) -> type:
         '''
         <summary> Calls a method on the target object. </summary>
 
@@ -230,7 +184,7 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.CallMethod(t=int, hierarchyPath="//*[@name='Player']/fn:component('PlayerController')", methodName="Jump")
+        await api.CallMethod(hierarchyPath="//*[@name='Player']/fn:component('PlayerController')", methodName="Jump")
         ```
         </example>
         '''
@@ -244,16 +198,19 @@ class ApiClient:
 
         # TODO: Set and serialize the method's arguments.
         if arguments:
-            raise NotImplementedError('Arguments are not yet supported.')
+            #raise NotImplementedError('Arguments are not yet supported.')
             msg.GDIOMsg.SetArguments(arguments)
 
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
+        cmd_GetObjectValueResponse : Messages.Cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            raise Exception(cmd_GenericResponse.ErrorMessage)
+        if cmd_GetObjectValueResponse.RC != Enums.ResponseCode.OK:
+            raise Exception(cmd_GetObjectValueResponse.ErrorMessage)
 
-        return t(cmd_GenericResponse.ReturnValues)
+        if cmd_GetObjectValueResponse.Value is not None:
+            return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+        else:
+            return None
 
     @requireClientConnectionAsync
     async def CaptureScreenshot(self,
@@ -266,7 +223,7 @@ class ApiClient:
         <summary> Captures a screenshot of the currently connected app. </summary>
 
         <param name="filename" type="str"> The path and filename of the screen capture. </param>
-        <param name="storeInGameFolder" type="bool"> (**Not Implemented**) Save the screenshot on the device the game is running on rather than returning it to the client. </param>
+        <param name="storeInGameFolder" type="bool"> Save the screenshot on the device the game is running on rather than returning it to the client. </param>
         <param name="overwriteExisting" type="bool"> Overwrite if the file already exists. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
 
@@ -600,13 +557,11 @@ class ApiClient:
 
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
             
-    # TODO: autoplay
     async def Connect(self,
             hostname           : str = '127.0.0.1', # The hostname of the device running the target game.
             port               : int = 19734,       # The port that the target Gamedriver agent is configured to use.
-            autoplay           : bool = False,      # TODO: Start the game automatically within the Unity Editor.
+            autoplay           : bool = False,      # Start the game automatically within the Unity Editor.
             timeout            : int = 30,          # The number of seconds to wait for the command to be recieved by the agent.
-            autoPortResolution : bool = True,       # TODO: Automatically resolve the port a Gamedriver Agent is running on.
 
             reader : asyncio.StreamReader = None, # TEMP
             writer : asyncio.StreamWriter = None, # TEMP
@@ -616,9 +571,8 @@ class ApiClient:
 
         <param name="hostname" type="str"> The hostname of the device running the target game. </param>
         <param name="port" type="int"> The port that the target Gamedriver agent is configured to use. </param>
-        <param name="autoplay" type="bool"> (**Not Implemented**) Start the game automatically within the Unity Editor. </param>
+        <param name="autoplay" type="bool"> Start the game automatically within the Unity Editor. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be recieved by the agent. </param>
-        <param name="autoPortResolution" type="bool"> (**Not Implemented**) Automatically resolve the port a Gamedriver Agent is running on. </param>
 
         <returns value="bool"> True if nothing went wrong while trying to connect; None otherwise </returns>
 
@@ -639,15 +593,15 @@ class ApiClient:
                     raise Exception("No compatible game found on the specified hostname.")
 
                 logging.debug(f"Autoplaying on the editor instance at {hostname}:{AUTOPLAY_DEFAULT_PORT}")
+
+
                 # This uses the socket module becuase I don't know how to use the asyncio module for UDP.
-                UdpClient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                UdpClient.sendto(bytes('agent|startplay', 'utf-8'), (hostname, AUTOPLAY_DEFAULT_PORT))
-                UdpClient.close()
+                UDPsend(hostname, AUTOPLAY_DEFAULT_PORT, 'agent|startplay')
 
 
             self.client = Client(hostname, port, timeout)
-
-            if not await self.client.Connect(internalComms=False, reader=reader, writer=writer):
+            connected = await (self.client.Connect(internalComms=False, reader=reader, writer=writer))
+            if not connected:
                 raise Exception('Failed to connect to the game')
 
         # If any exception is thrown,
@@ -658,14 +612,22 @@ class ApiClient:
         # If no exception is thrown
         else:
             # and connection details haven't been saved yet,
-            if self.gameConnectionDetails == None:
-                logging.debug(f"Saving connection details to ApiClient for connection: {self.client.GCD}")
-                # save the connection details that the client recieved.
-                self.gameConnectionDetails = self.client.GCD
+            if not self.gameConnectionDetails:
                 
+                # save the connection details that the client recieved.
+                await asyncio.wait_for(self._WaitForConnectionDetails(), timeout)
 
         # No exceptions thrown; return
         return True
+
+    async def _WaitForConnectionDetails(self):
+        logging.debug("Waiting for connection details...")
+
+        while self.client.GCD == None:
+            await asyncio.sleep(0)
+
+        logging.debug(f"Saving connection details {self.client.GCD}")
+        self.gameConnectionDetails = self.client.GCD
     
     ## Regex overload
     '''
@@ -675,7 +637,7 @@ class ApiClient:
     '''
 
     @requireClientConnectionAsync
-    async def DisableHooks(self, hookingObject : Enums.HookingObject, timeout : int = 30) -> bool:
+    async def DisableHooks(self, hookingObject : Enums.HookingObject = Enums.HookingObject.ALL, timeout : int = 30) -> bool:
         '''
         <summary> Disables the ability to preform the target input type from the ApiClient. </summary>
 
@@ -689,8 +651,14 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        # Disable Keyboard, Mouse, Touch and Controller hooks globally.
-        await api.DisableHooks(hookingObject=HookingObject.All)
+        # Disable Mouse Hooks
+        await api.DisableHooks(HookingObject.MOUSE)
+
+        # Disable Gamepad Hooks
+        await api.DisableHooks(HookingObject.GAMEPAD)
+
+        # or just disable everything at once
+        await api.DisableHooks(HookingObject.ALL)
         ```
         </example>
         '''
@@ -1051,7 +1019,7 @@ class ApiClient:
         return cmd_GenericResponse.RC == Enums.ResponseCode.OK
 
     @requireClientConnectionAsync
-    async def EnableHooks(self, hookingObject, timeout : int = 30) -> bool:
+    async def EnableHooks(self, hookingObject : Enums.HookingObject = Enums.HookingObject.ALL, timeout : int = 30) -> bool:
         '''
         <summary> Enables the given hooking object. </summary>
 
@@ -1065,7 +1033,14 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
+        # Enable Mouse Hooks
         await api.EnableHooks(HookingObject.MOUSE)
+
+        # Enable Gamepad Hooks
+        await api.EnableHooks(HookingObject.GAMEPAD)
+
+        # or just enable everything at once
+        await api.EnableHooks(HookingObject.ALL)
         ```
         </example>
         '''
@@ -1206,8 +1181,8 @@ class ApiClient:
         return cmd_GenericResponse.ReturnedValues['FPS']
         
 
-    @requireClientConnectionAsync
-    async def GetNextCollisionEvent(self) -> ProtocolObjects.Collision:
+    @requireClientConnection
+    def GetNextCollisionEvent(self, eventId) -> ProtocolObjects.Collision:
         '''
         <summary> (**Not Implemented**) Gets the next collision event. </summary>
 
@@ -1223,7 +1198,10 @@ class ApiClient:
         ```
         </example>
         '''
-        raise NotImplementedError
+        nextEvent = self.client.GetNextEvent(eventId)
+        if nextEvent is None:
+            return None
+        return nextEvent
 
     @requireClientConnectionAsync
     async def GetObjectDistance(self,
@@ -1250,23 +1228,25 @@ class ApiClient:
         ```
         </example>
         '''
-        # TODO : weird deserialization thingy at the end
-        raise NotImplementedError
 
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_ObjectDistanceRequest(
-                ObjectAHierarchyPath = objectA_HierarchyPath,
-                ObjectBHierarchyPath = objectB_HierarchyPath
+                ObjectA_HierarchyPath = objectA_HierarchyPath,
+                ObjectB_HierarchyPath = objectB_HierarchyPath
             )
         )
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
+        cmd_GetObjectValueResponse : Messages.Cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            return -1
+        if cmd_GetObjectValueResponse.RC != Enums.ResponseCode.OK:
+            raise Exception('Failed getting object distance')
 
-        return cmd_GenericResponse
+        if cmd_GetObjectValueResponse.Value is not None:
+            return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+        else:
+            # TODO: More pedantic return value
+            return None
 
     @requireClientConnectionAsync
     async def GetObjectFieldValue(self,
@@ -1293,15 +1273,14 @@ class ApiClient:
         ```
         </example>
         '''
-        # TODO : weird deserialization thingy at the end
-        raise NotImplementedError
+
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_GetObjectValueRequest(
                 HierarchyPath = hierarchyPath,
 
                 # This probably doesn't work like this
-                Type = t.__class__
+                TypeFullName = t.__class__
             )
         )
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -2206,10 +2185,9 @@ class ApiClient:
         '''
         raise NotImplementedError
 
-    @requireClientConnectionAsync
-    async def ToggleEditorPause(self):
+    def StopEditorPlay(self):
         '''
-        <summary> (**Not Implemented**) Toggles the editor pause. </summary>
+        <summary> Stops the editor play. </summary>
 
         <returns value="bool"> True if successful, false otherwise. </returns>
 
@@ -2218,16 +2196,19 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.ToggleEditorPause()
+        api.StopEditorPlay()
         ```
         </example>
         '''
-        raise NotImplementedError
+        hostname = '127.0.0.1'
+        if self.CurrentPlayDetails is not None:
+            hostname = self.CurrentPlayDetails.Addr
+        logging.debug(f'Stopping editor play on {hostname}')
+        UDPsend(hostname, AUTOPLAY_DEFAULT_PORT, 'agent|stopplay')
 
-    @requireClientConnectionAsync
-    async def ToggleEditorPlay(self):
+    def ToggleEditorPause(self):
         '''
-        <summary> (**Not Implemented**) Toggles the editor play. </summary>
+        <summary> Toggles the editor pause. </summary>
 
         <returns value="bool"> True if successful, false otherwise. </returns>
 
@@ -2236,11 +2217,36 @@ class ApiClient:
         api = ApiClient()
         await api.Connect()
         
-        await api.ToggleEditorPlay()
+        api.ToggleEditorPause()
         ```
         </example>
         '''
-        raise NotImplementedError
+        hostname = '127.0.0.1'
+        if self.CurrentPlayDetails is not None:
+            hostname = self.CurrentPlayDetails.Addr
+        logging.debug(f'Toggling editor pause on {hostname}')
+        UDPsend(hostname, AUTOPLAY_DEFAULT_PORT, 'agent|togglepause')
+
+    def ToggleEditorPlay(self):
+        '''
+        <summary> Toggles the editor play. </summary>
+
+        <returns value="bool"> True if successful, false otherwise. </returns>
+
+        <example>
+        ```python
+        api = ApiClient()
+        await api.Connect()
+        
+        api.ToggleEditorPlay()
+        ```
+        </example>
+        '''
+        hostname = '127.0.0.1'
+        if self.CurrentPlayDetails is not None:
+            hostname = self.CurrentPlayDetails.Addr
+        logging.debug(f'Toggling editor play on {hostname}')
+        UDPsend(hostname, AUTOPLAY_DEFAULT_PORT, 'agent|toggleplay')
 
     @requireClientConnectionAsync
     async def TouchInput(self,
