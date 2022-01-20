@@ -125,6 +125,32 @@ class TestFixture:
         await api.Wait(100)
         api.StopEditorPlay()
 
+    async def test_getobjectpos(self):
+        
+        api = ApiClient(debug=True)
+
+        isConnected = await api.Connect(autoplay=True)
+
+        if not isConnected:
+            return
+
+        await api.Wait(1000)
+
+        ## TEST
+
+        pos = await api.GetObjectPosition("//*[@name='Player']")
+
+        if pos:
+            print(pos)
+
+        ## /TEST
+
+        await api.Wait(5000)
+        await api.Disconnect()
+
+        await api.Wait(100)
+        api.StopEditorPlay()
+
     async def test_customtypes(self):
 
         from .CustomTypes import Color, Serializer
@@ -153,4 +179,4 @@ class TestFixture:
 if __name__ == '__main__':
     Game = TestFixture()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(Game.test_fieldvalue())
+    loop.run_until_complete(Game.test_getobjectpos())

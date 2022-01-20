@@ -240,9 +240,11 @@ class Cmd_GetObjectListRequest(Message):
 
 
 class Cmd_GetObjectPositionRequest(Message):
-    def __init__(self, ObjectHierarchyPath = None, CameraHierarchyPath = None):
-        self.ObjectHierarchyPath = '' if ObjectHierarchyPath == None else ObjectHierarchyPath
+    def __init__(self, ObjectHierarchyPath = None, CameraHierarchyPath = None, SpaceConversion = Enums.CoordinateConversion.NONE):
+
+        self.ObjectHierarchyPath = ObjectHierarchyPath
         self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
+        self.SpaceConversion = SpaceConversion
 
 
 class Cmd_GetObjectValueRequest(Message):
@@ -254,7 +256,7 @@ class Cmd_GetObjectValueRequest(Message):
 
         if TypeFullName is not None:
             self.TypeFullName = TypeFullName
-            
+
 class Cmd_GetObjectValueResponse(Cmd_GenericResponse):
     def __init__(self, Value, SerializeObjectType, Serializer, directObject, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):
         super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)

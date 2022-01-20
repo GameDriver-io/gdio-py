@@ -1396,17 +1396,18 @@ class ApiClient:
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_GetObjectPositionRequest(
-                HierarchyPath = hierarchyPath,
-                CameraHierarchyPath=cameraHierarchyPath,
-                CoordSpace = coordSpace
+                ObjectHierarchyPath = hierarchyPath,
+                CameraHierarchyPath = cameraHierarchyPath,
+                SpaceConversion = coordSpace
             )
         )
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
-        if response.Value3 == None or response.RC != Enums.ResponseCode.INFORMATION:
-            raise Exception(response.ErrorMessage)
+        cmd_VectorResponse : Messages.Cmd_VectorResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        return response.Value3
+        if cmd_VectorResponse.Value3 == None or cmd_VectorResponse.RC != Enums.ResponseCode.INFORMATION:
+            raise Exception(cmd_VectorResponse.ErrorMessage)
+
+        return cmd_VectorResponse.Value3
 
     @requireClientConnectionAsync
     async def GetSceneName(self, timeout : int = 30) -> str:
