@@ -9,6 +9,7 @@ import msgpack
 import os
 import asyncio, socket
 import time, datetime
+import subprocess
 
 import logging
 
@@ -1441,6 +1442,7 @@ class ApiClient:
 
         return response.InformationMessage
 
+    """
     def GetVersionString(self) -> str:
         '''
         <summary> (**Not Implemented**) Gets the version string of the agent. </summary>
@@ -1455,7 +1457,7 @@ class ApiClient:
         </example>
         '''
         raise NotImplementedError
-        return
+    """
 
     @requireClientConnectionAsync
     async def KeyPress(self,
@@ -1510,9 +1512,9 @@ class ApiClient:
         # No exceptions thrown; return True
         return True
 
-    def Launch(self, filename : str, arguments : str = None):
+    def Launch(self, filepath : str, arguments : str = None):
         '''
-        <summary> (**Not Implemented**) Launches a process. </summary>
+        <summary> Launches an executable. </summary>
 
         <param name="filename" type="str"> The filename of the process to launch. </param>
         <param name="arguments" type="str"> The arguments to launch the process with. </param>
@@ -1523,8 +1525,10 @@ class ApiClient:
         ```
         </example>
         '''
-        ## Not sure what this one does yet
-        raise NotImplementedError
+        
+        args = arguments if arguments else ''
+        path = os.path.abspath(filepath)
+        subprocess.Popen([path, args])
 
     @requireClientConnectionAsync
     async def LoadScene(self, sceneName : str, timeout : int = 30) -> bool:
