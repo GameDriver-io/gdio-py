@@ -1,5 +1,3 @@
-from sqlite3 import connect
-
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
 
@@ -170,7 +168,7 @@ class ApiClient:
     async def CallMethod(self,
             hierarchyPath : str,      # The HierarchyPath for an object and the script attached to it.
             methodName    : str,      # The name of the method to call within the script.
-            arguments     : list,     # TODO: The list of arguments to pass into the method.
+            arguments     : list = None,     # TODO: The list of arguments to pass into the method.
             timeout       : int = 30, # The number of seconds to wait for the command to be recieved by the agent.
         ) -> type:
         '''
@@ -201,9 +199,7 @@ class ApiClient:
             )
         )
 
-        # TODO: Set and serialize the method's arguments.
         if arguments:
-            #raise NotImplementedError('Arguments are not yet supported.')
             msg.GDIOMsg.SetArguments(arguments)
 
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -2024,11 +2020,14 @@ class ApiClient:
         ```
         </example>
         '''
-        request = Messages.Cmd_SetInputFieldTextRequest(
-            HierarchyPath = hierarchyPath,
-            Text = text,
-            Timeout = timeout,
-            WaitForObject = waitForObject
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_SetInputFieldTextRequest(
+                HierarchyPath = hierarchyPath,
+                Text = text,
+                Timeout = timeout,
+                WaitForObject = waitForObject
+            )
         )
         requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
@@ -2299,17 +2298,20 @@ class ApiClient:
         ```
         </example>
         '''
-        request = Messages.Cmd_TouchEventRequest(
-            StartPosition=ProtocolObjects.Vector2(X=x1, Y=y1),
-            DestinationPosition=ProtocolObjects.Vector2(X=x2, Y=y2),
-            FrameCount = frameCount,
-            TapCount = tapCount,
-            Radius = radius,
-            Pressure = pressure,
-            AltitudeAngle = altitudeAngle,
-            AzmulthAngle = azmulthAngle,
-            FingerId = fingerId,            
-            MaximumPossiblePressure = maximumPossiblePressure
+        request = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_TouchEventRequest(
+                StartPosition=ProtocolObjects.Vector2(X=x1, Y=y1),
+                DestinationPosition=ProtocolObjects.Vector2(X=x2, Y=y2),
+                FrameCount = frameCount,
+                TapCount = tapCount,
+                Radius = radius,
+                Pressure = pressure,
+                AltitudeAngle = altitudeAngle,
+                AzmulthAngle = azmulthAngle,
+                FingerId = fingerId,            
+                MaximumPossiblePressure = maximumPossiblePressure
+            )
         )
         requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
@@ -2411,9 +2413,13 @@ class ApiClient:
         ```
         </example>
         '''
-        raise NotImplementedError
+        nextEvent =  await asyncio.wait_for(self.client.WaitForNextEvent(eventId), timeout)
+        if nextEvent is None:
+            return None
+        return nextEvent
 
-    def waitForObject(self,
+    @requireClientConnectionAsync
+    async def WaitForObject(self,
             hierarchyPath : str,
             timeout : int = 30
         ) -> bool:
@@ -2434,10 +2440,29 @@ class ApiClient:
         ```
         </example>
         '''
-        raise NotImplementedError
+        
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_WaitForObjectRequest(
+                HierarchyPath = hierarchyPath,
+                Timeout = timeout
+            )
+        )
 
-    def waitForObjectValue(self,
+        requestInfo : Messages.RequestInfo = await self.client.SendMessage(msg)
+        cmd_WaitForObjectResponse : Messages.Cmd_WaitForObjectResponse = await self.client.GetResult(requestInfo.RequestId)
+
+        if cmd_WaitForObjectResponse.RC == Enums.ResponseCode.OK and cmd_WaitForObjectResponse.ObjectResolutionResult == Enums.OBJECT_RESOLUTION.OBJECT_FOUND:
+            return True
+
+        return False
+
+    @requireClientConnectionAsync
+    async def waitForObjectValue(self,
             hierarchyPath : str,
+            fieldOrPropertyName : str,
+            waitForObject : bool = True,
+            value = None,
             timeout : int = 30
         ) -> bool:
         '''
@@ -2458,6 +2483,36 @@ class ApiClient:
         </example>
         '''
         raise NotImplementedError
+
+        packed = None
+
+        typecode = Enums.CSTypeFullName[value.__class__.__name__]
+        if typecode == 'System.Object':
+            packed = msgpack.packb(value)
+
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_WaitForObjectValueRequest(
+                HierarchyPath = hierarchyPath,
+                FieldOrPropertyName = fieldOrPropertyName,
+                Timeout = timeout,
+            )
+        )
+
+        # This series of conditionals doesnt really make sense yet
+        if packed:
+            msg.GDIOMsg.SerializedObjectType = value.__class__
+            msg.GDIOMsg.Value = packed
+            msg.GDIOMsg.CustomSerialization = True
+
+        elif typecode == 'System.Object':
+            serializer = None
+
+            msg.GDIOMsg.CustomSerialization = True
+        # TODO: Messages.Cmd_WaitForObjectValueRequest.SetValue(value)
+
+        
+
 
     def _cleanup(self):
         '''

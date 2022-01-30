@@ -77,6 +77,14 @@ class Client:
         for index, key in enumerate(self.EventCollection):
             if key == eventId:
                 return self.EventCollection.pop(index)
+
+    async def WaitForNextEvent(self, eventId):
+        while True:
+            await asyncio.sleep(0)
+            try:
+                return self.GetNextEvent(eventId)
+            except:
+                pass
     
     async def ProcessMessage(self, msg) -> None:
         

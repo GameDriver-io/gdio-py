@@ -45,6 +45,7 @@ class TestFixture:
         await api.Wait(1000)
 
         await api.CallMethod("//*[@name='Player']/fn:component('TestScript')", "Sum_Void", [1, 1])
+        await api.CallMethod("//*[@name='Player']/fn:component('TestScript')", "log4")
         returnValue = await api.CallMethod("//*[@name='Player']/fn:component('TestScript')", "Sum_Return", [1, 1])
         print(returnValue)
 
@@ -72,8 +73,10 @@ class TestFixture:
         if collision:
             print(collision)
 
-            event = api.GetNextCollisionEvent(collision)
+            event = await api.WaitForCollisionEvent(collision)
             print(event)
+
+            await api.UnregisterCollisionMonitor(collision)
 
 
         
@@ -179,4 +182,4 @@ class TestFixture:
 if __name__ == '__main__':
     Game = TestFixture()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(Game.test_getobjectpos())
+    loop.run_until_complete(Game.test_collisionmonitor())

@@ -1,4 +1,5 @@
-import msgpack
+from re import A
+#import msgpack
 from . import Serializers
 from . import ProtocolObjects
 from . import Enums
@@ -86,6 +87,7 @@ class Cmd_GenericResponse(Message):
             RC : Enums.ResponseCode,
             ReturnedValues : list
         ):
+        # All these fields will be set by the response
         self.StackTrace = StackTrace
         self.ErrorMessage = ErrorMessage
         self.InformationMessage = InformationMessage
@@ -112,11 +114,12 @@ class Cmd_CallMethodRequest(Message):
             Arguments2 : list = None,
             _serializer : Serializers.CustomSerializer = None
         ):
-        
+        # Required fields
         self.HierarchyPath = HierarchyPath
         self.MethodName = MethodName
         self.Arguments = Arguments if Arguments else []
 
+        # Optional fields
         if Arguments2:
             self.Arguments2 = Arguments2
         
@@ -197,9 +200,10 @@ class Cmd_ChangeObjectResolverCacheStateRequest(Message):
 
 
 class Cmd_ClickObjectRequest(Message):
-    def __init__(self, MouseButtonId = 0, HierarchyPath = None, CameraHierarchyPath = None, IsDoubleClick = False, FrameCount = 5):
+    def __init__(self, MouseButtonId, HierarchyPath, CameraHierarchyPath = None, IsDoubleClick = False, FrameCount = 5):
+        # Required fields
         self.MouseButtonId = MouseButtonId
-        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+        self.HierarchyPath = HierarchyPath
         self.CameraHierarchyPath = '' if CameraHierarchyPath == None else CameraHierarchyPath
         self.IsDoubleClick = IsDoubleClick
         self.FrameCount = FrameCount
@@ -485,17 +489,40 @@ class Cmd_WaitForObjectRequest(Message):
     def __init__(self, Timeout = 30, HierarchyPath = None):
         self.Timeout = Timeout
         self.HierarchyPath = HierarchyPath if HierarchyPath else ''
+        
+
+class Cmd_WaitForObjectResponse(Cmd_GenericResponse):
+    def __init__(self,
+            StackTrace = None,
+            ErrorMessage = None,
+            InformationMessage = None,
+            WarningMessage = None,
+            RC = None,
+            ReturnedValues = None,
+
+            ObjectResolutionResult = Enums.OBJECT_RESOLUTION.OBJECT_NOT_FOUND
+        ):
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+
+        self.ObjectResolutionResult = ObjectResolutionResult
 
 
 class Cmd_WaitForObjectValueRequest(Message):
     def __init__(self, Timeout = 30, HierarchyPath = None, ObjectFieldOrPropertyName = None, Value = None, CustomSerialization = False, SerializedObjectType = None, Serializer = None):
+        # Required fields
         self.Timeout = Timeout
         self.HierarchyPath = HierarchyPath if HierarchyPath else ''
         self.ObjectFieldOrPropertyName = ObjectFieldOrPropertyName if ObjectFieldOrPropertyName else ''
-        self.Value = Value
-        self.CustomSerialization = CustomSerialization
-        self.SerializedObjectType = SerializedObjectType
-        self.Serializer = Serializer
+        
+        # Conditional fields
+        if Value:
+            self.Value = Value
+        if CustomSerialization:
+            self.CustomSerialization = CustomSerialization
+        if SerializedObjectType:
+            self.SerializedObjectType = SerializedObjectType
+        if Serializer:
+            self.Serializer = Serializer
 
 
 
