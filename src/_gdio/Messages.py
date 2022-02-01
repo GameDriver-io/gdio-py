@@ -524,6 +524,16 @@ class Cmd_WaitForObjectValueRequest(Message):
         if Serializer:
             self.Serializer = Serializer
 
+    def SetValue(self, value):
+        self.CustomSerialization = False
+        self.Value = value
+
+    def SetCustomValue(self, value, serializer):
+        self.SerializedObjectType = type(value)
+        self.Serializer = serializer.GetType()
+        self.CustomSerialization = True
+        self.Value = serializer.pack(value)
+
 
 
 

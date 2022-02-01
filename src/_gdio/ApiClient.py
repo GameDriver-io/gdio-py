@@ -2029,7 +2029,7 @@ class ApiClient:
                 WaitForObject = waitForObject
             )
         )
-        requestInfo = await asyncio.wait_for(self.client.SendMessage(request), timeout)
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
