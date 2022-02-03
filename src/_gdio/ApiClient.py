@@ -1,6 +1,6 @@
-from _gdio import Serializers
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
+from _gdio import Serializers
 
 from functools import wraps
 
