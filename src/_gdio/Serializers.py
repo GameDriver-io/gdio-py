@@ -6,10 +6,10 @@ def IsBuiltin(obj):
     return obj.__class__.__module__ == 'builtins'
 
 class CustomSerializer:
-    def Serialize(self, obj):
+    def Pack(self, obj):
         raise NotImplementedError
 
-    def Deserialize(self, obj):
+    def Unpack(self, obj):
         raise NotImplementedError
 
 def msgSerialize(obj):

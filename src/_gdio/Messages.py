@@ -4,6 +4,8 @@ from . import Serializers
 from . import ProtocolObjects
 from . import Enums
 
+# TODO: Dataclasses
+
 CmdIds = {
     "Cmd_ChangeObjectResolverCacheStateRequest" : 47,
     "Cmd_GetSceneNameRequest" : 27,
@@ -112,6 +114,8 @@ class Cmd_CallMethodRequest(Message):
             MethodName : str = None,
             Arguments : list = None,
             Arguments2 : list = None,
+
+            # I dont think this will ever work cross-language
             _serializer : Serializers.CustomSerializer = None
         ):
         # Required fields
@@ -137,11 +141,11 @@ class Cmd_CallMethodRequest(Message):
             return
         for argument in arguments:
             if not Serializers.IsBuiltin(argument):
-                raise NotImplementedError(f'{argument} is not a builtin type. Custom type serialization is not supported yet.')
+                #raise NotImplementedError(f'{argument} is not a builtin type. Custom type serialization is not supported yet.')
                 if (customSerializer == None):
                     raise Exception(f'CustomSerializer is not defined for type: {type(arguments[0])}')
                     
-                serializedObjectData = customSerializer.Serialize(arguments[0])
+                serializedObjectData = customSerializer.Pack(arguments[0])
 
             else:
                 nonSerializedObject = argument
@@ -149,7 +153,7 @@ class Cmd_CallMethodRequest(Message):
             self.Arguments.append(ProtocolObjects.SerializedObject(
                 SerializedObjectType = type(argument),
                 SerializedObjectData = serializedObjectData,
-                NonSerializedObject = nonSerializedObject
+                NonSerializedObject = nonSerializedObject 
             ).pack())
 
 

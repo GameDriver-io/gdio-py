@@ -1,3 +1,4 @@
+from _gdio import Serializers
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
 
@@ -44,12 +45,12 @@ class ApiClient:
 
             hostname           : str = '127.0.0.1', # The hostname of the device running the target game.
             port               : int = 19734,       # The port that the target Gamedriver agent is configured to use.
-            autoplay           : bool = False,      # TODO: Start the game automatically within the Unity Editor.
+            autoplay           : bool = False,      # Start the game automatically within the Unity Editor.
             connectionTimeout  : int = 30,          # The number of seconds to wait for the command to be recieved by the agent.
             autoPortResolution : bool = True,       # TODO: Automatically resolve the port a Gamedriver Agent is running on.
 
             debug : bool = False,
-            customSerializers : list = None
+            customSerializer : Serializers.CustomSerializer = None
         ):
 
         self.hostname = hostname
@@ -73,7 +74,7 @@ class ApiClient:
 
             logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename=log_file_path, filemode='w')
 
-        self.CustomSerializers = customSerializers
+        self.CustomSerializers = customSerializer
 
     @requireClientConnectionAsync
     async def AxisPress(self,
@@ -200,7 +201,7 @@ class ApiClient:
         )
 
         if arguments:
-            msg.GDIOMsg.SetArguments(arguments)
+            msg.GDIOMsg.SetArguments(arguments, self.CustomSerializer)
 
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         cmd_GetObjectValueResponse : Messages.Cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
@@ -253,7 +254,7 @@ class ApiClient:
         if cmd_CaptureScreenshotResponse.RC == Enums.ResponseCode.ERROR:
             raise Exception(cmd_CaptureScreenshotResponse.ErrorMessage)
 
-        # TODO: Im not sure this works properly
+        # TODO: Im not sure if this works properly
         if storeInGameFolder:
             return cmd_CaptureScreenshotResponse.ImagePath
 
