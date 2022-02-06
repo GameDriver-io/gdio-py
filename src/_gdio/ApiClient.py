@@ -1,3 +1,4 @@
+from re import M
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
 from _gdio import Serializers
@@ -74,7 +75,7 @@ class ApiClient:
 
             logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename=log_file_path, filemode='w')
 
-        self.CustomSerializers = customSerializer
+        self.CustomSerializer = customSerializer
 
     @requireClientConnectionAsync
     async def AxisPress(self,
@@ -2038,7 +2039,14 @@ class ApiClient:
         return True
 
     @requireClientConnectionAsync
-    async def SetObjectFieldValue() -> bool:
+    async def SetObjectFieldValue(
+            self,
+            hierarchyPath : str,
+            fieldName : str,
+            value : object,
+            waitForObject : bool = True,
+            timeout : int = 30
+        ) -> bool:
         '''
         <summary> (**Not Implemented**) Sets the value of an object field. </summary>
 
@@ -2049,8 +2057,37 @@ class ApiClient:
         # TODO
         ```
         '''
-        # TODO: Big one
-        raise NotImplementedError
+
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_SetObjectValueRequest(
+                HierarchyPath = hierarchyPath,
+                ObjectFieldOrPropertyName = fieldName,
+                WaitForObject = waitForObject,
+                Timeout = timeout,
+            )
+        )
+
+        # setting the serialized value
+        if Serializers.IsBuiltin(value):
+            msg.GDIOMsg.SerializedObjectType = type (value)
+            msg.GDIOMsg.Value = msgpack.pack(value)
+            msg.GDIOMsg.CustomSerialization = False
+            
+        # Custom serialization
+        else:
+            msg.GDIOMsg.SerializedObjectType = type (value)
+            msg.GDIOMsg.Value = self.CustomSerializer.Pack(value)
+            msg.GDIOMsg.CustomSerialization = True
+
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        response = await self.client.GetResult(requestInfo.RequestId)
+
+        if response.RC != Enums.ResponseCode.OK:
+            raise Exception(response.ErrorMessage)
+
+        return True
+
 
     @requireClientConnectionAsync
     async def Tap_XY(self,
@@ -2483,13 +2520,6 @@ class ApiClient:
         ```
         </example>
         '''
-        raise NotImplementedError
-
-        packed = None
-
-        typecode = Enums.CSTypeFullName[value.__class__.__name__]
-        if typecode == 'System.Object':
-            packed = msgpack.packb(value)
 
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
@@ -2501,22 +2531,20 @@ class ApiClient:
         )
 
         # This series of conditionals doesnt really make sense yet
-        if packed:
+        if Serializers.IsBuiltin(value):
             msg.GDIOMsg.SerializedObjectType = value.__class__
-            msg.GDIOMsg.Value = packed
+            msg.GDIOMsg.Value = msgpack.packb(value)
+            msg.GDIOMsg.CustomSerialization = False
+
+        else:
+            msg.GDIOMsg.SerializedObjectType = value.__class__
+            msg.GDIOMsg.Value = self.CustomSerializer.Pack(value)
             msg.GDIOMsg.CustomSerialization = True
 
-        elif typecode == 'System.Object':
-            serializer = None
+        requestInfo : Messages.RequestInfo = await self.client.SendMessage(msg)
+        cmd_WaitForObjectValueResponse : Messages.Cmd_WaitForObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
 
-            msg.GDIOMsg.CustomSerialization = True
-        # TODO: Messages.Cmd_WaitForObjectValueRequest.SetValue(value)
+        if cmd_WaitForObjectValueResponse.RC == Enums.ResponseCode.OK and cmd_WaitForObjectValueResponse.ObjectResolutionResult == Enums.OBJECT_RESOLUTION.OBJECT_FOUND:
+            return True
 
-        
-
-
-    def _cleanup(self):
-        '''
-        <summary> Cleans up the API client. </summary>
-        '''
-        pass
+        return False
