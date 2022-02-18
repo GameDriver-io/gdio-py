@@ -83,7 +83,7 @@ class ApiClient:
             value          : float,    # The value of change on the target axis from -1.0 to +1.0.
             numberOfFrames : int,      # The number of frames to hold the input for.
             timeout        : int = 30  # The number of seconds to wait for the command to be processed by the agent.
-        ) -> bool:
+        ):
         '''
         <summary> Send arbitrary axis states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND) </summary>
         <param name="axisId" type="str"> The name of the target input axis as defined in the Unity Input Manager (Old). </param>
@@ -91,12 +91,10 @@ class ApiClient:
         <param name="numberOfFrames" type="int"> The number of frames to hold the input for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
-
         <example>
         ```python
         # Move the horizontal axis to the right for 100 frames.
-        await api.AxisPress(axisId='Horizontal', value=1.0, numberOfFrames=100)
+        await api.AxisPress(axisId="Horizontal", value=1.0, numberOfFrames=100)
         ```
         </example>
         '''
@@ -117,14 +115,12 @@ class ApiClient:
         if cmd_GenericResponse.RC == Enums.ResponseCode.ERROR:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return (cmd_GenericResponse.RC == Enums.ResponseCode.OK)
-
     @requireClientConnectionAsync
     async def ButtonPress(self,
-            buttonId       : str,      # The name of the target input button as defined in the Unity Input Manager.
-            numberOfFrames : int,      # The number of frames to hold the input for.
-            timeout        : int = 30  # The number of seconds to wait for the command to be processed by the agent.
-        ) -> bool:
+            buttonId       : str,
+            numberOfFrames : int,
+            timeout        : int = 30
+        ):
         '''
         <summary> Send arbitrary button states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND) </summary>
 
@@ -132,12 +128,10 @@ class ApiClient:
         <param name="numberOfFrames" type="int"> The number of frames to hold the input for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
-
         <example>
         ```python
         # Press the Jump button for 100 frames.
-        await api.ButtonPress(buttonId='Jump', numberOfFrames=100)
+        await api.ButtonPress(buttonId="Jump", numberOfFrames=100)
         ```
         </example>
         '''
@@ -157,15 +151,13 @@ class ApiClient:
         if cmd_GenericResponse.RC == Enums.ResponseCode.ERROR:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return (cmd_GenericResponse.RC == Enums.ResponseCode.OK)
-
     ## Return value overload
     @requireClientConnectionAsync
     async def CallMethod(self,
-            hierarchyPath : str,      # The HierarchyPath for an object and the script attached to it.
-            methodName    : str,      # The name of the method to call within the script.
-            arguments     : list = None,     # TODO: The list of arguments to pass into the method.
-            timeout       : int = 30, # The number of seconds to wait for the command to be processed by the agent.
+            hierarchyPath : str,
+            methodName    : str,
+            arguments     : list = None,
+            timeout       : int = 30,
         ) -> type:
         '''
         <summary> Execute a method on an object </summary>
@@ -175,7 +167,7 @@ class ApiClient:
         <param name="arguments" type="list[any]"> The list of arguments to pass into the method. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> The return value of the target method of type `t`. </returns>
+        <returns value="bool"> The return value of the method. </returns>
 
         <example>
         ```python
@@ -211,10 +203,10 @@ class ApiClient:
 
     @requireClientConnectionAsync
     async def CaptureScreenshot(self,
-            filename          : str,          # The path and filename of the screen capture.
-            storeInGameFolder : bool = False, # Save the screenshot on the device the game is running on rather than returning it to the client.
-            overwriteExisting : bool = False, # Overwrite if the file already exists.
-            timeout           : int = 30,     # The number of seconds to wait for the command to be processed by the agent.
+            filename          : str,
+            storeInGameFolder : bool = False,
+            overwriteExisting : bool = False,
+            timeout           : int = 30,
         ) -> str:
         '''
         <summary> Capture a screenshot of the currently running game. </summary>
@@ -228,7 +220,7 @@ class ApiClient:
 
         <example>
         ```python
-        await api.CaptureScreenshot(filename='/path/to/file/screenshot.png')
+        await api.CaptureScreenshot(filename="/path/to/file/screenshot.png")
         ```
         </example>
         '''
@@ -262,12 +254,12 @@ class ApiClient:
     ## Float positions overload
     @requireClientConnectionAsync
     async def Click_XY(self,
-            buttonId        : Enums.MouseButtons, # The button to click.
-            x               : float,              # The x position in screen coordinates at which to click.
-            y               : float,              # The y position in screen coordinates at which to click.
-            clickFrameCount : int,                # The number of frames to click for.
-            timeout         : int = 30            # The number of seconds to wait for the command to be processed by the agent.
-        ) -> bool:
+            buttonId        : Enums.MouseButtons,
+            x               : float,
+            y               : float,
+            clickFrameCount : int,
+            timeout         : int = 30
+        ):
         '''
         <summary> Clicks a mouse button at the target coordinates. </summary>
 
@@ -276,8 +268,6 @@ class ApiClient:
         <param name="y" type="float"> The y position in screen coordinates at which to click. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
 
         <example>
         ```python
@@ -300,28 +290,24 @@ class ApiClient:
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
-
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
 
     ## Vector2 positions overload
     # TODO: Can probably combine this with the XY overload
     @requireClientConnectionAsync
     async def Click_Vec2(self,
-            buttonId        : Enums.MouseButtons,      # The button to click.
-            position        : ProtocolObjects.Vector2, # The position in screen coordinates at which to click.
-            clickFrameCount : int,                     # The number of frames to click for.
-            timeout         : int = 30                 # The number of seconds to wait for the command to be processed by the agent.
-        ) -> bool:
+            buttonId        : Enums.MouseButtons,
+            position        : ProtocolObjects.Vector2,
+            clickFrameCount : int,
+            timeout         : int = 30
+        ):
         '''
         <summary> Clicks a mouse button at the target coordinates. </summary>
 
         <param name="buttonId" type="MouseButtons"> The button to click. </param>
-        <param name="position" type="ProtocolObjects.Vector2"> The position in screen coordinates at which to click. </param>
+        <param name="position" type="Vector2"> The position in screen coordinates at which to click. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
 
         <example>
         ```python
@@ -330,22 +316,22 @@ class ApiClient:
         ```
         </example>
         '''
-        return await self.Click_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
+        await self.Click_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
 
     ## Float positions overload
     @requireClientConnectionAsync
     async def ClickEx_XY(self,
-            buttonId                : Enums.MouseButtons, # The button to click.
-            x                       : float,              # The x position in screen coordinates at which to click.
-            y                       : float,              # The y position in screen coordinates at which to click.
-            clickFrameCount         : int,                # The number of frames to click for.
-            keys                    : list = None,        # The list of keys to press while clicking.
-            keysNumberOfFrames      : int = 5,            # The number of frames to hold the keys for.
-            modifiers               : list = None,        # The list of modifier keys to press while clicking.
-            modifiersNumberOfFrames : int = 3,            # The number of frames to hold the modifier keys for.
-            delayAfterModifiersMsec : int = 500,          # The number of milliseconds to wait after pressing the modifiers before clicking the keys.
-            timeout                 : int = 30            # The number of seconds to wait for the command to be processed by the agent.
-        ) -> bool:
+            buttonId                : Enums.MouseButtons,
+            x                       : float,
+            y                       : float,
+            clickFrameCount         : int,
+            keys                    : list = None,
+            keysNumberOfFrames      : int = 5,
+            modifiers               : list = None,
+            modifiersNumberOfFrames : int = 3,
+            delayAfterModifiersMsec : int = 500,
+            timeout                 : int = 30
+        ):
         '''
         <summary> Clicks a mouse button at the target coordinates along with keypresses. </summary>
 
@@ -359,8 +345,6 @@ class ApiClient:
         <param name="modifiersNumberOfFrames" type="int"> The number of frames to hold the modifier keys for. </param>
         <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers before clicking the keys. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
 
         <example>
         ```python
@@ -393,25 +377,23 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-
     ## Vector2 positions overload
     async def ClickEx_Vec2(self,
-            buttonId                : Enums.MouseButtons,      # The button to click.
-            position                : ProtocolObjects.Vector2, # The position in screen coordinates at which to click.
-            clickFrameCount         : int,                     # The number of frames to click for.
-            keys                    : list = None,             # The list of keys to press while clicking.
-            keysNumberOfFrames      : int = 5,                 # The number of frames to hold the keys for.
-            modifiers               : list = None,             # The list of modifier keys to press while clicking.
-            modifiersNumberOfFrames : int = 3,                 #  The number of frames to hold the modifier keys for.
-            delayAfterModifiersMsec : int = 500,               # The number of milliseconds to wait after pressing the modifiers before clicking the keys.
-            timeout                 : int = 30                 # The number of seconds to wait for the command to be processed by the agent.
-        ) -> bool:
+            buttonId                : Enums.MouseButtons,
+            position                : ProtocolObjects.Vector2,
+            clickFrameCount         : int,
+            keys                    : list = None,
+            keysNumberOfFrames      : int = 5,
+            modifiers               : list = None,
+            modifiersNumberOfFrames : int = 3,
+            delayAfterModifiersMsec : int = 500,
+            timeout                 : int = 30
+        ):
         '''
         <summary> Clicks a mouse button at the target coordinates along with keypresses. </summary>
 
         <param name="buttonId" type="MouseButtons"> The button to click. </param>
-        <param name="position" type="ProtocolObjects.Vector2"> The position in screen coordinates at which to click. </param>
+        <param name="position" type="Vector2"> The position in screen coordinates at which to click. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
         <param name="keys" type="list[KeyCode]"> The list of keys to press while clicking. </param>
         <param name="keysNumberOfFrames" type="int"> The number of frames to hold the keys for. </param>
@@ -420,8 +402,6 @@ class ApiClient:
         <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers before clicking the keys. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
-
         <example>
         ```python
         # Shift+Left click the screen at (100, 100) for 5 frames.
@@ -429,16 +409,16 @@ class ApiClient:
         ```
         </example>
         '''
-        return await self.ClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
+        await self.ClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
     
     @requireClientConnectionAsync
     async def ClickObject(self,
-            buttonId            : Enums.MouseButtons, # The button to click.
-            hierarchyPath       : str,                # The hierarchy path of the object to click.
-            frameCount          : int,                # The number of frames to click for.
-            cameraHierarchyPath : str = None,         # The hierarchy path of the camera to use.
+            buttonId            : Enums.MouseButtons,
+            hierarchyPath       : str,
+            frameCount          : int,
+            cameraHierarchyPath : str = None,
             timeout             : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Clicks a mouse button at the position of the target object. </summary>
 
@@ -447,8 +427,6 @@ class ApiClient:
         <param name="frameCount" type="int"> The number of frames to click for. </param>
         <param name="cameraHierarchyPath" type="str"> The hierarchy path of the camera to use to find the object. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
 
         <example>
         ```python
@@ -473,9 +451,6 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-
     @requireClientConnectionAsync
     async def ClickObjectEx(self,
             buttonId                : Enums.MouseButtons,
@@ -488,7 +463,7 @@ class ApiClient:
             modifiersNumberOfFrames : int = 3,
             delayAfterModifiersMsec : int = 500,
             timeout                 : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Clicks a mouse button at the position of the target object along with keypresses. </summary>
 
@@ -502,8 +477,6 @@ class ApiClient:
         <param name="modifiersNumberOfFrames" type="int"> The number of frames to hold the modifiers for. </param>
         <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
 
         <example>
         ```python
@@ -529,9 +502,6 @@ class ApiClient:
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
-
-
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
             
     async def Connect(self,
             hostname           : str = '127.0.0.1', # The hostname of the device running the target game.
@@ -539,8 +509,8 @@ class ApiClient:
             autoplay           : bool = False,      # Start the game automatically within the Unity Editor.
             timeout            : int = 30,          # The number of seconds to wait for the command to be processed by the agent.
 
-            reader : asyncio.StreamReader = None, # TEMP
-            writer : asyncio.StreamWriter = None, # TEMP
+            _reader : asyncio.StreamReader = None, # TEMP
+            _writer : asyncio.StreamWriter = None, # TEMP
         ) -> bool:
         '''
         <summary> Connects to an agent at the target hostname and port. </summary>
@@ -550,12 +520,12 @@ class ApiClient:
         <param name="autoplay" type="bool"> Start the game automatically within the Unity Editor. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if nothing went wrong while trying to connect; None otherwise </returns>
+        <returns value="bool"> True if nothing went wrong while trying to connect; Otherwise an exception is thown </returns>
 
         <example>
         ```python
         api = ApiClient()
-        if await api.Connect(hostname='localhost', port=19734):
+        if await api.Connect(hostname="localhost", port=19734):
             print("Connected!")
         ```
         </example>
@@ -574,7 +544,7 @@ class ApiClient:
                 UDPsend(hostname, AUTOPLAY_DEFAULT_PORT, 'agent|startplay')
 
             self.client = Client(hostname, port, timeout)
-            connected = await (self.client.Connect(internalComms=False, reader=reader, writer=writer))
+            connected = await (self.client.Connect(internalComms=False, reader=_reader, writer=_writer))
             if not connected:
                 raise Exception('Failed to connect to the game')
 
@@ -591,7 +561,7 @@ class ApiClient:
                 # save the connection details that the client recieved.
                 await asyncio.wait_for(self._WaitForConnectionDetails(), timeout)
 
-        # No exceptions thrown; return
+        # No exceptions thrown; return success.
         return True
 
     async def _WaitForConnectionDetails(self):
@@ -611,26 +581,24 @@ class ApiClient:
     '''
 
     @requireClientConnectionAsync
-    async def DisableHooks(self, hookingObject : Enums.HookingObject = Enums.HookingObject.ALL, timeout : int = 30) -> bool:
+    async def DisableHooks(self, hookingObject : Enums.HookingObject = Enums.HookingObject.ALL, timeout : int = 30):
         '''
         <summary> Disables the ability to preform the target input type from the ApiClient. </summary>
 
         <param name="HookingObject" type="str"> The input type to disable. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
-
         <example>
         ```python
         
         # Disable Mouse Hooks
-        await api.DisableHooks(HookingObject.MOUSE)
+        await api.DisableHooks(hookingObject=HookingObject.MOUSE)
 
         # Disable Gamepad Hooks
-        await api.DisableHooks(HookingObject.GAMEPAD)
+        await api.DisableHooks(hookingObject=HookingObject.GAMEPAD)
 
         # or just disable everything at once
-        await api.DisableHooks(HookingObject.ALL)
+        await api.DisableHooks(hookingObject=HookingObject.ALL)
         ```
         </example>
         '''
@@ -651,16 +619,12 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-
     @requireClientConnectionAsync
-    async def DisableObjectCaching(self, timeout : int = 30) -> bool:
+    async def DisableObjectCaching(self, timeout : int = 30):
         '''
         <summary> Disables object caching of objects for HierarchyPath resolution. </summary>
 
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
 
         <example>
         ```python
@@ -681,14 +645,9 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-
-    async def Disconnect(self) -> None:
+    async def Disconnect(self):
         '''
         <summary> Disconnects from the agent. </summary>
-
-        <returns value="None"> None. </returns>
 
         <example>
         ```python
@@ -714,7 +673,7 @@ class ApiClient:
             y : float,
             clickFrameCount : int,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Double-clicks a mouse button at the target coordinates. </summary>
 
@@ -724,12 +683,10 @@ class ApiClient:
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
-
         <example>
         ```python
         # Double-click the left mouse button at (500, 500)
-        await api.DoubleClick_XY(MouseButtons.LEFT, 500, 500, 5)
+        await api.DoubleClick_XY(buttonId=MouseButtons.LEFT, x=500, y=500, clickFrameCount=5)
         ```
         </example>
         '''
@@ -749,8 +706,6 @@ class ApiClient:
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
-
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     ## Vector2 positions overload
     async def DoubleClick_Vec2(self,
@@ -758,7 +713,7 @@ class ApiClient:
             position : ProtocolObjects.Vector2,
             clickFrameCount : int,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Double-clicks a mouse button at the target coordinates. </summary>
 
@@ -767,16 +722,14 @@ class ApiClient:
         <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> `True` if the command was sent successfully, `False` otherwise. </returns>
-
         <example>
         ```python
         # Double-click the left mouse button at (500, 500)
-        await api.DoubleClick_XY(MouseButtons.LEFT, (500, 500), 5)
+        await api.DoubleClick_XY(buttonId=MouseButtons.LEFT, position=(500, 500), clickFrameCount=5)
         ```
         </example>
         '''
-        return await self.DoubleClick_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
+        await self.DoubleClick_XY(buttonId, position.x, position.y, clickFrameCount, timeout)
 
     ## Float positions overload
     @requireClientConnectionAsync
@@ -791,7 +744,7 @@ class ApiClient:
             modifiersNumberOfFrames : int = 3,
             delayAfterModifiersMsec : int = 500,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Double-clicks the mouse at the target coordinates. </summary>
 
@@ -806,12 +759,10 @@ class ApiClient:
         <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
-
         <example>
         ```python
         # Double-click the left mouse button at (500, 500) while pressing Shift and Control
-        await api.DoubleClickEx_XY(MouseButtons.LEFT, 500, 500, 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, 500)
+        await api.DoubleClickEx_XY(buttonId=MouseButtons.LEFT, x=500, y=500, clickFrameCount=5, keys=[KeyCode.SHIFT, KeyCode.CONTROL], keysNumberOfFrames=5)
         ```
         </example>
         '''
@@ -834,8 +785,6 @@ class ApiClient:
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
-
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     ## Vector2 positions overload
     async def DoubleClickEx_Vec2(self,
@@ -848,12 +797,12 @@ class ApiClient:
             modifiersNumberOfFrames : int = 3,
             delayAfterModifiersMsec : int = 500,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Double-clicks the mouse at the target coordinates. </summary>
 
         <param name="buttonId" type="MouseButtons"> The button to click. </param>
-        <param name="position" type="ProtocolObjects.Vector2"> The position to click at. </param>
+        <param name="position" type="Vector2"> The position to click at. </param>
         <param name="clickFrameCount" type="int"> The number of frames to click. </param>
         <param name="keys" type="list"> The list of keys to press. </param>
         <param name="keysNumberOfFrames" type="int"> The number of frames to press the keys. </param>
@@ -862,16 +811,14 @@ class ApiClient:
         <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
-
         <example>
         ```python
         # Double-click the left mouse button at (500, 500) while pressing Shift and Control
-        await api.DoubleClickEx_Vec2(MouseButtons.LEFT, ProtocolObjects.Vector2(500, 500), 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, 500)
+        await api.DoubleClickEx_Vec2(buttonId=MouseButtons.LEFT, position=Vector2(500, 500), clickFrameCount=5, keys=[KeyCode.SHIFT, KeyCode.CONTROL], keysNumberOfFrames=5)
         ```
         </example>
         '''
-        return await self.DoubleClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
+        await self.DoubleClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
 
     ## Float positions overload
     @requireClientConnectionAsync
@@ -880,7 +827,7 @@ class ApiClient:
             hierarchyPath : str,
             frameCount : int,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Double-clicks the mouse at the target coordinates. </summary>
 
@@ -889,12 +836,10 @@ class ApiClient:
         <param name="frameCount" type="int"> The number of frames to click. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
-
         <example>
         ```python
         # Double-click the position of the `Player` object
-        await api.DoubleClickObject(MouseButtons.LEFT, "//*[@name='Player']", 5)
+        await api.DoubleClickObject(buttonId=MouseButtons.LEFT, hierarchyPath="//*[@name='Player']", 5)
         ```
         </example>
         '''
@@ -914,8 +859,6 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-
     @requireClientConnectionAsync
     async def DoubleClickObjectEx(self,
             buttonId : Enums.MouseButtons,
@@ -927,7 +870,7 @@ class ApiClient:
             modifiersNumberOfFrames : int = 3,
             delayAfterModifiersMsec : int = 500,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Double-clicks the mouse at the target coordinates. </summary>
 
@@ -941,12 +884,10 @@ class ApiClient:
         <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
-
         <example>
         ```python
         # Double-click the position of the `Player` object while pressing Shift and Control
-        await api.DoubleClickObjectEx(MouseButtons.LEFT, "//*[@name='Player']", 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, [KeyCode.SHIFT, KeyCode.CONTROL], 5, 500)
+        await api.DoubleClickObjectEx(buttonId=MouseButtons.LEFT, hierarchyPath="//*[@name='Player']", clickFrameCount=5, keys=[KeyCode.SHIFT, KeyCode.CONTROL], keysNumberOfFrames=5)
         ```
         </example>
         '''
@@ -968,17 +909,13 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-
     @requireClientConnectionAsync
-    async def EnableHooks(self, hookingObject : Enums.HookingObject = Enums.HookingObject.ALL, timeout : int = 30) -> bool:
+    async def EnableHooks(self, hookingObject : Enums.HookingObject = Enums.HookingObject.ALL, timeout : int = 30):
         '''
         <summary> Enables the given hooking object. </summary>
 
         <param name="hookingObject" type="HookingObject"> The hooking object to enable. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
 
         <example>
         ```python
@@ -986,13 +923,13 @@ class ApiClient:
         await api.Connect()
         
         # Enable Mouse Hooks
-        await api.EnableHooks(HookingObject.MOUSE)
+        await api.EnableHooks(hookingObject=HookingObject.MOUSE)
 
         # Enable Gamepad Hooks
-        await api.EnableHooks(HookingObject.GAMEPAD)
+        await api.EnableHooks(hookingObject=HookingObject.GAMEPAD)
 
         # or just enable everything at once
-        await api.EnableHooks(HookingObject.ALL)
+        await api.EnableHooks(hookingObject=HookingObject.ALL)
         ```
         </example>
         '''
@@ -1013,16 +950,12 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-
     @requireClientConnectionAsync
-    async def EnableObjectCaching(self, timeout : int = 30) -> bool:
+    async def EnableObjectCaching(self, timeout : int = 30):
         '''
         <summary> Enables caching of objects for hierarchyPath resolution. </summary>
 
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
 
         <example>
         ```python
@@ -1042,17 +975,13 @@ class ApiClient:
 
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
-
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
     
     @requireClientConnectionAsync
-    async def FlushObjectLookupCache(self, timeout : int = 30) -> bool:
+    async def FlushObjectLookupCache(self, timeout : int = 30):
         '''
         <summary> Flushes the object lookup cache. </summary>
 
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> True if the command was sent successfully, False otherwise. </returns>
 
         <example>
         ```python
@@ -1071,14 +1000,12 @@ class ApiClient:
         if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
-        return cmd_GenericResponse.RC == Enums.ResponseCode.OK
-
     @requireClientConnection
     def GetConnectedGameDetails(self) -> ProtocolObjects.GameConnectionDetails:
         '''
         <summary> Gets the details of the connected game. </summary>
 
-        <returns value="ProtocolObjects.GameConnectionDetails"> The details of the connected game. </returns>
+        <returns value="GameConnectionDetails"> The details of the connected game. </returns>
 
         <example>
         ```python
@@ -1090,7 +1017,7 @@ class ApiClient:
         return self.gameConnectionDetails
 
     @requireClientConnectionAsync
-    async def GetLastFPS(self, timeout=30) -> float:
+    async def GetLastFPS(self, timeout = 30) -> float:
         '''
         <summary> Gets the last reported FPS value. </summary>
 
@@ -1124,14 +1051,18 @@ class ApiClient:
         '''
         <summary> Gets the next collision event. </summary>
 
-        <returns value="ProtocolObjects.Collision"> The next collision event. </returns>
+        <returns value="Collision"> The next collision event. </returns>
 
         <example>
         ```python
-        # Get the next collision event that happens on the `player` object
-        id = await api.RegisterCollisionMonitor("//*[@name='Player']")
-        collision = await api.GetNextCollisionEvent(id)
-        print(collision)
+        # Begin recieving collision events that occur on the `Player` object
+        monitorid = await api.RegisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
+
+        # Get the next collision event that occurs on the `Player` object
+        collision = await api.GetNextCollisionEvent(eventId=monitorid)
+
+        # Stop recieving collision events on the `Player` object
+        await api.UnregisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
         ```
         </example>
         '''
@@ -1157,7 +1088,7 @@ class ApiClient:
 
         <example>
         ```python
-        distance = await api.GetObjectDistance("//*[@name='ObjectA']", "//*[@name='ObjectB']")
+        distance = await api.GetObjectDistance(objectA_HierarchyPath="//*[@name='ObjectA']", objectB_HierarchyPath="//*[@name='ObjectB']")
         print(distance)
         ```
         </example>
@@ -1179,7 +1110,7 @@ class ApiClient:
         if cmd_GetObjectValueResponse.Value is not None:
             return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
         else:
-            # TODO: More pedantic return value
+            # TODO: More pedantic return value; something like float-min
             return None
 
     @requireClientConnectionAsync
@@ -1200,7 +1131,7 @@ class ApiClient:
         <example>
         ```python
         # Check to see if the `Player` object is active in the scene
-        value = await api.GetObjectFieldValue(bool, "//Player[@name='Player']/@active")
+        value = await api.GetObjectFieldValue(t=bool, hierachyPath="//Player[@name='Player']/@active")
         print(value)
         ```
         </example>
@@ -1241,7 +1172,7 @@ class ApiClient:
         <example>
         ```python
         # Check to see if the `Player` object is active in the scene
-        value = await api.GetObjectFieldValueByName('//*[@name='Player']', 'active')
+        value = await api.GetObjectFieldValueByName(hierarchyPath="//*[@name='Player']", fieldName="active")
         print(value)
         ```
         </example>
@@ -1270,7 +1201,7 @@ class ApiClient:
 
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
+        <returns value="list"> The list of objects in the scene. </returns>
 
         <example>
         ```python
@@ -1307,12 +1238,12 @@ class ApiClient:
         <param name="cameraHierarchyPath" type="str"> The hierarchy path of the camera to use. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="ProtocolObjects.Vector3"> The position of the object. </returns>
+        <returns value="Vector3"> The position of the object. </returns>
 
         <example>
         ```python
         # Get the position of the `Player` object in screen space
-        position = await api.GetObjectPosition("//*[@name='Player']", CoordinateConversion.SCREEN_SPACE)
+        position = await api.GetObjectPosition(hierarchyPath="//*[@name='Player']", coordSpace=CoordinateConversion.SCREEN_SPACE)
         print(position)
         ```
         </example>
@@ -1343,7 +1274,7 @@ class ApiClient:
 
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
+        <returns value="str"> The name of the active scene. </returns>
 
         <example>
         ```python
@@ -1390,7 +1321,7 @@ class ApiClient:
             modifiersNumberOfFrames : int = 3,
             delayAfterModifiersMsec : int = 500,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Presses a key. </summary>
 
@@ -1401,11 +1332,9 @@ class ApiClient:
         <param name="delayAfterModifiersMsec" type="int"> The delay after pressing the modifiers. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
-        await api.KeyPress([KeyCode.A, KeyCode.B, KeyCode.C], 10)
+        await api.KeyPress(keys=[KeyCode.A, KeyCode.B, KeyCode.C], numberOfFrames=10)
         ```
         </example>
         '''
@@ -1429,9 +1358,6 @@ class ApiClient:
         )
         keysRequestInfo = await asyncio.wait_for(self.client.SendMessage(keysMessage), timeout)
 
-        # No exceptions thrown; return True
-        return True
-
     def Launch(self, filepath : str, arguments : str = None):
         '''
         <summary> Launches an executable. </summary>
@@ -1443,7 +1369,7 @@ class ApiClient:
 
         <example>
         ```python
-        game_process = api.Launch("/path/to/executable.exe", "arg1 arg2")
+        game_process = api.Launch(filepath="/path/to/executable.exe", arguments="arg1 arg2")
 
         api.TerminateGame(game_process)
         ```
@@ -1457,18 +1383,16 @@ class ApiClient:
         return proc
 
     @requireClientConnectionAsync
-    async def LoadScene(self, sceneName : str, timeout : int = 30) -> bool:
+    async def LoadScene(self, sceneName : str, timeout : int = 30):
         '''
         <summary> Loads a scene by name. </summary>
 
         <param name="sceneName" type="str"> The name of the scene to load. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
-        await api.LoadScene('SceneA')
+        await api.LoadScene(sceneName="SceneA")
         ```
         </example>
         '''
@@ -1482,8 +1406,6 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         response = await self.client.GetResult(requestInfo.RequestId)
         
-        return True
-
     def _VerifyEditorInstance(self, hostname : str, timeout = 30) -> list:
         '''
 
@@ -1526,12 +1448,10 @@ class ApiClient:
         <param name="waitForEmptyInput" type="bool"> Whether or not to wait for the mouse to be empty before continuing. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
         # Drag the mouse to (10, 10) over the next 100 frames
-        await api.MouseDrag(MouseButtons.Left, 10, 10, 100)
+        await api.MouseDrag(button=MouseButtons.Left, dx=10, dy=10, frameCount=100)
         ```
         </example>
         '''
@@ -1551,8 +1471,6 @@ class ApiClient:
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
-        return True
-
     @requireClientConnectionAsync
     async def MouseMoveToObject(self,
             objectHierarchyPath : str,
@@ -1570,12 +1488,10 @@ class ApiClient:
         <param name="waitForEmptyInput" type="bool"> Whether or not to wait for the mouse to be empty before continuing. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
         # Move the mouse to the object 'Box' over the next 100 frames
-        await api.MouseMoveToObject("//*[@name='Box']", 100)
+        await api.MouseMoveToObject(objectHierarchyPath="//*[@name='Box']", frameCount=100)
         ```
         </example>
         '''
@@ -1594,8 +1510,6 @@ class ApiClient:
             self.WaitForEmptyInput(timeout)
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
-
-        return True
 
     @requireClientConnectionAsync
     async def MouseMoveToPoint(self,
@@ -1618,12 +1532,10 @@ class ApiClient:
         <param name="waitForEmptyInput" type="bool"> Whether or not to wait for the mouse to be empty before continuing. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
         # Move the mouse to (10, 10) over the next 100 frames
-        await api.MouseMoveToPoint(10, 10, 100)
+        await api.MouseMoveToPoint(dx=10, dy=10, frameCount=100)
         ```
         </example>
         '''
@@ -1641,8 +1553,6 @@ class ApiClient:
             self.WaitForEmptyInput(timeout)
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
-
-        return True
 
     @requireClientConnectionAsync
     async def NavAgentMoveToPoint(self,
@@ -1666,7 +1576,7 @@ class ApiClient:
         <example>
         ```python
         # Move the nav agent to (100, 100)
-        await api.NavAgentMoveToPoint("//*[@name='Agent']", 100, 100)
+        await api.NavAgentMoveToPoint(navAgent_HierarchyPath="//*[@name='Agent']", dx=100, dy=100)
         ```
         </example>
         '''
@@ -1694,7 +1604,7 @@ class ApiClient:
         '''
         <summary> Perform a Raycast to a point to find out what is in that position. </summary>
 
-        <param name="raycastPoint" type="ProtocolObjects.Vector3"> The raycast point. </param>
+        <param name="raycastPoint" type="Vector3"> The raycast point. </param>
         <param name="cameraHierarchyPath" type="str"> The hierarchy path of the camera to use for the raycast. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
@@ -1702,8 +1612,8 @@ class ApiClient:
 
         <example>
         ```python
-        raycastPoint = ProtocolObjects.Vector3(100, 100, 100)
-        raycastResults = await api.Raycast(raycastPoint)
+        point = Vector3(100, 100, 100)
+        raycastResults = await api.Raycast(raycastPoint=point)
         ```
         </example>
         '''
@@ -1725,34 +1635,34 @@ class ApiClient:
 
     @requireClientConnectionAsync
     async def RegisterCollisionMonitor(self,
-            HierarchyPath : str,
+            hierarchyPath : str,
             timeout : int = 30    
-        ):
+        ) -> str:
         '''
         <summary> Registers a collision monitor to recieve collision events on an object. </summary>
 
-        <param name="HierarchyPath" type="str"> The hierarchy path of the object to monitor. </param>
+        <param name="hierarchyPath" type="str"> The hierarchy path of the object to monitor. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> The Id of the collision monitor </returns>
+        <returns value="str"> The Id of the collision monitor </returns>
 
         <example>
         ```python
         # Begin recieving collision events that occur on the `Player` object
-        monitorid = await api.RegisterCollisionMonitor("//*[@name='Player']")
+        monitorid = await api.RegisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
 
         # Wait for a collision event
-        await api.WaitForCollisionEvent(monitorid)
+        collision = await api.WaitForCollisionEvent(eventId=monitorid)
 
         # Stop recieving collision events on the `Player` object
-        await api.UnregisterCollisionMonitor("//*[@name='Player']")
+        await api.UnregisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
         ```
         </example>
         '''
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_RegisterCollisionMonitorRequest(
-                HierarchyPath = HierarchyPath
+                HierarchyPath = hierarchyPath
             )
         )
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -1773,16 +1683,14 @@ class ApiClient:
         <summary> Rotates an object using a quaternion. </summary>
 
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to rotate. </param>
-        <param name="quaternion" type="ProtocolObjects.Vector4"> The quaternion to rotate the object by. </param>
+        <param name="quaternion" type="Vector4"> The quaternion to rotate the object by. </param>
         <param name="waitForObject" type="bool"> Whether or not to wait for the object to rotate. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> True if successful, False otherwise. </returns>
 
         <example>
         ```python
         # Rotate the `box` object by a quaternion of (0, 0, 0, 1)
-        await api.RotateObject_Quaternion("//*[@name='Box']", Vector4(0, 0, 0, 1))
+        await api.RotateObject_Quaternion(hierarchyPath="//*[@name='Box']", quaternion=Vector4(0, 0, 0, 1))
         ```
         </example>
         '''
@@ -1792,7 +1700,7 @@ class ApiClient:
                 Timeout = timeout,
                 WaitForObject = waitForObject
         )
-        return await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
+        await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
 
     @requireClientConnectionAsync
     async def RotateObject_Euler(self,
@@ -1806,19 +1714,17 @@ class ApiClient:
         <summary> Rotates an object using euler angles. </summary>
 
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to rotate. </param>
-        <param name="euler" type="ProtocolObjects.Vector3"> The Euler angles to rotate the object by. </param>
+        <param name="euler" type="Vector3"> The Euler angles to rotate the object by. </param>
         <param name="relativeTo" type="Space"> The space to rotate the object in. </param>
         <param name="waitForObject" type="bool"> Whether or not to wait for the object to rotate. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> True if successful, False otherwise. </returns>
 
         <example>
         ```python
         # Rotate the `box` object by 10 degrees around the X axis
         # then rotate it by 20 degrees around the new relative Y axis
         # then rotate it by 30 degrees around the new relative Z axis
-        await api.RotateObject_Euler("//*[@name='Box']", ProtocolObjects.Vector3(10, 20, 30))
+        await api.RotateObject_Euler(hierarchyPath="//*[@name='Box']", euler=Vector3(10, 20, 30))
         ```
         </example>
         '''
@@ -1830,7 +1736,7 @@ class ApiClient:
             WaitForObject = waitForObject
         )
 
-        return await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
+        await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
 
     @requireClientConnectionAsync
     async def RotateObject_AxisAngle(self,
@@ -1853,12 +1759,10 @@ class ApiClient:
         <param name="waitForObject" type="bool"> Whether or not to wait for the object to rotate. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
         # Rotate the `box` object by 10 degrees around the X axis, 20 degrees around the Y axis, and 30 degrees around the Z axis
-        await api.RotateObject_AxisAngle("//*[@name='Box']", 10, 20, 30)
+        await api.RotateObject_AxisAngle(hierarchyPath="//*[@name='Box']", xAngle=10, yAngle=20, zAngle=30)
         ```
         </example>
         '''
@@ -1871,7 +1775,7 @@ class ApiClient:
             Timeout = timeout,
             WaitForObject = waitForObject
         )
-        return await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
+        await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
 
     @requireClientConnectionAsync
     async def _RotateObject(self,
@@ -1893,8 +1797,6 @@ class ApiClient:
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
-        return True
-
     @requireClientConnectionAsync
     async def SetInputFieldText(self,
             hierarchyPath : str,
@@ -1910,12 +1812,10 @@ class ApiClient:
         <param name="waitForObject" type="bool"> Whether or not to wait for the object to be set. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
         # Set the text of the `InputField` object to `Hello World`
-        await api.SetInputFieldText("//FilterInputTxt[@name='TextMeshPro InputField']", "Hello World")
+        await api.SetInputFieldText(hierarchyPath="//FilterInputTxt[@name='TextMeshPro InputField']", text="Hello World")
         ```
         </example>
         '''
@@ -1933,8 +1833,6 @@ class ApiClient:
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
-        return True
-
     @requireClientConnectionAsync
     async def SetObjectFieldValue(
             self,
@@ -1943,7 +1841,7 @@ class ApiClient:
             value : object,
             waitForObject : bool = True,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Set the field or property of an object. </summary>
 
@@ -1953,12 +1851,10 @@ class ApiClient:
         <param name="waitForObject" type="bool"> If True, wait for the object to exist if it doesn't. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
         # Set the `Text` field of the `TextMeshPro` object to `Hello World`
-        await api.SetObjectFieldValue("/Untagged[@name='Canvas']/FilterInputTxt[@name='TextMeshPro InputField']/fn:component('TMPro.TMP_InputField')", "text", "string:Hello World")
+        await api.SetObjectFieldValue(hierarchyPath="/Untagged[@name='Canvas']/FilterInputTxt[@name='TextMeshPro InputField']/fn:component('TMPro.TMP_InputField')", fieldName="text", value="string:Hello World")
         ```
         '''
 
@@ -1988,8 +1884,6 @@ class ApiClient:
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
-        return True
-
 
     @requireClientConnectionAsync
     async def Tap_XY(self,
@@ -1998,7 +1892,7 @@ class ApiClient:
             tapCount : int = 1,
             frameCount : int = 5,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Tap the handheld device at the target position. </summary>
 
@@ -2008,11 +1902,10 @@ class ApiClient:
         <param name="frameCount" type="int"> The number of frames to tap the object. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
-        await api.Tap_XY(100, 100)
+        # Tap the screen once at (100, 100)
+        await api.Tap_XY(x=100, y=100)
         ```
         </example>
         '''
@@ -2032,15 +1925,13 @@ class ApiClient:
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
-        return True
-
     @requireClientConnectionAsync
     async def Tap_Vec2(self,
             position : ProtocolObjects.Vector2,
             tapCount : int = 1,
             frameCount : int = 5,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Tap the handheld device at the target position. </summary>
 
@@ -2053,11 +1944,12 @@ class ApiClient:
 
         <example>
         ```python
-        await api.Tap_Vec2(Vector2(100, 100))
+        # Tap the screen once at (100, 100)
+        await api.Tap_Vec2(position=Vector2(100, 100))
         ```
         </example>
         '''
-        return await self.Tap_XY(position.X, position.Y, tapCount, frameCount, timeout)
+        await self.Tap_XY(position.X, position.Y, tapCount, frameCount, timeout)
 
     @requireClientConnectionAsync
     async def TapObject(self,
@@ -2066,7 +1958,7 @@ class ApiClient:
             frameCount : int = 5,
             cameraHierarchyPath : str = None,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Tap the handheld device at the target position. </summary>
 
@@ -2076,12 +1968,10 @@ class ApiClient:
         <param name="cameraHierarchyPath" type="str"> The hierarchy path of the camera to use when tapping. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
-        # Tap the `TextMeshPro InputField` object
-        await api.TapObject("//FilterInputTxt[@name='TextMeshPro InputField']")
+        # Tap the screen once at the position of the `TextMeshPro InputField` object
+        await api.TapObject(hierarchyPath="//FilterInputTxt[@name='TextMeshPro InputField']")
         ```
         </example>
         '''
@@ -2101,8 +1991,6 @@ class ApiClient:
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
-        return True
-
     @requireClientConnectionAsync
     async def TerminateGame(self, process):
         '''
@@ -2112,7 +2000,7 @@ class ApiClient:
         ```python
         game_process = api.Launch("/path/to/executable.exe", "arg1 arg2")
 
-        api.TerminateGame(game_process)
+        api.TerminateGame(process=game_process)
         ```
         </example>
         '''
@@ -2186,7 +2074,7 @@ class ApiClient:
             azmulthAngle : float = 0,
             maximumPossiblePressure : float = 1,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Touches an object. </summary>
 
@@ -2205,12 +2093,10 @@ class ApiClient:
         <param name="maximumPossiblePressure" type="float"> The maximum possible pressure of the touch. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
         # Performs a single touch input from 0,0 to 100, 100 with a single "finger" over a duration of 50 frames
-        await api.TouchInput(Vector2(0, 0), Vector2(100, 100), 0, 1, 50);
+        await api.TouchInput(x1=0, y1=0, x2=100, y2=100, fingerId=0, tapCount=1, frameCount=50)
         ```
         </example>
         '''
@@ -2236,32 +2122,28 @@ class ApiClient:
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
-        return True
-
     
     @requireClientConnectionAsync
     async def UnregisterCollisionMonitor(self,
             hierarchyPath : str,
             timeout : int = 30
-        ) -> bool:
+        ):
         '''
         <summary> Unregisters a collision monitor to stop recieving collision events on an object. </summary>
 
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to monitor. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
-
         <example>
         ```python
         # Begin recieving collision events that occur on the `Player` object
-        monitorid = await api.RegisterCollisionMonitor("//*[@name='Player']")
+        monitorid = await api.RegisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
 
         # Wait for a collision event
-        await api.WaitForCollisionEvent(monitorid)
+        collision = await api.WaitForCollisionEvent(eventId=monitorid)
 
         # Stop recieving collision events on the `Player` object
-        await api.UnregisterCollisionMonitor("//*[@name='Player']")
+        await api.UnregisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
         ```
         </example>
         '''
@@ -2273,8 +2155,6 @@ class ApiClient:
         if response.RC != Enums.ResponseCode.OK:
             raise Exception(response.ErrorMessage)
 
-        return True
-
     async def Wait(self, miliseconds : int) -> None:
         '''
         <summary> Waits for a specified number of miliseconds. </summary>
@@ -2284,7 +2164,7 @@ class ApiClient:
         <example>
         ```python
         # Waits for 1 second
-        await api.Wait(1000)
+        await api.Wait(miliseconds=1000)
         ```
         </example>
         '''
@@ -2316,18 +2196,18 @@ class ApiClient:
         <param name="eventId" type="str"> The Id of the collision monitor to wait for an event from. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the event to be processed </param>
 
-        <returns value="ProtocolObjects.Collision"> The collision event message. </returns>
+        <returns value="Collision"> The collision event. </returns>
 
         <example>
         ```python
         # Begin recieving collision events that occur on the `Player` object
-        monitorid = await api.RegisterCollisionMonitor("//*[@name='Player']")
+        monitorid = await api.RegisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
 
         # Wait for a collision event
-        await api.WaitForCollisionEvent(monitorid)
+        await api.WaitForCollisionEvent(eventId=monitorid)
 
         # Stop recieving collision events on the `Player` object
-        await api.UnregisterCollisionMonitor("//*[@name='Player']")
+        await api.UnregisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
         ```
         </example>
         '''
@@ -2347,12 +2227,12 @@ class ApiClient:
         <param name="hierarchyPath" type="str"> The hierarchy path of the object to wait for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the object to exist. </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
+        <returns value="bool"> True if the object is found, False otherwise. </returns>
 
         <example>
         ```python
         # Waits for the `Key` object to exist
-        await api.WaitForObject('//*[@name='Key']')
+        await api.WaitForObject(hierarchyPath="//*[@name='Key']")
         ```
         </example>
         '''
@@ -2389,12 +2269,12 @@ class ApiClient:
         <param name="value" type="str"> The value to wait for. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the object to exist </param>
 
-        <returns value="bool"> True if successful, False otherwise. </returns>
+        <returns value="bool"> True if the object is found and has the specified value, False otherwise. </returns>
 
         <example>
         ```python
         # Waits for the `Button` object to exist and have a value of `True` for the `isPressed` property
-        await api.WaitForObject("//*[@name='Button']/fn:component('ButtonScript')", 'isPressed', True)
+        await api.WaitForObject(hierarchyPath="//*[@name='Button']/fn:component('ButtonScript')", fieldOrPropertyName="isPressed", value=True)
         ```
         </example>
         '''
