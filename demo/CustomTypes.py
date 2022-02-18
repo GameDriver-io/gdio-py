@@ -1,31 +1,26 @@
 from gdio.plugin import CustomSerializer
 import msgpack
 
-class Color:
+class CustomColor:
     def __init__(self, r, g, b, a) -> None:
-        self.r = r
-        self.g = g
-        self.b = b
-        self.a = a
+        self.m_R = r
+        self.m_g = g
+        self.m_b = b
+        self.m_a = a
 
 class Serializer(CustomSerializer):
 
-    @classmethod
-    def pack(cls, obj : Color):
-        if isinstance(obj, Color):
-            ret = {
-                'r': obj.r,
-                'g': obj.g,
-                'b': obj.b,
-                'a': obj.a
-            }
+    @staticmethod
+    def Pack(obj : CustomColor):
+        if isinstance(obj, CustomColor):
+            ret = f'CustomColor:{obj.m_R}|{obj.m_g}|{obj.m_b}|{obj.m_a}'
 
         return msgpack.packb(ret)
 
-    @classmethod
-    def unpack(cls, obj : Color):
+    @staticmethod
+    def Unpack(obj):
         unpacked = msgpack.unpackb(obj)
-        if isinstance(obj, Color):
-            ret = Color(unpacked['r'], unpacked['g'], unpacked['b'], unpacked['a'])
+        if '$CustomColor' in unpacked:
+            ret = CustomColor(unpacked['r'], unpacked['g'], unpacked['b'], unpacked['a'])
 
         return ret

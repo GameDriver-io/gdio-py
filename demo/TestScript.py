@@ -76,7 +76,9 @@ class TestFixture:
             event = await api.WaitForCollisionEvent(collision)
             print(event)
 
-            await api.UnregisterCollisionMonitor(collision)
+        await api.Wait(5000)
+        print("Unregistering")
+        await api.UnregisterCollisionMonitor(collision)
 
 
         
@@ -156,9 +158,9 @@ class TestFixture:
 
     async def test_customtypes(self):
 
-        from .CustomTypes import Color, Serializer
+        from CustomTypes import CustomColor, Serializer
         
-        api = ApiClient(debug=True, customSerializers=[Serializer])
+        api = ApiClient(debug=True, customSerializer=Serializer)
 
         isConnected = await api.Connect(autoplay=True)
 
@@ -169,7 +171,7 @@ class TestFixture:
 
         ## TEST
 
-        
+        await api.CallMethod("//*[@name='Player']/fn:component('TestScript')", "Log_Color", [CustomColor(1, 2, 3, 4)])
 
         ## /TEST
 
@@ -182,4 +184,4 @@ class TestFixture:
 if __name__ == '__main__':
     Game = TestFixture()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(Game.test_collisionmonitor())
+    loop.run_until_complete(Game.test_customtypes())

@@ -1,10 +1,8 @@
 from re import A
-#import msgpack
+
 from . import Serializers
 from . import ProtocolObjects
 from . import Enums
-
-# TODO: Dataclasses
 
 CmdIds = {
     "Cmd_ChangeObjectResolverCacheStateRequest" : 47,

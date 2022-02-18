@@ -202,6 +202,9 @@ class ApiClient:
         )
 
         if arguments:
+
+            if not Serializers.IsBuiltin(arguments):
+                raise NotImplementedError("Custom serializers are not yet supported for method calls.")
             msg.GDIOMsg.SetArguments(arguments, self.CustomSerializer)
 
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -737,7 +740,6 @@ class ApiClient:
             return
 
         ## TODO: CLEANUP
-        self._cleanup()
         self.gameConnectionDetails = None
 
         await self.client.Disconnect()
@@ -2068,13 +2070,11 @@ class ApiClient:
             )
         )
 
-        # setting the serialized value
         if Serializers.IsBuiltin(value):
             msg.GDIOMsg.SerializedObjectType = type (value)
             msg.GDIOMsg.Value = msgpack.pack(value)
             msg.GDIOMsg.CustomSerialization = False
             
-        # Custom serialization
         else:
             msg.GDIOMsg.SerializedObjectType = type (value)
             msg.GDIOMsg.Value = self.CustomSerializer.Pack(value)
