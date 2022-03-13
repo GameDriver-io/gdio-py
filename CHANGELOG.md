@@ -20,6 +20,9 @@ This version is preparing for the full inital release of the API.
    - This includes code examples that were incorrect. Wrote new ones.
 
 
+### Removed
+ - Removed `CallMethod_Void` because it was no different than `CallMethod` aside from return type.
+
 # 12-10-2021
 
 ### Added
