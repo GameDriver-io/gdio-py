@@ -1,29 +1,44 @@
-# ApiClient-py
- A Python implementation of the GameDriver Unity API
+# gdio-py
+Python bindings for the GameDriver Client API
 
- - [Installation](#Installation)
+ - [Quick Start](#Quick-Start)
  - [Changelog](CHANGELOG.md)
  - [API Reference](docs/ApiClient_Reference.md)
 
-## Installation
+## Quick Start
 
-Install the latest commit directly from the repository using:
+Install the latest commit directly from the repository by typing the following into a command line:
 ```bash
-pip install git+https://github.com/ethanavatar/gdio-py.git
+pip install git+https://github.com/GameDriver-io/gdio-py.git
 ```
 
-Alternatively, to make local changes without recompiling, you can clone the repository and install the package in editable (-e) mode.
-```bash
-git clone https://github.com/ethanavatar/gdio-py.git
-pip install -e gdio-py
-```
-This way, the module refers directly to the installed folder rather than the version in site-packages, and all changes made to the source are immediately usable.
-
-After either one of the above steps, the module and its members can be imported and used.
+Here is an example of how you can use the API with the [pytest](https://docs.pytest.org/en/latest/getting-started.html) framework:
 ```py
+import asyncio
+import pytest
+
 from gdio.api import ApiClient
 from gdio.common.objects import *
 
-api = ApiClient()
-...
+@pytest.fixture(scope="session")
+async def agent_connection():
+    # Create a new agent connection
+    api = ApiClient()
+    await api.Connect('localhost', 19734)
+
+    # Return the connection instance
+    yield api
+
+    # Close the connection when all tests are done
+    await api.Disconnect()
+
+async def test_1(agent_connection):
+    api = agent_connection
+    # Test some stuff
+    ...
+
+async def test_2(agent_connection):
+    api = agent_connection
+    # Test some more stuff
+    ...
 ```

@@ -1,8 +1,24 @@
 # Changelog
 
-## Upcoming
+# Upcoming
  - Fixing slight differences between this and the original API so that tests can be run in either version without changing timings
- - Custom types as arguments to `ApiClient.CallMethod` and `ApiClient.CallMethod_Void`
+ - A test suite for the API methods
+ - Publish to PyPi
+
+# 3-13-2022
+
+This version is preparing for the full inital release of the API.
+
+### Added
+ - Every method that wasn't working in the previous version.
+ - Basic support for custom type serialization.
+   - [`src/gdio/plugin.py`](src/gdio/plugin.py) that re-exports the CustomSerializer class.
+
+### Changed
+ - API documentation styling
+ - Rewrote entries for many methods that had incorrect documentation.
+   - This includes code examples that were incorrect. Wrote new ones.
+
 
 # 12-10-2021
 
@@ -21,7 +37,7 @@
 
 ### Changed
  - Changed many of the docstrings to be more accurately decriptive.
-   - This is being done actively because GitHub Copilot wrote them initially, and they were mostly wrong.
+   - This is being done actively because GitHub Copilot wrote them initially, and they were ~~mostly~~ all wrong.
 
 # 11-12-2021
 This version made progress on the rest of the client methods. Aside from around 15 of them, their functionality should be mostly complete. However, I have yet to test most of them. It also restuctures the oackage to be less cluttered; at least for the end user
