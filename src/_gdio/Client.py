@@ -94,8 +94,13 @@ class Client:
             if msg.GDIOMsg.IsError():
                 raise Exception(msg.GDIOMsg.ErrorMessage)
 
-        # If the message is not a generic response or there are no errors
-        logging.debug(f'[RECV] {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}:\n{json.dumps(msg.pack(), indent=4, default=Serializers.msgDeserialize)}')
+
+        if hasattr(msg.GDIOMsg, 'CorrelationId'):
+            # If the message is not a generic response or there are no errors
+            logging.debug(f'[RECV] {msg.GDIOMsg.GetName()} in response to {msg.CorrelationId}:\n{json.dumps(msg.pack(), indent=4, default=Serializers.msgDeserialize)}')
+
+        else:
+            logging.debug(f'[RECV] {msg.GDIOMsg.GetName()}:\n{json.dumps(msg.pack(), indent=4, default=Serializers.msgDeserialize)}')
 
         # If the handshake is not complete,
         if self._currentHandshakeState != Enums.HandshakeState.COMPLETE:
@@ -126,7 +131,7 @@ class Client:
         # If the message is an event
         if 'Evt_' in msg.GDIOMsg.GetName():
 
-            logging.debug(f'Recieved event {msg.GDIOMsg.GetName()} in response to {msg.GDIOMsg.CorrelationId}. Registering event...')
+            logging.debug(f'Recieved event {msg.GDIOMsg.GetName()}. Registering event...')
 
             # If the message is an empty input event,
             if isinstance(msg.GDIOMsg, Messages.Evt_EmptyInput):
