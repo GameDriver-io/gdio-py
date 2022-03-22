@@ -2183,7 +2183,7 @@ class ApiClient:
         ```
         </example>
         '''
-        await asyncio.wait_for(self.client.WaitForEmptyInput(datetime.datetime.now().timestamp()), timeout)
+        await asyncio.wait_for(self.client.WaitForEmptyInput(), timeout)
 
     @requireClientConnectionAsync
     async def WaitForCollisionEvent(self,

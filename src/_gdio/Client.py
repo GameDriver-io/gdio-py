@@ -33,6 +33,7 @@ class Client:
 
         self.Results : dict = {}
         self.LastEvent : dict = {}
+        self.LastInput = 0
 
         self.GCD = None
 
@@ -179,9 +180,12 @@ class Client:
     def SetEventTimestamp(self, eventType):
         self.LastEvent.update({eventType : datetime.datetime.now().timestamp()})
 
-    async def WaitForEmptyInput(self, timestamp):
+    def SetLastInputTimestamp(self):
+        self.LastInput = datetime.datetime.now().timestamp()
+
+    async def WaitForEmptyInput(self):
         logging.debug(f'Waiting for empty input...')
-        while (self.GetLastEventTimestamp(Messages.Evt_EmptyInput) >= timestamp) != True:
+        while (self.GetLastEventTimestamp(Messages.Evt_EmptyInput) >= self.LastInput) != True:
             await asyncio.sleep(0)
         return True
 
@@ -195,6 +199,9 @@ class Client:
     async def SendMessage(self, obj, writer=None):
 
         writer = self._writer if writer == None else writer
+
+        if obj.GDIOMsg.GetName() in ['Cmd_InputManagerStateRequest',]:
+            self.SetLastInputTimestamp()
 
         while obj.RequestId in self.EventHandlers:
             obj.RequestId = str(uuid.uuid4())
