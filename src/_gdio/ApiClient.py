@@ -1404,7 +1404,7 @@ class ApiClient:
         )
 
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        response = await self.client.GetResult(requestInfo.RequestId)
+        #response = await self.client.GetResult(requestInfo.RequestId)
         
     def _VerifyEditorInstance(self, hostname : str, timeout = 30) -> list:
         '''

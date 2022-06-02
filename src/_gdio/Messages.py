@@ -244,6 +244,12 @@ class Cmd_GetObjectListRequest(Message):
     def __init__(self):
         pass
 
+class Cmd_GetObjectListResponse(Cmd_GenericResponse):
+    def __init__(self, Objects : list, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+
+        self.Objects = Objects
+
 
 class Cmd_GetObjectPositionRequest(Message):
     def __init__(self, ObjectHierarchyPath = None, CameraHierarchyPath = None, SpaceConversion = Enums.CoordinateConversion.NONE):
