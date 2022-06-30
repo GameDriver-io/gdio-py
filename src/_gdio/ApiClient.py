@@ -1,4 +1,3 @@
-from re import M
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
 from _gdio import Serializers
@@ -10,6 +9,8 @@ import os
 import asyncio, socket
 import time, datetime
 import subprocess
+
+from xpath_parser import XpathExpression, InValidXpath
 
 import logging
 
@@ -31,6 +32,32 @@ def requireClientConnection(function):
         return function(*args, **kwargs)
     return inner
 
+def verify_hpath(arg_index=0):
+
+    def outer(function):
+
+        @wraps(function)
+        async def inner(*args, **kwargs):
+            if type(arg_index) == list:
+                for i in arg_index:
+                    try:
+                        print(XpathExpression(args[i]))
+
+                    except InValidXpath:
+                        raise Exception(f"Invalid path provided: {args[i]}")
+
+            else:
+                try:
+                    print(XpathExpression(args[arg_index]))
+
+                except InValidXpath:
+                    raise Exception(f"Invalid path provided: {args[arg_index]}")
+
+            await function(*args, **kwargs)
+
+        return inner
+    
+    return outer
 
 def UDPsend(hostname, port, data):
     UdpClient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -153,6 +180,7 @@ class ApiClient:
 
     ## Return value overload
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def CallMethod(self,
             hierarchyPath : str,
             methodName    : str,
@@ -176,6 +204,7 @@ class ApiClient:
         ```
         </example>
         '''
+
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_CallMethodRequest(
@@ -412,6 +441,7 @@ class ApiClient:
         await self.ClickEx_XY(buttonId, position.x, position.y, clickFrameCount, keys, keysNumberOfFrames, modifiers, modifiersNumberOfFrames, delayAfterModifiersMsec, timeout)
     
     @requireClientConnectionAsync
+    @verify_hpath(1)
     async def ClickObject(self,
             buttonId            : Enums.MouseButtons,
             hierarchyPath       : str,
@@ -452,6 +482,7 @@ class ApiClient:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
     @requireClientConnectionAsync
+    @verify_hpath(1)
     async def ClickObjectEx(self,
             buttonId                : Enums.MouseButtons,
             hierarchyPath           : str,
@@ -822,6 +853,7 @@ class ApiClient:
 
     ## Float positions overload
     @requireClientConnectionAsync
+    @verify_hpath(1)
     async def DoubleClickObject(self,
             buttonId : Enums.MouseButtons,
             hierarchyPath : str,
@@ -860,6 +892,7 @@ class ApiClient:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
     @requireClientConnectionAsync
+    @verify_hpath(1)
     async def DoubleClickObjectEx(self,
             buttonId : Enums.MouseButtons,
             hierarchyPath : str,
@@ -1072,6 +1105,7 @@ class ApiClient:
         return nextEvent
 
     @requireClientConnectionAsync
+    @verify_hpath([1, 2])
     async def GetObjectDistance(self,
             objectA_HierarchyPath : str,
             objectB_HierarchyPath : str,
@@ -1114,6 +1148,7 @@ class ApiClient:
             return None
 
     @requireClientConnectionAsync
+    @verify_hpath(1)
     async def GetObjectFieldValue(self,
             t : type,
             hierarchyPath : str,
@@ -1155,6 +1190,7 @@ class ApiClient:
         return msgpack.unpackb(cmd_GenericResponse.Value)
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def GetObjectFieldValueByName(self,
             hierarchyPath : str,
             fieldName : str,
@@ -1224,6 +1260,7 @@ class ApiClient:
         return cmd_GenericResponse.Objects
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def GetObjectPosition(self,
             hierarchyPath : str,
             coordSpace : Enums.CoordinateConversion = Enums.CoordinateConversion.NONE,
@@ -1472,8 +1509,9 @@ class ApiClient:
             raise Exception(response.ErrorMessage)
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def MouseMoveToObject(self,
-            objectHierarchyPath : str,
+            hierarchyPath : str,
             frameCount : float,
             waitForObject : bool = True,
             waitForEmptyInput : bool = True,
@@ -1482,7 +1520,7 @@ class ApiClient:
         '''
         <summary> Moves the mouse to an object. </summary>
 
-        <param name="objectHierarchyPath" type="str"> The object hierarchy path of the object to move to. </param>
+        <param name="hierarchyPath" type="str"> The object hierarchy path of the object to move to. </param>
         <param name="frameCount" type="float"> The number of frames to move the mouse. </param>
         <param name="waitForObject" type="bool"> Whether or not to wait for the object to be found. </param>
         <param name="waitForEmptyInput" type="bool"> Whether or not to wait for the mouse to be empty before continuing. </param>
@@ -1498,7 +1536,7 @@ class ApiClient:
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_MouseMoveToObjectRequest(
-                ObjectHierarchyPath = objectHierarchyPath,
+                ObjectHierarchyPath = hierarchyPath,
                 Timeout = timeout,
                 FrameCount = frameCount,
                 WaitForObject = waitForObject
@@ -1555,6 +1593,7 @@ class ApiClient:
             raise Exception(response.ErrorMessage)
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def NavAgentMoveToPoint(self,
             navAgent_HierarchyPath : str,
             dx : float,
@@ -1596,6 +1635,7 @@ class ApiClient:
         return True
 
     @requireClientConnectionAsync
+    @verify_hpath(1)
     async def Raycast(self,
             raycastPoint : ProtocolObjects.Vector3,
             cameraHierarchyPath : str = None,
@@ -1634,6 +1674,7 @@ class ApiClient:
         return response.RaycastResults
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def RegisterCollisionMonitor(self,
             hierarchyPath : str,
             timeout : int = 30    
@@ -1673,6 +1714,7 @@ class ApiClient:
         return str(response.ReturnedValues['Id'])
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def RotateObject_Quaternion(self,
             hierarchyPath : str,
             quaternion : ProtocolObjects.Vector4,
@@ -1703,6 +1745,7 @@ class ApiClient:
         await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def RotateObject_Euler(self,
             hierarchyPath : str,
             euler : ProtocolObjects.Vector3,
@@ -1739,6 +1782,7 @@ class ApiClient:
         await self._RotateObject(hierarchyPath, request, waitForObject, timeout)
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def RotateObject_AxisAngle(self,
             hierarchyPath : str,
             xAngle : float,
@@ -1779,9 +1823,7 @@ class ApiClient:
 
     @requireClientConnectionAsync
     async def _RotateObject(self,
-            HierarchyPath : str,
             request : Messages.Cmd_RotateRequest,
-            waitForObject : bool = True,
             timeout : int = 30
         ):
         '''
@@ -1798,6 +1840,7 @@ class ApiClient:
             raise Exception(response.ErrorMessage)
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def SetInputFieldText(self,
             hierarchyPath : str,
             text : str,
@@ -1834,6 +1877,7 @@ class ApiClient:
             raise Exception(response.ErrorMessage)
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def SetObjectFieldValue(
             self,
             hierarchyPath : str,
@@ -1952,6 +1996,7 @@ class ApiClient:
         await self.Tap_XY(position.X, position.Y, tapCount, frameCount, timeout)
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def TapObject(self,
             hierarchyPath : str,
             tapCount : int = 1,
@@ -2124,6 +2169,7 @@ class ApiClient:
 
     
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def UnregisterCollisionMonitor(self,
             hierarchyPath : str,
             timeout : int = 30
@@ -2217,6 +2263,7 @@ class ApiClient:
         return nextEvent
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def WaitForObject(self,
             hierarchyPath : str,
             timeout : int = 30
@@ -2254,6 +2301,7 @@ class ApiClient:
         return False
 
     @requireClientConnectionAsync
+    @verify_hpath(0)
     async def waitForObjectValue(self,
             hierarchyPath : str,
             fieldOrPropertyName : str,
