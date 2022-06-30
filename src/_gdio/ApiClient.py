@@ -1115,7 +1115,6 @@ class ApiClient:
 
     @requireClientConnectionAsync
     async def GetObjectFieldValue(self,
-            t : type,
             hierarchyPath : str,
             timeout : int = 30
         ):
@@ -1143,16 +1142,19 @@ class ApiClient:
                 HierarchyPath = hierarchyPath,
 
                 # This probably doesn't work like this
-                TypeFullName = Enums.CSTypeFullName[t.__name__]
+                #TypeFullName = Enums.CSTypeFullName[t.__name__]
             )
         )
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
+        cmd_GetObjectValueResponse : Messages.Cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
-            return -1
+        if cmd_GetObjectValueResponse.RC != Enums.ResponseCode.INFORMATION:
+            return None
 
-        return msgpack.unpackb(cmd_GenericResponse.Value)
+        if cmd_GetObjectValueResponse.Value is not None:
+            return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+
+        return cmd_GetObjectValueResponse.directObject
 
     @requireClientConnectionAsync
     async def GetObjectFieldValueByName(self,
@@ -1186,12 +1188,15 @@ class ApiClient:
             )
         )
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
-        cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
+        cmd_GetObjectValueResponse : Messages.Cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if cmd_GetObjectValueResponse.RC != Enums.ResponseCode.OK:
-            return -1
+        if cmd_GetObjectValueResponse.RC != Enums.ResponseCode.INFORMATION:
+            return None
 
-        return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+        if cmd_GetObjectValueResponse.Value is not None:
+            return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+
+        return cmd_GetObjectValueResponse.directObject
 
 
     @requireClientConnectionAsync
@@ -1218,10 +1223,30 @@ class ApiClient:
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if cmd_GenericResponse.RC != Enums.ResponseCode.OK:
+        if cmd_GenericResponse.RC != Enums.ResponseCode.INFORMATION:
             raise Exception(cmd_GenericResponse.ErrorMessage)
 
         return cmd_GenericResponse.Objects
+
+
+    async def GetObject(self,
+            hierarchyPath : str,
+            timeout : int = 30
+        ) -> object:
+
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = Messages.Cmd_GetGameObjectRequest(
+                HierarchyPath = hierarchyPath,
+            )
+        )
+        requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
+        cmd_GetObjectListResponse : Messages.Cmd_GetObjectListResponse = await self.client.GetResult(requestInfo.RequestId)
+
+        if cmd_GetObjectListResponse.RC != Enums.ResponseCode.INFORMATION:
+            raise Exception(cmd_GetObjectListResponse.ErrorMessage)
+
+        return cmd_GetObjectListResponse.Objects[0]
 
     @requireClientConnectionAsync
     async def GetObjectPosition(self,
@@ -1262,7 +1287,7 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         cmd_VectorResponse : Messages.Cmd_VectorResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if cmd_VectorResponse.Value3 == None or cmd_VectorResponse.RC != Enums.ResponseCode.INFORMATION:
+        if cmd_VectorResponse.RC != Enums.ResponseCode.INFORMATION:
             raise Exception(cmd_VectorResponse.ErrorMessage)
 
         return cmd_VectorResponse.Value3
