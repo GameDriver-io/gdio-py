@@ -542,7 +542,20 @@ class Cmd_WaitForObjectValueRequest(Message):
         self.CustomSerialization = True
         self.Value = serializer.pack(value)
 
+class Cmd_WaitForObjectValueResponse(Cmd_GenericResponse):
+    def __init__(self,
+            StackTrace = None,
+            ErrorMessage = None,
+            InformationMessage = None,
+            WarningMessage = None,
+            RC = None,
+            ReturnedValues = None,
 
+            ObjectResolutionResult = Enums.OBJECT_RESOLUTION.OBJECT_NOT_FOUND
+        ):
+        super().__init__(StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues)
+
+        self.ObjectResolutionResult = ObjectResolutionResult
 
 
 
