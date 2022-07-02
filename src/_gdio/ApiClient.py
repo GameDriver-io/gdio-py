@@ -1,9 +1,9 @@
-from re import M
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
 from _gdio import Serializers
 
 from functools import wraps
+import typing as t
 
 import msgpack
 import os
@@ -36,7 +36,6 @@ def UDPsend(hostname, port, data):
     UdpClient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     UdpClient.sendto(bytes(data, 'utf-8'), (hostname, port))
     UdpClient.close()
-
 
 class ApiClient:
     '''
@@ -78,26 +77,27 @@ class ApiClient:
         self.CustomSerializer = customSerializer
 
     @requireClientConnectionAsync
-    async def AxisPress(self,
-            axisId         : str,      # The name of the target input axis as defined in the Unity Input Manager.
-            value          : float,    # The value of change on the target axis from -1.0 to +1.0.
-            numberOfFrames : int,      # The number of frames to hold the input for.
-            timeout        : int = 30  # The number of seconds to wait for the command to be processed by the agent.
-        ):
-        '''
-        <summary> Send arbitrary axis states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND) </summary>
-        <param name="axisId" type="str"> The name of the target input axis as defined in the Unity Input Manager (Old). </param>
-        <param name="value" type="float"> The value of change on the target axis from -1.0 to +1.0. </param>
-        <param name="numberOfFrames" type="int"> The number of frames to hold the input for. </param>
-        <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <example>
+    async def AxisPress(self, axisId: str, value: float, numberOfFrames: int, timeout: int = 30) -> t.NoReturn:
+        """Send arbitrary axis states to the game.
         ```python
         # Move the horizontal axis to the right for 100 frames.
         await api.AxisPress(axisId="Horizontal", value=1.0, numberOfFrames=100)
         ```
-        </example>
-        '''
+        :param axisId: The name of the target input axis as defined in the Unity Input Manager.
+        :type axisId: str
+
+        :param value: The value of change on the target axis from -1.0 to +1.0.
+        :type value: float
+
+        :param numberOfFrames: The number of frames to hold the input for.
+        :type numberOfFrames: int
+
+        :param timeout: The number of seconds to wait for the command to be processed by the agent, defaults to 30.
+        :type timeout: int
+        
+        :return: None
+        :rtype: t.NoReturn
+        """
 
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
@@ -108,32 +108,32 @@ class ApiClient:
                 # Make this an enum.
                 InputType = 1,
                 ChangeValue = value
-                )
+            )
         )
 
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
     @requireClientConnectionAsync
-    async def ButtonPress(self,
-            buttonId       : str,
-            numberOfFrames : int,
-            timeout        : int = 30
-        ):
-        '''
-        <summary> Send arbitrary button states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND) </summary>
-
-        <param name="buttonId" type="str"> The name of the target input button as defined in the Unity Input Manager (Old). </param>
-        <param name="numberOfFrames" type="int"> The number of frames to hold the input for. </param>
-        <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <example>
+    async def ButtonPress(self, buttonId: str, numberOfFrames : int, timeout: int = 30) -> t.NoReturn:
+        """Send arbitrary button states to the game.
         ```python
         # Press the Jump button for 100 frames.
         await api.ButtonPress(buttonId="Jump", numberOfFrames=100)
         ```
-        </example>
-        '''
+
+        :param buttonId: The name of the target input button as defined in the Unity Input Manager (Old).
+        :type buttonId: str
+
+        :param numberOfFrames: The number of frames to hold the input for.
+        :type numberOfFrames: int
+
+        :param timeout: The number of seconds to wait for the command to be processed by the agent, defaults to 30
+        :type timeout: int, optional
+
+        :return: None
+        :rtype: t.NoReturn
+        """        
 
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
@@ -142,36 +142,38 @@ class ApiClient:
                 NumberOfFrames = numberOfFrames,
                 InputType = 0,
                 ChangeValue = 0
-            ),
+            )
         )
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         cmd_GenericResponse : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)
 
     ## Return value overload
     @requireClientConnectionAsync
-    async def CallMethod(self,
-            hierarchyPath : str,
-            methodName    : str,
-            arguments     : list = None,
-            timeout       : int = 30,
-        ) -> type:
-        '''
-        <summary> Execute a method on an object </summary>
-
-        <param name="hierarchyPath" type="str"> The HierarchyPath for a script attached to an object where the target method is defined. </param>
-        <param name="methodName" type="str"> The name of the method to call. </param>
-        <param name="arguments" type="list[any]"> The list of arguments to pass into the method. </param>
-        <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="bool"> The return value of the method. </returns>
-
-        <example>
+    async def CallMethod(self, hierarchyPath: str, methodName: str,arguments: list = None, timeout: int = 30,) -> t.NoReturn:
+        """Execute a method on an object
         ```python
         # Set the color of the `Player` object to red using its method `SetColor`.
         await api.CallMethod(hierarchyPath="//*[@name='Player']/fn:component('Box')", methodName="SetColor", arguments=[255, 0, 0])
         ```
-        </example>
-        '''
+
+        :param hierarchyPath: The HierarchyPath for a script attached to an object where the target method is defined.
+        :type hierarchyPath: str
+
+        :param methodName: The name of the method to call.
+        :type methodName: str
+
+        :param arguments: The list of arguments to pass into the method., defaults to None
+        :type arguments: list, optional
+
+        :param timeout: The number of seconds to wait for the command to be processed by the agent., defaults to 30
+        :type timeout: int, optional
+
+        :raises NotImplementedError: Custom serialization of arguments is not implemented yet.
+        :raises Exception: If an exception is thrown by the agent.
+
+        :return: None
+        :rtype: t.NoReturn
+        """        
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_CallMethodRequest(
@@ -196,32 +198,31 @@ class ApiClient:
         if cmd_GetObjectValueResponse.Value is not None:
             return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
 
-        else:
-            return None
-
     @requireClientConnectionAsync
-    async def CaptureScreenshot(self,
-            filename          : str,
-            storeInGameFolder : bool = False,
-            overwriteExisting : bool = False,
-            timeout           : int = 30,
-        ) -> str:
-        '''
-        <summary> Capture a screenshot of the currently running game. </summary>
-
-        <param name="filename" type="str"> The absolute path and filename of the screen capture. </param>
-        <param name="storeInGameFolder" type="bool"> Save the screenshot on the device the game is running on rather than returning it to the client. </param>
-        <param name="overwriteExisting" type="bool"> Overwrite if the file already exists. </param>
-        <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <returns value="str"> The path and filename of the screen capture. </returns>
-
-        <example>
+    async def CaptureScreenshot(self, filename: str, storeInGameFolder: bool = False, overwriteExisting: bool = False, timeout: int = 30) -> str:
+        """Capture a screenshot of the currently running game.
         ```python
         await api.CaptureScreenshot(filename="/path/to/file/screenshot.png")
         ```
-        </example>
-        '''
+
+        :param filename: The absolute path and filename of the screen capture.
+        :type filename: str
+
+        :param storeInGameFolder: Save the screenshot on the device the game is running on rather than returning it to the client., defaults to False
+        :type storeInGameFolder: bool, optional
+
+        :param overwriteExisting: Overwrite if the file already exists., defaults to False
+        :type overwriteExisting: bool, optional
+
+        :param timeout: The number of seconds to wait for the command to be processed by the agent, defaults to 30
+        :type timeout: int, optional
+
+        :raises Exception: If an exception is thrown by the agent.
+        :raises OSError: If the file already exists and `overwriteExisting` is set to `False`.
+
+        :return: _description_
+        :rtype: str
+        """             
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_CaptureScreenshotRequest(
@@ -252,29 +253,28 @@ class ApiClient:
         
     ## Float positions overload
     @requireClientConnectionAsync
-    async def ClickXY(self,
-            buttonId        : Enums.MouseButtons,
-            x               : float,
-            y               : float,
-            clickFrameCount : int,
-            timeout         : int = 30
-        ):
-        '''
-        <summary> Clicks a mouse button at the target coordinates. </summary>
-
-        <param name="buttonId" type="MouseButtons"> The button to click. </param>
-        <param name="x" type="float"> The x position in screen coordinates at which to click. </param>
-        <param name="y" type="float"> The y position in screen coordinates at which to click. </param>
-        <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
-        <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <example>
+    async def ClickXY(self, buttonId: Enums.MouseButtons, x: float, y: float, clickFrameCount: int, timeout: int = 30):
+        """Clicks a mouse button at the target coordinates.
         ```python
         # Left click the screen at (100, 100) for 5 frames.
         await api.Click_XY(ButtonId=MouseButtons.Left, x=100, y=100, clickFrameCount=5)
         ```
-        </example>
-        '''
+
+        :param buttonId: The name of the button to click.
+        :type buttonId: Enums.MouseButtons
+
+        :param x: The x coordinate of the click.
+        :type x: float
+
+        :param y: The y coordinate of the click.
+        :type y: float
+
+        :param clickFrameCount: The number of frames to click for.
+        :type clickFrameCount: int
+
+        :param timeout: The number of seconds to wait for the command to be processed by the agent, defaults to 30
+        :type timeout: int, optional
+        """        
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_ClickRequest(
@@ -316,39 +316,43 @@ class ApiClient:
 
     ## Float positions overload
     @requireClientConnectionAsync
-    async def ClickExXY(self,
-            buttonId                : Enums.MouseButtons,
-            x                       : float,
-            y                       : float,
-            clickFrameCount         : int,
-            keys                    : list = None,
-            keysNumberOfFrames      : int = 5,
-            modifiers               : list = None,
-            modifiersNumberOfFrames : int = 3,
-            delayAfterModifiersMsec : int = 500,
-            timeout                 : int = 30
-        ):
-        '''
-        <summary> Clicks a mouse button at the target coordinates along with keypresses. </summary>
-
-        <param name="buttonId" type="MouseButtons"> The button to click. </param>
-        <param name="x" type="float"> The x position in screen coordinates at which to click. </param>
-        <param name="y" type="float"> The y position in screen coordinates at which to click. </param>
-        <param name="clickFrameCount" type="int"> The number of frames to click for. </param>
-        <param name="keys" type="list[KeyCode]"> The list of keys to press while clicking. </param>
-        <param name="keysNumberOfFrames" type="int"> The number of frames to hold the keys for. </param>
-        <param name="modifiers" type="list[KeyCode]"> The list of modifier keys to press while clicking. </param>
-        <param name="modifiersNumberOfFrames" type="int"> The number of frames to hold the modifier keys for. </param>
-        <param name="delayAfterModifiersMsec" type="int"> The number of milliseconds to wait after pressing the modifiers before clicking the keys. </param>
-        <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
-
-        <example>
+    async def ClickExXY(self, buttonId: Enums.MouseButtons, x: float, y: float, clickFrameCount: int, keys: list = None, keysNumberOfFrames: int = 5, modifiers: list = None, modifiersNumberOfFrames: int = 3, delayAfterModifiersMsec: int = 500, timeout: int = 30 ):
+        """Clicks a mouse button at the target coordinates along with keypresses.
         ```python
         # Shift+Left click the screen at (100, 100) for 5 frames.
         await api.ClickEx_XY(buttonId=MouseButtons.Left, x=100, y=100, clickFrameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
         ```
-        </example>
-        '''
+
+        :param buttonId: The name of the button to click.
+        :type buttonId: Enums.MouseButtons
+
+        :param x: The x coordinate of the click.
+        :type x: float
+
+        :param y: The y coordinate of the click.
+        :type y: float
+
+        :param clickFrameCount: The number of frames to click for.
+        :type clickFrameCount: int
+
+        :param keys: The keys to press while clicking, defaults to None
+        :type keys: list, optional
+
+        :param keysNumberOfFrames: The number of frames to press the keys for, defaults to 5
+        :type keysNumberOfFrames: int, optional
+
+        :param modifiers: The modifiers to press while clicking, defaults to None
+        :type modifiers: list, optional
+
+        :param modifiersNumberOfFrames: The number of frames to press the modifiers for, defaults to 3
+        :type modifiersNumberOfFrames: int, optional
+
+        :param delayAfterModifiersMsec: The number of milliseconds to wait after pressing the modifiers, defaults to 500
+        :type delayAfterModifiersMsec: int, optional
+
+        :param timeout: The number of seconds to wait for the command to be processed by the agent, defaults to 30
+        :type timeout: int, optional
+        """        
         if keys != None or modifiers != None:
             await self.KeyPress(
                 keys,
