@@ -1,20 +1,23 @@
 # gdio-py
+
 Python bindings for the GameDriver Client API
 
- - [Quick Start](#Quick-Start)
- - [Changelog](CHANGELOG.md)
- - [API Reference](docs/ApiClient_Reference.md)
+- [Quick Start](#quick-start)
+- [Changelog](CHANGELOG.md)
+- [API Reference](docs/ApiClient_Reference.md)
 
 ## Quick Start
 
 This module requires at least Python 3.7
 
 You can install the latest release directly from the repository by typing the following into a command line:
+
 ```bash
 pip install git+https://github.com/GameDriver-io/gdio-py.git
 ```
 
 Here is an example of how you can use the API with the [pytest](https://docs.pytest.org/en/latest/getting-started.html) framework:
+
 ```py
 import asyncio
 import pytest
@@ -43,7 +46,7 @@ async def test_move(agent_connection):
     start_pos = await api.GetObjectPosition("//*[@name='Player']")
 
     # Move the player to the right
-    await api.AxisPress(axisId="Horizontal", value=1.0, numberOfFrames=100)
+    await api.AxisPress(axisId="Horizontal", value = 1.0, numberOfFrames = 100)
 
     # Wait for the player to move before checking the new position
     await api.Wait(500)

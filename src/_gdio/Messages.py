@@ -142,7 +142,7 @@ class Cmd_CallMethodRequest(Message):
                 if (customSerializer == None):
                     raise Exception(f'CustomSerializer is not defined for type: {type(argument)}')
                 
-                serializedObjectType = Serializers.BuiltinSerializer.GetType(argument)
+                serializedObjectType = Serializers.DefaultSerializer.GetType(argument)
                 serializedObjectData = customSerializer.Pack(argument)
 
             else:

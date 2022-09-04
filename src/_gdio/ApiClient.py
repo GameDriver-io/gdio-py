@@ -58,7 +58,6 @@ class ApiClient:
 
             debug : bool = False,
             customSerializer : Serializers.CustomSerializer = None,
-            event_loop: asyncio.AbstractEventLoop = None
         ):
 
         self.hostname = hostname
@@ -67,7 +66,7 @@ class ApiClient:
         self.connectionTimeout = connectionTimeout
         self.autoPortResolution = autoPortResolution
 
-        self.event_loop = event_loop if event_loop else asyncio.get_event_loop()
+        self.event_loop = asyncio.get_event_loop()
         self.event_loop.set_exception_handler(crash_on_exception)
 
         # Defined in self.Connect()
@@ -94,7 +93,7 @@ class ApiClient:
             timeout        : int = 30  # The number of seconds to wait for the command to be processed by the agent.
         ):
         '''
-        <summary> Send arbitrary axis states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND) </summary>
+        <summary> Send arbitrary axis states to the game </summary>
         <param name="axisId" type="str"> The name of the target input axis as defined in the Unity Input Manager (Old). </param>
         <param name="value" type="float"> The value of change on the target axis from -1.0 to +1.0. </param>
         <param name="numberOfFrames" type="int"> The number of frames to hold the input for. </param>
@@ -130,7 +129,7 @@ class ApiClient:
             timeout        : int = 30
         ):
         '''
-        <summary> Send arbitrary button states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND) </summary>
+        <summary> Send arbitrary button states to the game </summary>
 
         <param name="buttonId" type="str"> The name of the target input button as defined in the Unity Input Manager (Old). </param>
         <param name="numberOfFrames" type="int"> The number of frames to hold the input for. </param>
@@ -189,7 +188,7 @@ class ApiClient:
         if arguments:
 
             #cmd.SetArguments(arguments, self.CustomSerializer)
-            cmd.SetArguments(arguments, Serializers.BuiltinSerializer)
+            cmd.SetArguments(arguments, Serializers.DefaultSerializer)
 
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
@@ -1115,9 +1114,7 @@ class ApiClient:
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_GetObjectValueRequest(
                 HierarchyPath = hierarchyPath,
-
-                # This probably doesn't work like this
-                TypeFullName = Enums.CSTypeFullName[t.__name__]
+                TypeFullName = t.__module__ + '.' + t.__name__
             )
         )
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -1127,7 +1124,8 @@ class ApiClient:
             raise Exception(f'Exception thrown while getting object field value: {cmd_GetObjectValueResponse.ErrorMessage}')
 
         if cmd_GetObjectValueResponse.Value is not None:
-            return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+            retval: object  = msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+            return Serializers.DefaultSerializer.Unpack(retval)
 
         return cmd_GetObjectValueResponse.directObject
 
@@ -1169,7 +1167,8 @@ class ApiClient:
             return None
 
         if cmd_GetObjectValueResponse.Value is not None:
-            return msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+            retval: object  = msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+            return Serializers.DefaultSerializer.Unpack(retval)
 
         return cmd_GetObjectValueResponse.directObject
 
@@ -1854,25 +1853,29 @@ class ApiClient:
         ```
         '''
 
-        msg = ProtocolObjects.ProtocolMessage(
-            ClientUID = self.client.ClientUID,
-            GDIOMsg = Messages.Cmd_SetObjectValueRequest(
-                HierarchyPath = hierarchyPath,
-                ObjectFieldOrPropertyName = fieldName,
-                WaitForObject = waitForObject,
-                Timeout = timeout,
-            )
+        cmd = Messages.Cmd_SetObjectValueRequest(
+            HierarchyPath = hierarchyPath,
+            ObjectFieldOrPropertyName = fieldName,
+            WaitForObject = waitForObject,
+            Timeout = timeout,
+
+            CustomSerialization = False,
+            SerializedObjectType = None,
         )
 
         if Serializers.IsBuiltin(value):
-            msg.GDIOMsg.SerializedObjectType = type (value)
-            msg.GDIOMsg.Value = msgpack.pack(value)
-            msg.GDIOMsg.CustomSerialization = False
+            cmd.Value = msgpack.pack(value)
+            cmd.CustomSerialization = False
             
         else:
-            msg.GDIOMsg.SerializedObjectType = type (value)
-            msg.GDIOMsg.Value = self.CustomSerializer.Pack(value)
-            msg.GDIOMsg.CustomSerialization = True
+            cmd.SerializedObjectType = Serializers.DefaultSerializer.GetType(value)
+            cmd.Value = Serializers.DefaultSerializer.Pack(value)
+            cmd.CustomSerialization = False
+
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = cmd
+        )
 
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         response : Messages.Cmd_GenericResponse = await self.client.GetResult(requestInfo.RequestId)

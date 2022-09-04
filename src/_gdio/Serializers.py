@@ -25,9 +25,9 @@ def msgDeserialize(obj):
         return obj.to_unix()
 
 
-class BuiltinSerializer:
+class DefaultSerializer:
     @staticmethod
-    def Pack(obj):
+    def Pack(obj) -> dict:
         if isinstance(obj, GDObjects.Vector2):
             return {'x': obj.x, 'y': obj.y}
 
@@ -35,7 +35,7 @@ class BuiltinSerializer:
             return {'x': obj.x, 'y': obj.y, 'z': obj.z}
 
     @staticmethod
-    def Unpack(obj):
+    def Unpack(obj) -> object:
         if isinstance(obj, dict):
             if 'x' in obj and 'y' in obj and len(obj) == 2:
                 return GDObjects.Vector2(obj['x'], obj['y'])
