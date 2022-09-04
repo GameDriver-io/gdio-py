@@ -37,6 +37,12 @@ def UDPsend(hostname, port, data):
     UdpClient.sendto(bytes(data, 'utf-8'), (hostname, port))
     UdpClient.close()
 
+def crash_on_exception(loop: asyncio.AbstractEventLoop, context: dict):
+    loop.default_exception_handler(context)
+    exception = context.get('exception')
+    if exception:
+        print(f'Exception in event loop: {exception}')
+        loop.stop()
 
 class ApiClient:
     '''
@@ -51,7 +57,8 @@ class ApiClient:
             autoPortResolution : bool = True,       # TODO: Automatically resolve the port a Gamedriver Agent is running on.
 
             debug : bool = False,
-            customSerializer : Serializers.CustomSerializer = None
+            customSerializer : Serializers.CustomSerializer = None,
+            event_loop: asyncio.AbstractEventLoop = None
         ):
 
         self.hostname = hostname
@@ -59,8 +66,10 @@ class ApiClient:
         self.autoplay = autoplay
         self.connectionTimeout = connectionTimeout
         self.autoPortResolution = autoPortResolution
-    
-        
+
+        self.event_loop = event_loop if event_loop else asyncio.get_event_loop()
+        self.event_loop.set_exception_handler(crash_on_exception)
+
         # Defined in self.Connect()
         self.client = None
         self.CurrentPlayDetails = None
