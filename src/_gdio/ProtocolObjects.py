@@ -50,7 +50,7 @@ class ProtocolMessage:
 
 class SerializedObject:
     def __init__(self,
-            SerializedObjectType : type = None,
+            SerializedObjectType : str = None,
             NonSerializedObject : object = None,
             SerializedObjectData : list = None,
             CustomSerialization : bool = False

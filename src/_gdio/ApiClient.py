@@ -181,21 +181,20 @@ class ApiClient:
         ```
         </example>
         '''
-        msg = ProtocolObjects.ProtocolMessage(
-            ClientUID = self.client.ClientUID,
-            GDIOMsg = Messages.Cmd_CallMethodRequest(
-                HierarchyPath = hierarchyPath,
-                MethodName = methodName,
-            )
+        cmd = Messages.Cmd_CallMethodRequest(
+            HierarchyPath = hierarchyPath,
+            MethodName = methodName,
         )
 
         if arguments:
 
-            if not Serializers.IsBuiltin(arguments):
-                raise NotImplementedError("Custom serializers are not yet supported for method calls.")
+            #cmd.SetArguments(arguments, self.CustomSerializer)
+            cmd.SetArguments(arguments, Serializers.BuiltinSerializer)
 
-            msg.GDIOMsg.SetArguments(arguments, self.CustomSerializer)
-
+        msg = ProtocolObjects.ProtocolMessage(
+            ClientUID = self.client.ClientUID,
+            GDIOMsg = cmd
+        )
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         cmd_GetObjectValueResponse : Messages.Cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
 

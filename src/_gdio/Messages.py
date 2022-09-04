@@ -105,6 +105,8 @@ class Cmd_GenericResponse(Message):
         return (len(self.WarningMessage) > 1)
 
 
+import msgpack
+
 class Cmd_CallMethodRequest(Message):
     # TODO: custom serializer
     def __init__(self,
@@ -121,37 +123,33 @@ class Cmd_CallMethodRequest(Message):
         self.MethodName = MethodName
         self.Arguments = Arguments if Arguments else []
 
-        # Optional fields
-        if Arguments2:
-            self.Arguments2 = Arguments2
+        self.Arguments2 = Arguments2
         
-        if _serializer:
-            self._serializer = _serializer
+        self._serializer = _serializer
 
     def SetArguments(self, arguments = None, serializer = None):
-        try:
-            customSerializer : Serializers.CustomSerializer = self._serializer if serializer == None else serializer
-        except:
-            pass
+
+        customSerializer : Serializers.CustomSerializer = self._serializer if serializer == None else serializer
+
         serializedObjectData = None
         nonSerializedObject = None
         if arguments == None:
             return
         for argument in arguments:
             if not Serializers.IsBuiltin(argument):
-                #raise NotImplementedError(f'{argument} is not a builtin type. Custom type serialization is not supported yet.')
+
                 if (customSerializer == None):
-                    raise Exception(f'CustomSerializer is not defined for type: {type(arguments[0])}')
+                    raise Exception(f'CustomSerializer is not defined for type: {type(argument)}')
                     
-                serializedObjectData = customSerializer.Pack(arguments[0])
+                serializedObjectData = customSerializer.Pack(argument)
 
             else:
                 nonSerializedObject = argument
 
             self.Arguments.append(ProtocolObjects.SerializedObject(
-                SerializedObjectType = type(argument),
-                SerializedObjectData = serializedObjectData,
-                NonSerializedObject = nonSerializedObject 
+                SerializedObjectType = Serializers.BuiltinSerializer.GetType(argument),
+                SerializedObjectData = msgpack.packb(serializedObjectData),
+                NonSerializedObject = nonSerializedObject
             ).pack())
 
 
