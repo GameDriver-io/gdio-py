@@ -23,8 +23,7 @@ from gdio.api import ApiClient
 from gdio.common.objects import *
 
 # This fixture is run before every test that takes agent_connection as an argument
-# scope='session' means every test will use the same connection
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="method")
 async def agent_connection():
     # Create a new agent connection
     api = ApiClient()
