@@ -1,3 +1,4 @@
+from inspect import isbuiltin
 from _gdio import GDObjects
 from . import ProtocolObjects
 
@@ -45,6 +46,10 @@ class BuiltinSerializer:
     @staticmethod
     def GetType(obj) -> str:
         ret: str = ''
+
+        if isbuiltin(obj):
+            return None
+
         if isinstance(obj, GDObjects.Vector2):
             ret = 'gdio.common.objects.Vector2'
 

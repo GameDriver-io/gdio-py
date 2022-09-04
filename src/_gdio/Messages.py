@@ -131,6 +131,7 @@ class Cmd_CallMethodRequest(Message):
 
         customSerializer : Serializers.CustomSerializer = self._serializer if serializer == None else serializer
 
+        serializedObjectType = None
         serializedObjectData = None
         nonSerializedObject = None
         if arguments == None:
@@ -140,14 +141,15 @@ class Cmd_CallMethodRequest(Message):
 
                 if (customSerializer == None):
                     raise Exception(f'CustomSerializer is not defined for type: {type(argument)}')
-                    
+                
+                serializedObjectType = Serializers.BuiltinSerializer.GetType(argument)
                 serializedObjectData = customSerializer.Pack(argument)
 
             else:
                 nonSerializedObject = argument
 
             self.Arguments.append(ProtocolObjects.SerializedObject(
-                SerializedObjectType = Serializers.BuiltinSerializer.GetType(argument),
+                SerializedObjectType = serializedObjectType,
                 SerializedObjectData = msgpack.packb(serializedObjectData),
                 NonSerializedObject = nonSerializedObject
             ).pack())
