@@ -27,36 +27,24 @@ def msgDeserialize(obj):
 
 class DefaultSerializer:
     @staticmethod
-    def Pack(obj) -> dict:
-        if isinstance(obj, GDObjects.Vector2):
-            return {'x': obj.x, 'y': obj.y}
+    def Pack(obj: object) -> dict:
+        if obj.__module__ == GDObjects.__name__:
+            return vars(obj)
 
-        if isinstance(obj, GDObjects.Vector3):
-            return {'x': obj.x, 'y': obj.y, 'z': obj.z}
+        elif IsBuiltin(obj):
+            return obj
 
     @staticmethod
-    def Unpack(obj) -> object:
-        if isinstance(obj, dict):
-            if 'x' in obj and 'y' in obj and len(obj) == 2:
-                return GDObjects.Vector2(obj['x'], obj['y'])
+    def Unpack(obj: object) -> object:
+        if obj.__module__ == GDObjects.__name__:
+            return obj.from_dict(obj)
 
-            if 'x' in obj and 'y' in obj and 'z' in obj and len(obj) == 3:
-                return GDObjects.Vector3(obj['x'], obj['y'], obj['z'])
 
     @staticmethod
     def GetType(obj) -> str:
-        ret: str = ''
 
         if isbuiltin(obj):
             return None
 
-        if isinstance(obj, GDObjects.Vector2):
-            ret = 'gdio.common.objects.Vector2'
-
-        elif isinstance(obj, GDObjects.Vector3):
-            ret = 'gdio.common.objects.Vector3'
-
-        elif isinstance(obj, GDObjects.Vector4):
-            ret = 'gdio.common.objects.Vector4'
-
-        return f'{ret}, gdio.common.objects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'
+        elif obj.__module__ == GDObjects.__name__:
+            return f'gdio.common.objects.{obj.__class__.__name__}, gdio.common.objects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'

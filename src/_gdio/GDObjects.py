@@ -1,10 +1,35 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import IntEnum, auto
 from collections import namedtuple
 
-Vector2 = namedtuple('Vector2', ['x', 'y'])
-Vector3 = namedtuple('Vector3', ['x', 'y', 'z'])
-Vector4 = namedtuple('Vector4', ['x', 'y', 'z', 'w'])
+@dataclass
+class Vector2:
+    x: float
+    y: float
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
+
+@dataclass
+class Vector3:
+    x: float
+    y: float
+    z: float
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
+
+@dataclass
+class Vector4:
+    x: float
+    y: float
+    z: float
+    w: float
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 @dataclass
 class Quaternion:
@@ -12,6 +37,9 @@ class Quaternion:
     y: float
     z: float
     w: float
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 @dataclass
 class FrustumPlanes:
@@ -21,6 +49,9 @@ class FrustumPlanes:
     Bottom: float
     zNear: float
     zFar: float
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 class Matrix4x4:
     def __init__(self,
@@ -66,6 +97,9 @@ class Matrix4x4:
         self.m21 = m21
         self.m22 = m22
         self.m23 = m23
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 
 class COLLISION_EVENT(IntEnum):
@@ -79,11 +113,17 @@ class Color:
     g: float
     b: float
     a: float
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 @dataclass
 class LiteObject:
     name: str
     instanceId: int
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 class Transform:
     def __init__(self,
@@ -126,6 +166,9 @@ class Transform:
         self.rotation = rotation
         self.up = up
         self.worldToLocalMatrix = worldToLocalMatrix
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 class LiteGameObject(LiteObject):
     tag: str
@@ -142,6 +185,9 @@ class LiteGameObject(LiteObject):
     hierarchyPath: str
     Components: list
     transform: Transform
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 class PhysicsMaterialCombine(IntEnum):
     Average = 0
@@ -203,6 +249,9 @@ class Rigidbody:
     useGravity: bool
     velocity: Vector3
     worldCenterOfMass: Vector3
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 @dataclass
 class Bounds:
@@ -211,6 +260,9 @@ class Bounds:
     max: Vector3
     min: Vector3
     size: Vector3
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 @dataclass
 class Collider:
@@ -221,6 +273,9 @@ class Collider:
     isTrigger: bool
     material: PhysicsMaterial
     sharedMaterial: PhysicsMaterial
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 @dataclass
 class ContactPoint:
@@ -229,6 +284,9 @@ class ContactPoint:
     distance: float
     otherCollider: Collider
     thisCollider: Collider
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 class CoordinateConversion(IntEnum):
     None_ = auto()
@@ -247,6 +305,9 @@ class GameConnectionDetails:
     GamePath: str
     IsEditor: bool
     Platform: str
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 @dataclass
 class GDIOUnitTest:
@@ -258,6 +319,9 @@ class LiteComponent(LiteObject):
     transform: Transform
     typeFullName: str
     hierarchyPath: str
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 class LogLevel(IntEnum):
     Error = auto()
@@ -290,6 +354,9 @@ class RaycastResult:
     hasButton: bool
     point: Vector3
     typeFullName: str
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(**d)
 
 class Space(IntEnum):
     World = auto()
