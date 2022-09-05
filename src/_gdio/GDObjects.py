@@ -4,63 +4,53 @@ from dataclasses import dataclass
 from enum import IntEnum, auto
 from collections import namedtuple
 
-@dataclass
-class Vector2:
-    x: float
-    y: float
+class Marshalable:
     @classmethod
     def from_dict(cls, d: dict):
         return cls(**d)
 
 @dataclass
-class Vector3:
+class Vector2(Marshalable):
     x: float
     y: float
-    z: float
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 @dataclass
-class Vector4:
+class Vector3(Marshalable):
     x: float
     y: float
     z: float
-    w: float
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 @dataclass
-class Quaternion:
+class Vector4(Marshalable):
     x: float
     y: float
     z: float
     w: float
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 @dataclass
-class FrustumPlanes:
+class Quaternion(Marshalable):
+    x: float
+    y: float
+    z: float
+    w: float
+
+@dataclass
+class FrustumPlanes(Marshalable):
     Left: float
     Right: float
     Top: float
     Bottom: float
     zNear: float
     zFar: float
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
-class Matrix4x4:
+class Matrix4x4(Marshalable):
     def __init__(self,
             determinant: float,
-            inverse, # Matrix4x4
+            inverse: Matrix4x4,
             isIdentitiy: bool,
             lossyScale: Vector3,
             rotation: Quaternion,
-            transpose, # Matrix4x4
+            transpose: Matrix4x4,
             m00: float,
             m01: float,
             m02: float,
@@ -97,9 +87,6 @@ class Matrix4x4:
         self.m21 = m21
         self.m22 = m22
         self.m23 = m23
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 
 class COLLISION_EVENT(IntEnum):
@@ -108,24 +95,18 @@ class COLLISION_EVENT(IntEnum):
     COLLISION_EXIT = auto()
 
 @dataclass
-class Color:
+class Color(Marshalable):
     r: float
     g: float
     b: float
     a: float
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 @dataclass
-class LiteObject:
+class LiteObject(Marshalable):
     name: str
     instanceId: int
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
-class Transform:
+class Transform(Marshalable):
     def __init__(self,
             childCount: int,
             eulerAngles: Vector3,
@@ -142,7 +123,7 @@ class Transform:
             parent,
             position: Vector3,
             right: Vector3,
-            root, # Transform
+            root: Transform,
             rotation: Quaternion,
             up: Vector3,
             worldToLocalMatrix: Matrix4x4,
@@ -166,11 +147,8 @@ class Transform:
         self.rotation = rotation
         self.up = up
         self.worldToLocalMatrix = worldToLocalMatrix
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
-class LiteGameObject(LiteObject):
+class LiteGameObject(LiteObject, Marshalable):
     tag: str
     activeSelf: bool
     sceneName: str
@@ -195,13 +173,12 @@ class PhysicsMaterialCombine(IntEnum):
     Minimum = 2
     Maximum = 3
 
-class PhysicsMaterial(LiteObject):
+class PhysicsMaterial(LiteObject, Marshalable):
     bounciness: float
     dynamicFriction: float
     staticFriction: float
     frictionCombine: PhysicsMaterialCombine
     bounceCombine: PhysicsMaterialCombine
-
 
 class CollisionDetectionMode(IntEnum):
     Discrete = 0
@@ -227,7 +204,7 @@ class RigidBodyConstraints(IntEnum):
     FreezeAll = 126
 
 @dataclass
-class Rigidbody:
+class Rigidbody(Marshalable):
     angularDrag: float
     angularVelocity: Vector3
     centerOfMass: Vector3
@@ -249,23 +226,16 @@ class Rigidbody:
     useGravity: bool
     velocity: Vector3
     worldCenterOfMass: Vector3
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 @dataclass
-class Bounds:
+class Bounds(Marshalable):
     center: Vector3
     extents: Vector3
     max: Vector3
     min: Vector3
     size: Vector3
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
-
 @dataclass
-class Collider:
+class Collider(Marshalable):
     attachedRigidbody: Rigidbody
     bounds: Bounds
     contactOffset: float
@@ -273,20 +243,14 @@ class Collider:
     isTrigger: bool
     material: PhysicsMaterial
     sharedMaterial: PhysicsMaterial
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 @dataclass
-class ContactPoint:
+class ContactPoint(Marshalable):
     point: Vector3
     normal: Vector3
     distance: float
     otherCollider: Collider
     thisCollider: Collider
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 class CoordinateConversion(IntEnum):
     None_ = auto()
@@ -299,29 +263,23 @@ class CoordinateConversion(IntEnum):
     ViewportToScreenPoint = auto()
 
 @dataclass
-class GameConnectionDetails:
+class GameConnectionDetails(Marshalable):
     Addr: str
     Port: int
     GamePath: str
     IsEditor: bool
     Platform: str
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 @dataclass
-class GDIOUnitTest:
+class GDIOUnitTest(Marshalable):
     IsUnitTest: bool
 
-class LiteComponent(LiteObject):
+class LiteComponent(LiteObject, Marshalable):
     gameObject: LiteGameObject
     tag: str
     transform: Transform
     typeFullName: str
     hierarchyPath: str
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 class LogLevel(IntEnum):
     Error = auto()
@@ -347,16 +305,13 @@ class ObjectListFilter(IntEnum):
     All = auto()
 
 @dataclass
-class RaycastResult:
+class RaycastResult(Marshalable):
     type: str
     tag: str
     name: str
     hasButton: bool
     point: Vector3
     typeFullName: str
-    @classmethod
-    def from_dict(cls, d: dict):
-        return cls(**d)
 
 class Space(IntEnum):
     World = auto()
