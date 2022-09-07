@@ -1,1 +1,1 @@
- - {name} : `{type}` - {summary}
+- {name} : `{type}` - {summary}

@@ -1199,13 +1199,15 @@ class ApiClient:
 
 
     @requireClientConnectionAsync
-    async def GetObjectList(self, timeout : int = 30) -> list:
+    async def GetObjectList(self, hierarchyPath: str = None, includeHPath: bool = False, timeout : int = 30) -> list:
         '''
-        <summary> Gets the list of objects in the scene. </summary>
+        <summary> Returns the list of objects that are children of the target object </summary>
 
+        <param name="hierarchyPath" type="str"> The hierarchy path of the object to get the children of (Default: None, return all objects) </param>
+        <param name="includeHPath" type="bool"> Whether or not to include the hierarchy path in the returned object list (Default: False) </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="list"> The list of objects in the scene. </returns>
+        <returns value="list"> The list of returned objects </returns>
 
         <example>
         ```python
@@ -1216,7 +1218,10 @@ class ApiClient:
         '''
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
-            GDIOMsg = Messages.Cmd_GetObjectListRequest()
+            GDIOMsg = Messages.Cmd_GetObjectListRequest(
+                HierarchyPath = hierarchyPath,
+                IncludeHPath = includeHPath,
+            ),
         )
 
         requestInfo : ProtocolObjects.RequestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
@@ -1224,7 +1229,7 @@ class ApiClient:
 
         return cmd_GenericResponse.Objects
 
-    
+
     ''' GODOT Function
     @requireClientConnectionAsync
     async def GetObject(self,

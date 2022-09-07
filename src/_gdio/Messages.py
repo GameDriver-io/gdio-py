@@ -241,8 +241,9 @@ class Cmd_GetObjectInterfacesList(Message):
 
 
 class Cmd_GetObjectListRequest(Message):
-    def __init__(self):
-        pass
+    def __init__(self, HierarchyPath: str = None, IncludeHPath = False):
+        self.HierarchyPath = '' if HierarchyPath == None else HierarchyPath
+        self.IncludeHPath = IncludeHPath
 
 class Cmd_GetObjectListResponse(Cmd_GenericResponse):
     def __init__(self, Objects : list, StackTrace, ErrorMessage, InformationMessage, WarningMessage, RC, ReturnedValues):

@@ -36,7 +36,7 @@ GameDriver.io Unity API Client class.
 | [`GetObjectDistance`](#GetObjectDistance) -> `float` |  Gets the distance between two objects.  |
 | [`GetObjectFieldValue`](#GetObjectFieldValue) -> `t` |  Gets the value of a field on an object.  |
 | [`GetObjectFieldValueByName`](#GetObjectFieldValueByName) -> `t` |  Gets the value of a field on an object by field name.  |
-| [`GetObjectList`](#GetObjectList) -> `list` |  Gets the list of objects in the scene.  |
+| [`GetObjectList`](#GetObjectList) -> `list` |  Returns the list of objects that are children of the target object  |
 | [`GetObjectPosition`](#GetObjectPosition) -> `Vector3` |  Gets the position of an object.  |
 | [`GetSceneName`](#GetSceneName) -> `str` |  Gets the name of the active scene.  |
 | [`KeyPress`](#KeyPress) -> `None` |  Presses a key.  |
@@ -77,10 +77,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - axisId : `str` -  The name of the target input axis as defined in the Unity Input Manager (Old). 
- - value : `float` -  The value of change on the target axis from -1.0 to +1.0. 
- - numberOfFrames : `int` -  The number of frames to hold the input for. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- axisId : `str` -  The name of the target input axis as defined in the Unity Input Manager (Old). 
+- value : `float` -  The value of change on the target axis from -1.0 to +1.0. 
+- numberOfFrames : `int` -  The number of frames to hold the input for. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -101,9 +101,9 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `str` -  The name of the target input button as defined in the Unity Input Manager (Old). 
- - numberOfFrames : `int` -  The number of frames to hold the input for. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `str` -  The name of the target input button as defined in the Unity Input Manager (Old). 
+- numberOfFrames : `int` -  The number of frames to hold the input for. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -124,10 +124,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The HierarchyPath for a script attached to an object where the target method is defined. 
- - methodName : `str` -  The name of the method to call. 
- - arguments : `list[any]` -  The list of arguments to pass into the method. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The HierarchyPath for a script attached to an object where the target method is defined. 
+- methodName : `str` -  The name of the method to call. 
+- arguments : `list[any]` -  The list of arguments to pass into the method. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -148,7 +148,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -171,10 +171,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - filename : `str` -  The absolute path and filename of the screen capture. 
- - storeInGameFolder : `bool` -  Save the screenshot on the device the game is running on rather than returning it to the client. 
- - overwriteExisting : `bool` -  Overwrite if the file already exists. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- filename : `str` -  The absolute path and filename of the screen capture. 
+- storeInGameFolder : `bool` -  Save the screenshot on the device the game is running on rather than returning it to the client. 
+- overwriteExisting : `bool` -  Overwrite if the file already exists. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -194,15 +194,15 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - position : `Vector2` -  The position in screen coordinates at which to click. 
- - clickFrameCount : `int` -  The number of frames to click for. 
- - keys : `list[KeyCode]` -  The list of keys to press while clicking. 
- - keysNumberOfFrames : `int` -  The number of frames to hold the keys for. 
- - modifiers : `list[KeyCode]` -  The list of modifier keys to press while clicking. 
- - modifiersNumberOfFrames : `int` -  The number of frames to hold the modifier keys for. 
- - delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers before clicking the keys. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- position : `Vector2` -  The position in screen coordinates at which to click. 
+- clickFrameCount : `int` -  The number of frames to click for. 
+- keys : `list[KeyCode]` -  The list of keys to press while clicking. 
+- keysNumberOfFrames : `int` -  The number of frames to hold the keys for. 
+- modifiers : `list[KeyCode]` -  The list of modifier keys to press while clicking. 
+- modifiersNumberOfFrames : `int` -  The number of frames to hold the modifier keys for. 
+- delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers before clicking the keys. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -223,16 +223,16 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - x : `float` -  The x position in screen coordinates at which to click. 
- - y : `float` -  The y position in screen coordinates at which to click. 
- - clickFrameCount : `int` -  The number of frames to click for. 
- - keys : `list[KeyCode]` -  The list of keys to press while clicking. 
- - keysNumberOfFrames : `int` -  The number of frames to hold the keys for. 
- - modifiers : `list[KeyCode]` -  The list of modifier keys to press while clicking. 
- - modifiersNumberOfFrames : `int` -  The number of frames to hold the modifier keys for. 
- - delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers before clicking the keys. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- x : `float` -  The x position in screen coordinates at which to click. 
+- y : `float` -  The y position in screen coordinates at which to click. 
+- clickFrameCount : `int` -  The number of frames to click for. 
+- keys : `list[KeyCode]` -  The list of keys to press while clicking. 
+- keysNumberOfFrames : `int` -  The number of frames to hold the keys for. 
+- modifiers : `list[KeyCode]` -  The list of modifier keys to press while clicking. 
+- modifiersNumberOfFrames : `int` -  The number of frames to hold the modifier keys for. 
+- delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers before clicking the keys. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -253,11 +253,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - hierarchyPath : `str` -  The hierarchy path of the object to click. 
- - frameCount : `int` -  The number of frames to click for. 
- - cameraHierarchyPath : `str` -  The hierarchy path of the camera to use to find the object. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- hierarchyPath : `str` -  The hierarchy path of the object to click. 
+- frameCount : `int` -  The number of frames to click for. 
+- cameraHierarchyPath : `str` -  The hierarchy path of the camera to use to find the object. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -278,16 +278,16 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - hierarchyPath : `str` -  The hierarchy path of the object to click. 
- - frameCount : `int` -  The number of frames to click for. 
- - cameraHierarchyPath : `str` -  The hierarchy path of the camera to use to find the object. 
- - keys : `list` -  The keys to press. 
- - keysNumberOfFrames : `int` -  The number of frames to hold the keys for. 
- - modifiers : `list` -  The modifiers to press. 
- - modifiersNumberOfFrames : `int` -  The number of frames to hold the modifiers for. 
- - delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- hierarchyPath : `str` -  The hierarchy path of the object to click. 
+- frameCount : `int` -  The number of frames to click for. 
+- cameraHierarchyPath : `str` -  The hierarchy path of the camera to use to find the object. 
+- keys : `list` -  The keys to press. 
+- keysNumberOfFrames : `int` -  The number of frames to hold the keys for. 
+- modifiers : `list` -  The modifiers to press. 
+- modifiersNumberOfFrames : `int` -  The number of frames to hold the modifiers for. 
+- delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -308,10 +308,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - position : `Vector2` -  The position in screen coordinates at which to click. 
- - clickFrameCount : `int` -  The number of frames to click for. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- position : `Vector2` -  The position in screen coordinates at which to click. 
+- clickFrameCount : `int` -  The number of frames to click for. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -332,11 +332,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - x : `float` -  The x position in screen coordinates at which to click. 
- - y : `float` -  The y position in screen coordinates at which to click. 
- - clickFrameCount : `int` -  The number of frames to click for. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- x : `float` -  The x position in screen coordinates at which to click. 
+- y : `float` -  The y position in screen coordinates at which to click. 
+- clickFrameCount : `int` -  The number of frames to click for. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -357,10 +357,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hostname : `str` -  The hostname of the device running the target game. 
- - port : `int` -  The port that the target Gamedriver agent is configured to listen on. 
- - autoplay : `bool` -  Start the game automatically within the Unity Editor. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hostname : `str` -  The hostname of the device running the target game. 
+- port : `int` -  The port that the target Gamedriver agent is configured to listen on. 
+- autoplay : `bool` -  Start the game automatically within the Unity Editor. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -382,8 +382,8 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - HookingObject : `str` -  The input type to disable. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- HookingObject : `str` -  The input type to disable. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -411,7 +411,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -450,15 +450,15 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - position : `Vector2` -  The position to click at. 
- - clickFrameCount : `int` -  The number of frames to click. 
- - keys : `list` -  The list of keys to press. 
- - keysNumberOfFrames : `int` -  The number of frames to press the keys. 
- - modifiers : `list` -  The list of modifiers to press. 
- - modifiersNumberOfFrames : `int` -  The number of frames to press the modifiers. 
- - delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- position : `Vector2` -  The position to click at. 
+- clickFrameCount : `int` -  The number of frames to click. 
+- keys : `list` -  The list of keys to press. 
+- keysNumberOfFrames : `int` -  The number of frames to press the keys. 
+- modifiers : `list` -  The list of modifiers to press. 
+- modifiersNumberOfFrames : `int` -  The number of frames to press the modifiers. 
+- delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -479,16 +479,16 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - x : `float` -  The x position to click at. 
- - y : `float` -  The y position to click at. 
- - clickFrameCount : `int` -  The number of frames to click. 
- - keys : `list` -  The list of keys to press. 
- - keysNumberOfFrames : `int` -  The number of frames to press the keys. 
- - modifiers : `list` -  The list of modifiers to press. 
- - modifiersNumberOfFrames : `int` -  The number of frames to press the modifiers. 
- - delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- x : `float` -  The x position to click at. 
+- y : `float` -  The y position to click at. 
+- clickFrameCount : `int` -  The number of frames to click. 
+- keys : `list` -  The list of keys to press. 
+- keysNumberOfFrames : `int` -  The number of frames to press the keys. 
+- modifiers : `list` -  The list of modifiers to press. 
+- modifiersNumberOfFrames : `int` -  The number of frames to press the modifiers. 
+- delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -509,10 +509,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - hierarchyPath : `str` -  The hierarchy path of the object to click. 
- - frameCount : `int` -  The number of frames to click. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- hierarchyPath : `str` -  The hierarchy path of the object to click. 
+- frameCount : `int` -  The number of frames to click. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -533,15 +533,15 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - hierarchyPath : `str` -  The hierarchy path of the object to click. 
- - clickFrameCount : `int` -  The number of frames to click. 
- - keys : `list` -  The list of keys to press. 
- - keysNumberOfFrames : `int` -  The number of frames to press the keys. 
- - modifiers : `list` -  The list of modifiers to press. 
- - modifiersNumberOfFrames : `int` -  The number of frames to press the modifiers. 
- - delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- hierarchyPath : `str` -  The hierarchy path of the object to click. 
+- clickFrameCount : `int` -  The number of frames to click. 
+- keys : `list` -  The list of keys to press. 
+- keysNumberOfFrames : `int` -  The number of frames to press the keys. 
+- modifiers : `list` -  The list of modifiers to press. 
+- modifiersNumberOfFrames : `int` -  The number of frames to press the modifiers. 
+- delayAfterModifiersMsec : `int` -  The number of milliseconds to wait after pressing the modifiers. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -562,10 +562,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - position : `Vector2` -  The position to click at. 
- - clickFrameCount : `int` -  The number of frames to click for. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- position : `Vector2` -  The position to click at. 
+- clickFrameCount : `int` -  The number of frames to click for. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -586,11 +586,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - buttonId : `MouseButtons` -  The button to click. 
- - x : `float` -  The x position to click at. 
- - y : `float` -  The y position to click at. 
- - clickFrameCount : `int` -  The number of frames to click for. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- buttonId : `MouseButtons` -  The button to click. 
+- x : `float` -  The x position to click at. 
+- y : `float` -  The y position to click at. 
+- clickFrameCount : `int` -  The number of frames to click for. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -611,8 +611,8 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hookingObject : `HookingObject` -  The hooking object to enable. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hookingObject : `HookingObject` -  The hooking object to enable. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -642,7 +642,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -662,7 +662,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -702,7 +702,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -749,9 +749,9 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - objectA_HierarchyPath : `str` -  The hierarchy path of the first object. 
- - objectB_HierarchyPath : `str` -  The hierarchy path of the second object. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- objectA_HierarchyPath : `str` -  The hierarchy path of the first object. 
+- objectB_HierarchyPath : `str` -  The hierarchy path of the second object. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -772,9 +772,9 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - t : `type` -  The type of the field. 
- - hierarchyPath : `str` -  The hierarchy path of the target field. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- t : `type` -  The type of the field. 
+- hierarchyPath : `str` -  The hierarchy path of the target field. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -796,9 +796,9 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object. 
- - fieldName : `str` -  The name of the field. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object. 
+- fieldName : `str` -  The name of the field. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -810,17 +810,19 @@ GameDriver.io Unity API Client class.
  value = await api.GetObjectFieldValueByName(hierarchyPath="//*[@name='Player']", fieldName="active")
  print(value)
  ```
- ### <a id='GetObjectList'></a> GetObjectList(timeout : `int`) -> `list`
+ ### <a id='GetObjectList'></a> GetObjectList(hierarchyPath : `str`, includeHPath : `bool`, timeout : `int`) -> `list`
 
- Gets the list of objects in the scene. 
+ Returns the list of objects that are children of the target object 
 
 #### Returns
 
- The list of objects in the scene. 
+ The list of returned objects 
 
 #### Parameters
 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object to get the children of (Default: None, return all objects) 
+- includeHPath : `bool` -  Whether or not to include the hierarchy path in the returned object list (Default: False) 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -841,10 +843,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object. 
- - coordSpace : `CoordinateConversion` -  The coordinate space to use. 
- - cameraHierarchyPath : `str` -  The hierarchy path of the camera to use. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object. 
+- coordSpace : `CoordinateConversion` -  The coordinate space to use. 
+- cameraHierarchyPath : `str` -  The hierarchy path of the camera to use. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -866,7 +868,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -887,12 +889,12 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - keys : `list` -  The keys to press. 
- - numberOfFrames : `int` -  The number of frames to press the keys. 
- - modifiers : `list` -  The modifiers to press. 
- - modifiersNumberOfFrames : `int` -  The number of frames to press the modifiers. 
- - delayAfterModifiersMsec : `int` -  The delay after pressing the modifiers. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- keys : `list` -  The keys to press. 
+- numberOfFrames : `int` -  The number of frames to press the keys. 
+- modifiers : `list` -  The modifiers to press. 
+- modifiersNumberOfFrames : `int` -  The number of frames to press the modifiers. 
+- delayAfterModifiersMsec : `int` -  The delay after pressing the modifiers. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -912,8 +914,8 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - filename : `str` -  The filename of the process to launch. 
- - arguments : `str` -  The arguments to launch the process with. 
+- filename : `str` -  The filename of the process to launch. 
+- arguments : `str` -  The arguments to launch the process with. 
 
 
 
@@ -935,8 +937,8 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - sceneName : `str` -  The name of the scene to load. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- sceneName : `str` -  The name of the scene to load. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -956,14 +958,14 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - button : `MouseButtons` -  The button to drag with. 
- - dx : `float` -  The amount to drag the mouse in the X direction. 
- - dy : `float` -  The amount to drag the mouse in the Y direction. 
- - frameCount : `float` -  The number of frames to drag the mouse. 
- - ox : `float` -  The offset X of the mouse. 
- - oy : `float` -  The offset Y of the mouse. 
- - waitForEmptyInput : `bool` -  Whether or not to wait for the mouse to be empty before continuing. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- button : `MouseButtons` -  The button to drag with. 
+- dx : `float` -  The amount to drag the mouse in the X direction. 
+- dy : `float` -  The amount to drag the mouse in the Y direction. 
+- frameCount : `float` -  The number of frames to drag the mouse. 
+- ox : `float` -  The offset X of the mouse. 
+- oy : `float` -  The offset Y of the mouse. 
+- waitForEmptyInput : `bool` -  Whether or not to wait for the mouse to be empty before continuing. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -984,11 +986,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - objectHierarchyPath : `str` -  The object hierarchy path of the object to move to. 
- - frameCount : `float` -  The number of frames to move the mouse. 
- - waitForObject : `bool` -  Whether or not to wait for the object to be found. 
- - waitForEmptyInput : `bool` -  Whether or not to wait for the mouse to be empty before continuing. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- objectHierarchyPath : `str` -  The object hierarchy path of the object to move to. 
+- frameCount : `float` -  The number of frames to move the mouse. 
+- waitForObject : `bool` -  Whether or not to wait for the object to be found. 
+- waitForEmptyInput : `bool` -  Whether or not to wait for the mouse to be empty before continuing. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1009,13 +1011,13 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - dx : `float` -  The amount to move the mouse in the X direction. 
- - dy : `float` -  The amount to move the mouse in the Y direction. 
- - frameCount : `float` -  The number of frames to move the mouse. 
- - ox : `float` -  The offset X of the mouse. 
- - oy : `float` -  The offset Y of the mouse. 
- - waitForEmptyInput : `bool` -  Whether or not to wait for the mouse to be empty before continuing. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- dx : `float` -  The amount to move the mouse in the X direction. 
+- dy : `float` -  The amount to move the mouse in the Y direction. 
+- frameCount : `float` -  The number of frames to move the mouse. 
+- ox : `float` -  The offset X of the mouse. 
+- oy : `float` -  The offset Y of the mouse. 
+- waitForEmptyInput : `bool` -  Whether or not to wait for the mouse to be empty before continuing. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1036,11 +1038,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - navAgent_HierarchyPath : `str` -  The object hierarchy path of the nav agent to move. 
- - dx : `float` -  The amount to move the nav agent in the X direction. 
- - dy : `float` -  The amount to move the nav agent in the Y direction. 
- - waitForMoveToComplete : `bool` -  Whether or not to wait for the nav agent to reach the destination. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- navAgent_HierarchyPath : `str` -  The object hierarchy path of the nav agent to move. 
+- dx : `float` -  The amount to move the nav agent in the X direction. 
+- dy : `float` -  The amount to move the nav agent in the Y direction. 
+- waitForMoveToComplete : `bool` -  Whether or not to wait for the nav agent to reach the destination. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1061,9 +1063,9 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - raycastPoint : `Vector3` -  The raycast point. 
- - cameraHierarchyPath : `str` -  The hierarchy path of the camera to use for the raycast. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- raycastPoint : `Vector3` -  The raycast point. 
+- cameraHierarchyPath : `str` -  The hierarchy path of the camera to use for the raycast. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1084,8 +1086,8 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object to monitor. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object to monitor. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1112,13 +1114,13 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object to rotate. 
- - xAngle : `float` -  The X angle to rotate the object by. 
- - yAngle : `float` -  The Y angle to rotate the object by. 
- - zAngle : `float` -  The Z angle to rotate the object by. 
- - relativeTo : `Space` -  The space to rotate the object in. 
- - waitForObject : `bool` -  Whether or not to wait for the object to rotate. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object to rotate. 
+- xAngle : `float` -  The X angle to rotate the object by. 
+- yAngle : `float` -  The Y angle to rotate the object by. 
+- zAngle : `float` -  The Z angle to rotate the object by. 
+- relativeTo : `Space` -  The space to rotate the object in. 
+- waitForObject : `bool` -  Whether or not to wait for the object to rotate. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1139,11 +1141,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object to rotate. 
- - euler : `Vector3` -  The Euler angles to rotate the object by. 
- - relativeTo : `Space` -  The space to rotate the object in. 
- - waitForObject : `bool` -  Whether or not to wait for the object to rotate. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object to rotate. 
+- euler : `Vector3` -  The Euler angles to rotate the object by. 
+- relativeTo : `Space` -  The space to rotate the object in. 
+- waitForObject : `bool` -  Whether or not to wait for the object to rotate. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1166,10 +1168,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object to rotate. 
- - quaternion : `Vector4` -  The quaternion to rotate the object by. 
- - waitForObject : `bool` -  Whether or not to wait for the object to rotate. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object to rotate. 
+- quaternion : `Vector4` -  The quaternion to rotate the object by. 
+- waitForObject : `bool` -  Whether or not to wait for the object to rotate. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1190,10 +1192,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the input field. 
- - text : `str` -  The text to set the input field to. 
- - waitForObject : `bool` -  Whether or not to wait for the object to be set. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the input field. 
+- text : `str` -  The text to set the input field to. 
+- waitForObject : `bool` -  Whether or not to wait for the object to be set. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1214,11 +1216,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object. 
- - fieldName : `str` -  The name of the field or property to set. 
- - value : `object` -  The value to set the field or property to. 
- - waitForObject : `bool` -  If True, wait for the object to exist if it doesn't. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object. 
+- fieldName : `str` -  The name of the field or property to set. 
+- value : `object` -  The value to set the field or property to. 
+- waitForObject : `bool` -  If True, wait for the object to exist if it doesn't. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1253,11 +1255,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object to tap. 
- - tapCount : `int` -  The number of times to tap the object. 
- - frameCount : `int` -  The number of frames to tap the object. 
- - cameraHierarchyPath : `str` -  The hierarchy path of the camera to use when tapping. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object to tap. 
+- tapCount : `int` -  The number of times to tap the object. 
+- frameCount : `int` -  The number of frames to tap the object. 
+- cameraHierarchyPath : `str` -  The hierarchy path of the camera to use when tapping. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1278,11 +1280,11 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - x : `float` -  The X coordinate to tap. 
- - y : `float` -  The Y coordinate to tap. 
- - tapCount : `int` -  The number of times to tap the object. 
- - frameCount : `int` -  The number of frames to tap the object. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- x : `float` -  The X coordinate to tap. 
+- y : `float` -  The Y coordinate to tap. 
+- tapCount : `int` -  The number of times to tap the object. 
+- frameCount : `int` -  The number of frames to tap the object. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1303,10 +1305,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - position : `Vector2` -  The position to tap. 
- - tapCount : `int` -  The number of times to tap the object. 
- - frameCount : `int` -  The number of frames to tap the object. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- position : `Vector2` -  The position to tap. 
+- tapCount : `int` -  The number of times to tap the object. 
+- frameCount : `int` -  The number of frames to tap the object. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1386,20 +1388,20 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - x1 : `float` -  The X coordinate of the first touch point. 
- - y1 : `float` -  The Y coordinate of the first touch point. 
- - x2 : `float` -  The X coordinate of the second touch point. 
- - y2 : `float` -  The Y coordinate of the second touch point. 
- - fingerId : `int` -  The finger ID. 
- - tapCount : `int` -  The number of times to tap the object. 
- - frameCount : `int` -  The number of frames to tap the object. 
- - waitForEmptyInput : `bool` -  Whether to wait for an empty input. 
- - radius : `float` -  The radius of the touch. 
- - pressure : `float` -  The pressure of the touch. 
- - altitudeAngle : `float` -  The altitude angle of the touch. 
- - azmulthAngle : `float` -  The azmulth angle of the touch. 
- - maximumPossiblePressure : `float` -  The maximum possible pressure of the touch. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- x1 : `float` -  The X coordinate of the first touch point. 
+- y1 : `float` -  The Y coordinate of the first touch point. 
+- x2 : `float` -  The X coordinate of the second touch point. 
+- y2 : `float` -  The Y coordinate of the second touch point. 
+- fingerId : `int` -  The finger ID. 
+- tapCount : `int` -  The number of times to tap the object. 
+- frameCount : `int` -  The number of frames to tap the object. 
+- waitForEmptyInput : `bool` -  Whether to wait for an empty input. 
+- radius : `float` -  The radius of the touch. 
+- pressure : `float` -  The pressure of the touch. 
+- altitudeAngle : `float` -  The altitude angle of the touch. 
+- azmulthAngle : `float` -  The azmulth angle of the touch. 
+- maximumPossiblePressure : `float` -  The maximum possible pressure of the touch. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1420,8 +1422,8 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object to monitor. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+- hierarchyPath : `str` -  The hierarchy path of the object to monitor. 
+- timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
 
 
 
@@ -1448,7 +1450,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - miliseconds : `int` -  The number of miliseconds to wait. 
+- miliseconds : `int` -  The number of miliseconds to wait. 
 
 
 
@@ -1469,8 +1471,8 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - eventId : `str` -  The Id of the collision monitor to wait for an event from. 
- - timeout : `int` -  The number of seconds to wait for the event to be processed 
+- eventId : `str` -  The Id of the collision monitor to wait for an event from. 
+- timeout : `int` -  The number of seconds to wait for the event to be processed 
 
 
 
@@ -1497,7 +1499,7 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - timeout : `int` -  The number of seconds to wait for the event to be processed 
+- timeout : `int` -  The number of seconds to wait for the event to be processed 
 
 
 
@@ -1517,8 +1519,8 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object to wait for. 
- - timeout : `int` -  The number of seconds to wait for the object to exist. 
+- hierarchyPath : `str` -  The hierarchy path of the object to wait for. 
+- timeout : `int` -  The number of seconds to wait for the object to exist. 
 
 
 
@@ -1539,10 +1541,10 @@ GameDriver.io Unity API Client class.
 
 #### Parameters
 
- - hierarchyPath : `str` -  The hierarchy path of the object to wait for. 
- - fieldOrPropertyName : `str` -  The name of the field/property to wait for. 
- - value : `str` -  The value to wait for. 
- - timeout : `int` -  The number of seconds to wait for the object to exist 
+- hierarchyPath : `str` -  The hierarchy path of the object to wait for. 
+- fieldOrPropertyName : `str` -  The name of the field/property to wait for. 
+- value : `str` -  The value to wait for. 
+- timeout : `int` -  The number of seconds to wait for the object to exist 
 
 
 
