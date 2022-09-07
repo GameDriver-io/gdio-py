@@ -6,26 +6,27 @@ GameDriver.io Unity API Client class.
 
 | Method Name | Summary |
 | ---- | ---- |
-| [`AxisPress`](#AxisPress) -> `None` |  Send arbitrary axis states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND)  |
-| [`ButtonPress`](#ButtonPress) -> `None` |  Send arbitrary button states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND)  |
+| [`AxisPress`](#AxisPress) -> `None` |  Send arbitrary axis states to the game  |
+| [`ButtonPress`](#ButtonPress) -> `None` |  Send arbitrary button states to the game  |
 | [`CallMethod`](#CallMethod) -> `bool` |  Execute a method on an object  |
-| [`CaptureScreenshot`](#CaptureScreenshot) -> `str` |  Capture a screenshot of the currently running game.  |
-| [`ClickEx_Vec2`](#ClickEx_Vec2) -> `None` |  Clicks a mouse button at the target coordinates along with keypresses.  |
-| [`ClickEx_XY`](#ClickEx_XY) -> `None` |  Clicks a mouse button at the target coordinates along with keypresses.  |
+| [`CaptureScreenshot`](#CaptureScreenshot) -> `ByteString` |  Capture a screenshot of the currently running game.  |
+| [`CaptureScreenshotToFile`](#CaptureScreenshotToFile) -> `str` |  Capture a screenshot of the currently running game.  |
+| [`ClickExVec2`](#ClickExVec2) -> `None` |  Clicks a mouse button at the target coordinates along with keypresses.  |
+| [`ClickExXY`](#ClickExXY) -> `None` |  Clicks a mouse button at the target coordinates along with keypresses.  |
 | [`ClickObject`](#ClickObject) -> `None` |  Clicks a mouse button at the position of the target object.  |
 | [`ClickObjectEx`](#ClickObjectEx) -> `None` |  Clicks a mouse button at the position of the target object along with keypresses.  |
-| [`Click_Vec2`](#Click_Vec2) -> `None` |  Clicks a mouse button at the target coordinates.  |
-| [`Click_XY`](#Click_XY) -> `None` |  Clicks a mouse button at the target coordinates.  |
+| [`ClickVec2`](#ClickVec2) -> `None` |  Clicks a mouse button at the target coordinates.  |
+| [`ClickXY`](#ClickXY) -> `None` |  Clicks a mouse button at the target coordinates.  |
 | [`Connect`](#Connect) -> `bool` |  Connects to an agent at the target hostname and port.  |
 | [`DisableHooks`](#DisableHooks) -> `None` |  Disables the ability to preform the target input type from the ApiClient.  |
 | [`DisableObjectCaching`](#DisableObjectCaching) -> `None` |  Disables object caching of objects for HierarchyPath resolution.  |
 | [`Disconnect`](#Disconnect) -> `None` |  Disconnects from the agent.  |
-| [`DoubleClickEx_Vec2`](#DoubleClickEx_Vec2) -> `None` |  Double-clicks the mouse at the target coordinates.  |
-| [`DoubleClickEx_XY`](#DoubleClickEx_XY) -> `None` |  Double-clicks the mouse at the target coordinates.  |
+| [`DoubleClickExVec2`](#DoubleClickExVec2) -> `None` |  Double-clicks the mouse at the target coordinates.  |
+| [`DoubleClickExXY`](#DoubleClickExXY) -> `None` |  Double-clicks the mouse at the target coordinates.  |
 | [`DoubleClickObject`](#DoubleClickObject) -> `None` |  Double-clicks the mouse at the target coordinates.  |
 | [`DoubleClickObjectEx`](#DoubleClickObjectEx) -> `None` |  Double-clicks the mouse at the target coordinates.  |
-| [`DoubleClick_Vec2`](#DoubleClick_Vec2) -> `None` |  Double-clicks a mouse button at the target coordinates.  |
-| [`DoubleClick_XY`](#DoubleClick_XY) -> `None` |  Double-clicks a mouse button at the target coordinates.  |
+| [`DoubleClickVec2`](#DoubleClickVec2) -> `None` |  Double-clicks a mouse button at the target coordinates.  |
+| [`DoubleClickXY`](#DoubleClickXY) -> `None` |  Double-clicks a mouse button at the target coordinates.  |
 | [`EnableHooks`](#EnableHooks) -> `None` |  Enables the given hooking object.  |
 | [`EnableObjectCaching`](#EnableObjectCaching) -> `None` |  Enables caching of objects for hierarchyPath resolution.  |
 | [`FlushObjectLookupCache`](#FlushObjectLookupCache) -> `None` |  Flushes the object lookup cache.  |
@@ -47,15 +48,15 @@ GameDriver.io Unity API Client class.
 | [`NavAgentMoveToPoint`](#NavAgentMoveToPoint) -> `bool` |  Moves the nav agent to a point.  |
 | [`Raycast`](#Raycast) -> `list` |  Perform a Raycast to a point to find out what is in that position.  |
 | [`RegisterCollisionMonitor`](#RegisterCollisionMonitor) -> `str` |  Registers a collision monitor to recieve collision events on an object.  |
-| [`RotateObject_AxisAngle`](#RotateObject_AxisAngle) -> `None` |  Rotates an object using absolute axis angles.  |
+| [`RotateObjectAxisAngle`](#RotateObjectAxisAngle) -> `None` |  Rotates an object using absolute axis angles.  |
 | [`RotateObject_Euler`](#RotateObject_Euler) -> `None` |  Rotates an object using euler angles.  |
 | [`RotateObject_Quaternion`](#RotateObject_Quaternion) -> `None` |  Rotates an object using a quaternion.  |
 | [`SetInputFieldText`](#SetInputFieldText) -> `None` |  Sets the text of an InputField or TMP_InputField.  |
 | [`SetObjectFieldValue`](#SetObjectFieldValue) -> `None` |  Set the field or property of an object.  |
 | [`StopEditorPlay`](#StopEditorPlay) -> `None` |  Stops Play Mode in the Unity Editor.  |
 | [`TapObject`](#TapObject) -> `None` |  Tap the handheld device at the target position.  |
+| [`TapXY`](#TapXY) -> `None` |  Tap the handheld device at the target position.  |
 | [`Tap_Vec2`](#Tap_Vec2) -> `bool` |  Tap the handheld device at the target position.  |
-| [`Tap_XY`](#Tap_XY) -> `None` |  Tap the handheld device at the target position.  |
 | [`TerminateGame`](#TerminateGame) -> `None` |  Terminates the game.  |
 | [`ToggleEditorPause`](#ToggleEditorPause) -> `bool` |  Toggles Pause in the Unity Editor while Play Mode is active.  |
 | [`ToggleEditorPlay`](#ToggleEditorPlay) -> `bool` |  Toggles Play Mode in the Unity Editor.  |
@@ -65,10 +66,10 @@ GameDriver.io Unity API Client class.
 | [`WaitForCollisionEvent`](#WaitForCollisionEvent) -> `Collision` |  Waits for a new collision event.  |
 | [`WaitForEmptyInput`](#WaitForEmptyInput) -> `None` |  Waits for an empty input event.  |
 | [`WaitForObject`](#WaitForObject) -> `bool` |  Waits for an object to exist.  |
-| [`waitForObjectValue`](#waitForObjectValue) -> `bool` |  Wait for an object to exist and have a specific value for a specified field/property.  |
+| [`WaitForObjectValue`](#WaitForObjectValue) -> `bool` |  Wait for an object to exist and have a specific value for a specified field/property.  |
 ### <a id='AxisPress'></a> AxisPress(axisId : `str`, value : `float`, numberOfFrames : `int`, timeout : `int`) -> `None`
 
- Send arbitrary axis states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND) 
+ Send arbitrary axis states to the game 
 
 #### Returns
 
@@ -92,7 +93,7 @@ GameDriver.io Unity API Client class.
  ```
  ### <a id='ButtonPress'></a> ButtonPress(buttonId : `str`, numberOfFrames : `int`, timeout : `int`) -> `None`
 
- Send arbitrary button states to the game. Defaults to LEFT ALT/CTRL/SHIFT/WINDOWS(COMMAND) 
+ Send arbitrary button states to the game 
 
 #### Returns
 
@@ -137,7 +138,30 @@ GameDriver.io Unity API Client class.
  # Set the color of the `Player` object to red using its method `SetColor`.
  await api.CallMethod(hierarchyPath="//*[@name='Player']/fn:component('Box')", methodName="SetColor", arguments=[255, 0, 0])
  ```
- ### <a id='CaptureScreenshot'></a> CaptureScreenshot(filename : `str`, storeInGameFolder : `bool`, overwriteExisting : `bool`, timeout : `int`) -> `str`
+ ### <a id='CaptureScreenshot'></a> CaptureScreenshot(timeout : `int`) -> `ByteString`
+
+ Capture a screenshot of the currently running game. 
+
+#### Returns
+
+ The captured image data 
+
+#### Parameters
+
+ - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+
+
+
+#### Example
+
+
+ ```python
+ img_data = await api.CaptureScreenshot()
+
+ with open("screenshot.png", "wb") as f:
+ 	f.write(img_data)
+ ```
+ ### <a id='CaptureScreenshotToFile'></a> CaptureScreenshotToFile(filename : `str`, storeInGameFolder : `bool`, overwriteExisting : `bool`, timeout : `int`) -> `str`
 
  Capture a screenshot of the currently running game. 
 
@@ -158,9 +182,9 @@ GameDriver.io Unity API Client class.
 
 
  ```python
- await api.CaptureScreenshot(filename="/path/to/file/screenshot.png")
+ await api.CaptureScreenshotToFile(filename="/path/to/file/screenshot.png")
  ```
- ### <a id='ClickEx_Vec2'></a> ClickEx_Vec2(buttonId : `MouseButtons`, position : `Vector2`, clickFrameCount : `int`, keys : `list[KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `None`
+ ### <a id='ClickExVec2'></a> ClickExVec2(buttonId : `MouseButtons`, position : `Vector2`, clickFrameCount : `int`, keys : `list[KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `None`
 
  Clicks a mouse button at the target coordinates along with keypresses. 
 
@@ -189,7 +213,7 @@ GameDriver.io Unity API Client class.
  # Shift+Left click the screen at (100, 100) for 5 frames.
  await api.ClickEx_XY(buttonId=MouseButtons.Left, position=(100, 100), clickFrameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
  ```
- ### <a id='ClickEx_XY'></a> ClickEx_XY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list[KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `None`
+ ### <a id='ClickExXY'></a> ClickExXY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list[KeyCode]`, keysNumberOfFrames : `int`, modifiers : `list[KeyCode]`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `None`
 
  Clicks a mouse button at the target coordinates along with keypresses. 
 
@@ -274,7 +298,7 @@ GameDriver.io Unity API Client class.
  # Shift+Left click the screen at the position of the `Player` object for 5 frames.
  await api.ClickObjectEx(buttonId=MouseButtons.Left, hierarchyPath="//*[@name='Player']", frameCount=5, keys=[KeyCode.LShift], keysNumberOfFrames=5)
  ```
- ### <a id='Click_Vec2'></a> Click_Vec2(buttonId : `MouseButtons`, position : `Vector2`, clickFrameCount : `int`, timeout : `int`) -> `None`
+ ### <a id='ClickVec2'></a> ClickVec2(buttonId : `MouseButtons`, position : `Vector2`, clickFrameCount : `int`, timeout : `int`) -> `None`
 
  Clicks a mouse button at the target coordinates. 
 
@@ -298,7 +322,7 @@ GameDriver.io Unity API Client class.
  # Left click the screen at (100, 100) for 5 frames.
  await api.Click_XY(ButtonId=MouseButtons.Left, position=(100, 100), clickFrameCount=5)
  ```
- ### <a id='Click_XY'></a> Click_XY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`) -> `None`
+ ### <a id='ClickXY'></a> ClickXY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`) -> `None`
 
  Clicks a mouse button at the target coordinates. 
 
@@ -416,7 +440,7 @@ GameDriver.io Unity API Client class.
  ```python
  await api.Disconnect()
  ```
- ### <a id='DoubleClickEx_Vec2'></a> DoubleClickEx_Vec2(buttonId : `MouseButtons`, position : `Vector2`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `None`
+ ### <a id='DoubleClickExVec2'></a> DoubleClickExVec2(buttonId : `MouseButtons`, position : `Vector2`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `None`
 
  Double-clicks the mouse at the target coordinates. 
 
@@ -445,7 +469,7 @@ GameDriver.io Unity API Client class.
  # Double-click the left mouse button at (500, 500) while pressing Shift and Control
  await api.DoubleClickEx_Vec2(buttonId=MouseButtons.LEFT, position=Vector2(500, 500), clickFrameCount=5, keys=[KeyCode.SHIFT, KeyCode.CONTROL], keysNumberOfFrames=5)
  ```
- ### <a id='DoubleClickEx_XY'></a> DoubleClickEx_XY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `None`
+ ### <a id='DoubleClickExXY'></a> DoubleClickExXY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, keys : `list`, keysNumberOfFrames : `int`, modifiers : `list`, modifiersNumberOfFrames : `int`, delayAfterModifiersMsec : `int`, timeout : `int`) -> `None`
 
  Double-clicks the mouse at the target coordinates. 
 
@@ -528,7 +552,7 @@ GameDriver.io Unity API Client class.
  # Double-click the position of the `Player` object while pressing Shift and Control
  await api.DoubleClickObjectEx(buttonId=MouseButtons.LEFT, hierarchyPath="//*[@name='Player']", clickFrameCount=5, keys=[KeyCode.SHIFT, KeyCode.CONTROL], keysNumberOfFrames=5)
  ```
- ### <a id='DoubleClick_Vec2'></a> DoubleClick_Vec2(buttonId : `MouseButtons`, position : `Vector2`, clickFrameCount : `int`, timeout : `int`) -> `None`
+ ### <a id='DoubleClickVec2'></a> DoubleClickVec2(buttonId : `MouseButtons`, position : `Vector2`, clickFrameCount : `int`, timeout : `int`) -> `None`
 
  Double-clicks a mouse button at the target coordinates. 
 
@@ -552,7 +576,7 @@ GameDriver.io Unity API Client class.
  # Double-click the left mouse button at (500, 500)
  await api.DoubleClick_XY(buttonId=MouseButtons.LEFT, position=(500, 500), clickFrameCount=5)
  ```
- ### <a id='DoubleClick_XY'></a> DoubleClick_XY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`) -> `None`
+ ### <a id='DoubleClickXY'></a> DoubleClickXY(buttonId : `MouseButtons`, x : `float`, y : `float`, clickFrameCount : `int`, timeout : `int`) -> `None`
 
  Double-clicks a mouse button at the target coordinates. 
 
@@ -1078,7 +1102,7 @@ GameDriver.io Unity API Client class.
  # Stop recieving collision events on the `Player` object
  await api.UnregisterCollisionMonitor(hierarchyPath="//*[@name='Player']")
  ```
- ### <a id='RotateObject_AxisAngle'></a> RotateObject_AxisAngle(hierarchyPath : `str`, xAngle : `float`, yAngle : `float`, zAngle : `float`, relativeTo : `Space`, waitForObject : `bool`, timeout : `int`) -> `None`
+ ### <a id='RotateObjectAxisAngle'></a> RotateObjectAxisAngle(hierarchyPath : `str`, xAngle : `float`, yAngle : `float`, zAngle : `float`, relativeTo : `Space`, waitForObject : `bool`, timeout : `int`) -> `None`
 
  Rotates an object using absolute axis angles. 
 
@@ -1244,31 +1268,7 @@ GameDriver.io Unity API Client class.
  # Tap the screen once at the position of the `TextMeshPro InputField` object
  await api.TapObject(hierarchyPath="//FilterInputTxt[@name='TextMeshPro InputField']")
  ```
- ### <a id='Tap_Vec2'></a> Tap_Vec2(position : `Vector2`, tapCount : `int`, frameCount : `int`, timeout : `int`) -> `bool`
-
- Tap the handheld device at the target position. 
-
-#### Returns
-
- True if successful, False otherwise. 
-
-#### Parameters
-
- - position : `Vector2` -  The position to tap. 
- - tapCount : `int` -  The number of times to tap the object. 
- - frameCount : `int` -  The number of frames to tap the object. 
- - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
-
-
-
-#### Example
-
-
- ```python
- # Tap the screen once at (100, 100)
- await api.Tap_Vec2(position=Vector2(100, 100))
- ```
- ### <a id='Tap_XY'></a> Tap_XY(x : `float`, y : `float`, tapCount : `int`, frameCount : `int`, timeout : `int`) -> `None`
+ ### <a id='TapXY'></a> TapXY(x : `float`, y : `float`, tapCount : `int`, frameCount : `int`, timeout : `int`) -> `None`
 
  Tap the handheld device at the target position. 
 
@@ -1292,6 +1292,30 @@ GameDriver.io Unity API Client class.
  ```python
  # Tap the screen once at (100, 100)
  await api.Tap_XY(x=100, y=100)
+ ```
+ ### <a id='Tap_Vec2'></a> Tap_Vec2(position : `Vector2`, tapCount : `int`, frameCount : `int`, timeout : `int`) -> `bool`
+
+ Tap the handheld device at the target position. 
+
+#### Returns
+
+ True if successful, False otherwise. 
+
+#### Parameters
+
+ - position : `Vector2` -  The position to tap. 
+ - tapCount : `int` -  The number of times to tap the object. 
+ - frameCount : `int` -  The number of frames to tap the object. 
+ - timeout : `int` -  The number of seconds to wait for the command to be processed by the agent. 
+
+
+
+#### Example
+
+
+ ```python
+ # Tap the screen once at (100, 100)
+ await api.Tap_Vec2(position=Vector2(100, 100))
  ```
  ### <a id='TerminateGame'></a> TerminateGame() -> `None`
 
@@ -1505,7 +1529,7 @@ GameDriver.io Unity API Client class.
  # Waits for the `Key` object to exist
  await api.WaitForObject(hierarchyPath="//*[@name='Key']")
  ```
- ### <a id='waitForObjectValue'></a> waitForObjectValue(hierarchyPath : `str`, fieldOrPropertyName : `str`, value : `str`, timeout : `int`) -> `bool`
+ ### <a id='WaitForObjectValue'></a> WaitForObjectValue(hierarchyPath : `str`, fieldOrPropertyName : `str`, value : `str`, timeout : `int`) -> `bool`
 
  Wait for an object to exist and have a specific value for a specified field/property. 
 

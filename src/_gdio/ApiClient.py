@@ -208,31 +208,31 @@ class ApiClient:
 
     @requireClientConnectionAsync
     async def CaptureScreenshot(self,
-            filename          : str,
-            storeInGameFolder : bool = False,
+            _filename          : str = "",
+            _storeInGameFolder : bool = False,
             timeout           : int = 30,
         ) -> t.ByteString:
         '''
         <summary> Capture a screenshot of the currently running game. </summary>
 
-        <param name="filename" type="str"> The absolute path and filename of the screen capture. </param>
-        <param name="storeInGameFolder" type="bool"> Save the screenshot on the device the game is running on rather than returning it to the client. </param>
-        <param name="overwriteExisting" type="bool"> Overwrite if the file already exists. </param>
         <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
 
-        <returns value="str"> The path and filename of the screen capture. </returns>
+        <returns value="ByteString"> The captured image data </returns>
 
         <example>
         ```python
-        await api.CaptureScreenshot(filename="/path/to/file/screenshot.png")
+        img_data = await api.CaptureScreenshot()
+
+        with open("screenshot.png", "wb") as f:
+        \tf.write(img_data)
         ```
         </example>
         '''
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
             GDIOMsg = Messages.Cmd_CaptureScreenshotRequest(
-                StoreInGameFolder = storeInGameFolder,
-                Filename = filename,
+                StoreInGameFolder = _storeInGameFolder,
+                Filename = _filename,
             )
         )
 
@@ -242,7 +242,7 @@ class ApiClient:
         if cmd_CaptureScreenshotResponse.RC == Enums.ResponseCode.ERROR:
             raise Exception(cmd_CaptureScreenshotResponse.ErrorMessage)
 
-        if storeInGameFolder:
+        if _storeInGameFolder:
             return cmd_CaptureScreenshotResponse.ImagePath
         
         return cmd_CaptureScreenshotResponse.ImageData
@@ -266,7 +266,7 @@ class ApiClient:
 
         <example>
         ```python
-        await api.CaptureScreenshot(filename="/path/to/file/screenshot.png")
+        await api.CaptureScreenshotToFile(filename="/path/to/file/screenshot.png")
         ```
         </example>
         '''
