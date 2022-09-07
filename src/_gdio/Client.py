@@ -1,5 +1,7 @@
 from . import ProtocolObjects, Messages, Serializers, Enums
 
+import typing as t
+
 import asyncio, socket, sys
 import msgpack, uuid, json
 import datetime, time
@@ -37,7 +39,16 @@ class Client:
 
         self.GCD = None
 
-    async def _ReadHandler(self, reader=None):
+    async def read_until(self, reader: asyncio.StreamReader, length: int):
+        bytes_read = 0
+        msg_data: t.ByteString = b''
+        while bytes_read < length:
+            msg_data += await reader.read(length - bytes_read)
+            bytes_read = len(msg_data)
+
+        return msg_data
+
+    async def _ReadHandler(self, reader: asyncio.StreamReader = None):
         
         reader = self._reader if reader == None else reader
 
@@ -49,12 +60,12 @@ class Client:
             try:
                 logging.debug('Reading...')
                 msg_length = await reader.read(4)
+                msg_length = int.from_bytes(msg_length[:4], byteorder=BYTE_ORDER, signed=False)
                 msg_crc = await reader.read(4)
-                msg_data = await reader.read(int.from_bytes(msg_length[:4], byteorder=BYTE_ORDER, signed=False))
                 
-                #unpacked = msgpack.unpackb(msg_data, object_hook=Serializers.msgDeserialize)
+                msg_data = await self.read_until(reader, msg_length)
+
                 unpacked = msgpack.unpackb(msg_data)
-                #print(f'\n{unpacked}\n')
                 
                 msg = ProtocolObjects.ProtocolMessage(**unpacked)
                 await self.ProcessMessage(msg)

@@ -1,10 +1,10 @@
-from re import M
 from .Client import Client
 from . import ProtocolObjects, Messages, Enums
 from _gdio import Serializers
 
 from functools import wraps
 
+import typing as t
 import msgpack
 import os
 import asyncio, socket
@@ -210,9 +210,8 @@ class ApiClient:
     async def CaptureScreenshot(self,
             filename          : str,
             storeInGameFolder : bool = False,
-            overwriteExisting : bool = False,
             timeout           : int = 30,
-        ) -> str:
+        ) -> t.ByteString:
         '''
         <summary> Capture a screenshot of the currently running game. </summary>
 
@@ -243,9 +242,35 @@ class ApiClient:
         if cmd_CaptureScreenshotResponse.RC == Enums.ResponseCode.ERROR:
             raise Exception(cmd_CaptureScreenshotResponse.ErrorMessage)
 
-        # TODO: Im not sure if this works properly
         if storeInGameFolder:
             return cmd_CaptureScreenshotResponse.ImagePath
+        
+        return cmd_CaptureScreenshotResponse.ImageData
+
+    @requireClientConnectionAsync
+    async def CaptureScreenshotToFile(self,
+            filename          : str,
+            storeInGameFolder : bool = False,
+            overwriteExisting : bool = False,
+            timeout           : int = 30,
+        ) -> str:
+        '''
+        <summary> Capture a screenshot of the currently running game. </summary>
+
+        <param name="filename" type="str"> The absolute path and filename of the screen capture. </param>
+        <param name="storeInGameFolder" type="bool"> Save the screenshot on the device the game is running on rather than returning it to the client. </param>
+        <param name="overwriteExisting" type="bool"> Overwrite if the file already exists. </param>
+        <param name="timeout" type="int"> The number of seconds to wait for the command to be processed by the agent. </param>
+
+        <returns value="str"> The path and filename of the screen capture. </returns>
+
+        <example>
+        ```python
+        await api.CaptureScreenshot(filename="/path/to/file/screenshot.png")
+        ```
+        </example>
+        '''
+        img_bytes: t.ByteString = await self.CaptureScreenshot(filename, storeInGameFolder, timeout)
 
         abspath = os.path.abspath(filename)
 
@@ -253,7 +278,7 @@ class ApiClient:
             raise OSError(f'Cannot save screenshot to {filename}, file already exists')
         
         with open(abspath, 'wb') as f:
-            f.write(cmd_CaptureScreenshotResponse.ImageData)
+            f.write(img_bytes)
 
         return filename
         
