@@ -1,6 +1,10 @@
 from inspect import isbuiltin
+import logging
+from unittest import result
 from _gdio import GDObjects
 from . import ProtocolObjects
+
+from inspect import getmembers, isclass
 
 import msgpack
 
@@ -35,10 +39,17 @@ class DefaultSerializer:
             return obj
 
     @staticmethod
-    def Unpack(obj: object) -> object:
-        if obj.__module__ == GDObjects.__name__:
-            return obj.from_dict(obj)
+    def Unpack(obj: dict) -> GDObjects.Marshalable:
+        for member in getmembers(GDObjects, isclass):
+            name, cls = member
+            result = None
+            try:
+                result = cls(**obj)
+            except TypeError:
+                pass
 
+            if result:
+                return result
 
     @staticmethod
     def GetType(obj) -> str:

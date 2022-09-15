@@ -1152,7 +1152,10 @@ class ApiClient:
             retval: object  = msgpack.unpackb(cmd_GetObjectValueResponse.Value)
             return Serializers.DefaultSerializer.Unpack(retval)
 
-        return cmd_GetObjectValueResponse.directObject
+        if cmd_GetObjectValueResponse.directObject is not None:
+            return cmd_GetObjectValueResponse.directObject
+
+        return None
 
     @requireClientConnectionAsync
     async def GetObjectFieldValueByName(self,
@@ -1188,14 +1191,17 @@ class ApiClient:
         requestInfo = await asyncio.wait_for(self.client.SendMessage(msg), timeout)
         cmd_GetObjectValueResponse : Messages.Cmd_GetObjectValueResponse = await self.client.GetResult(requestInfo.RequestId)
 
-        if cmd_GetObjectValueResponse.RC != Enums.ResponseCode.INFORMATION:
-            return None
+        if cmd_GetObjectValueResponse.RC == Enums.ResponseCode.ERROR:
+            raise Exception(f'Exception thrown while getting object field value: {cmd_GetObjectValueResponse.ErrorMessage}')
 
         if cmd_GetObjectValueResponse.Value is not None:
-            retval: object  = msgpack.unpackb(cmd_GetObjectValueResponse.Value)
+            retval: object = msgpack.unpackb(cmd_GetObjectValueResponse.Value)
             return Serializers.DefaultSerializer.Unpack(retval)
 
-        return cmd_GetObjectValueResponse.directObject
+        if cmd_GetObjectValueResponse.directObject is not None:
+            return cmd_GetObjectValueResponse.directObject
+
+        return None
 
 
     @requireClientConnectionAsync
