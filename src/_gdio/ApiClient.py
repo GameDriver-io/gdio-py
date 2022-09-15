@@ -1905,8 +1905,8 @@ class ApiClient:
             
         else:
             cmd.SerializedObjectType = Serializers.DefaultSerializer.GetType(value)
-            cmd.Value = Serializers.DefaultSerializer.Pack(value)
-            cmd.CustomSerialization = False
+            cmd.Value = msgpack.packb(Serializers.DefaultSerializer.Pack(value))
+            cmd.CustomSerialization = True
 
         msg = ProtocolObjects.ProtocolMessage(
             ClientUID = self.client.ClientUID,
